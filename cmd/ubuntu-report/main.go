@@ -10,7 +10,7 @@ import (
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	flag "github.com/spf13/pflag"
+	"github.com/spf13/cobra"
 
 	"github.com/ubuntu/ubuntu-report/internal/metrics"
 	"github.com/ubuntu/ubuntu-report/internal/utils"
@@ -20,38 +20,45 @@ func main() {
 	log.SetFormatter(&log.TextFormatter{DisableTimestamp: true})
 	log.SetLevel(log.ErrorLevel)
 
-	flagCollectOnly := flag.BoolP("show-only", "s", false, "only show what would be reported")
-	flagReportYes := flag.BoolP("yes", "y", false, "report automatically metrics without prompting")
-	flagVerbosity := flag.CountP("verbose", "v", "report issue INFO (-v) or DEBUG (-vv) output")
-	flagHelp := flag.BoolP("help", "h", false, "get this help")
-	flagForce := flag.BoolP("force", "f", false, "install if even already reported")
-	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "Usage of %s [flags]:\n", os.Args[0])
-		flag.PrintDefaults()
+	var flagCollectOnly, flagReportYes, flagForce bool
+	var flagVerbosity int
+
+	var rootCmd = &cobra.Command{
+		Use:   "ubuntu-report",
+		Short: "Report metrics from your system, install and upgrades",
+		Long: `This tool will collect and report metrics from current hardware,` +
+			`partition and session information.` + "\n" +
+			`Those information can't be used to identify a single machine and` +
+			`are presented before being sent to the server.`,
+		Run: func(cmd *cobra.Command, args []string) {
+			if flagVerbosity == 1 {
+				log.SetLevel(log.InfoLevel)
+			} else if flagVerbosity > 1 {
+				log.SetFormatter(&log.TextFormatter{})
+				log.SetLevel(log.DebugLevel)
+				log.Debug("verbosity set to debug and will print stacktraces")
+				utils.ErrorFormat = "%+v"
+			}
+
+			if flagCollectOnly && flagReportYes {
+				log.Error("can't use show-only and yes flags together as the first option disable reporting")
+				cmd.Usage()
+				os.Exit(1)
+			}
+
+			if err := runTelemetry(flagCollectOnly, flagReportYes, flagForce, utils.ErrorFormat); err != nil {
+				log.Error(err)
+				os.Exit(1)
+			}
+		},
 	}
 
-	flag.Parse()
-	if *flagHelp {
-		flag.Usage()
-		os.Exit(2)
-	}
+	rootCmd.Flags().BoolVarP(&flagCollectOnly, "show-only", "s", false, "only show what would be reported")
+	rootCmd.Flags().BoolVarP(&flagReportYes, "yes", "y", false, "report automatically metrics without prompting")
+	rootCmd.Flags().CountVarP(&flagVerbosity, "verbose", "v", "report issue INFO (-v) or DEBUG (-vv) output")
+	rootCmd.Flags().BoolVarP(&flagForce, "force", "f", false, "install if even already reported")
 
-	if *flagVerbosity == 1 {
-		log.SetLevel(log.InfoLevel)
-	} else if *flagVerbosity > 1 {
-		log.SetFormatter(&log.TextFormatter{})
-		log.SetLevel(log.DebugLevel)
-		log.Debug("verbosity set to debug and will print stacktraces")
-		utils.ErrorFormat = "%+v"
-	}
-
-	if *flagCollectOnly && *flagReportYes {
-		log.Error("couldn't use show-only and yes flags together as the first option disable reporting")
-		flag.Usage()
-		os.Exit(1)
-	}
-
-	if err := runTelemetry(*flagCollectOnly, *flagReportYes, *flagForce, utils.ErrorFormat); err != nil {
+	if err := rootCmd.Execute(); err != nil {
 		log.Error(err)
 		os.Exit(1)
 	}
