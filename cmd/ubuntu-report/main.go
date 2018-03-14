@@ -14,6 +14,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/ubuntu/ubuntu-report/internal/metrics"
+	"github.com/ubuntu/ubuntu-report/internal/sender"
 	"github.com/ubuntu/ubuntu-report/internal/utils"
 )
 
@@ -138,9 +139,9 @@ func runTelemetry(collectOnly, autoReport, ignorePreviousReport bool) error {
 		log.Debug("report yes flag was set")
 	}
 
-	/*if err := sender.Send(sender.URL, data); err != nil {
-		return errors.Errorf("data were not delivered successfully to metrics server: "+errorFormat, err)
-	}*/
+	if err := sender.Send(sender.GetURL(sender.URL, distro, version), data); err != nil {
+		return errors.Wrapf(err, "data were not delivered successfully to metrics server")
+	}
 
 	return saveMetrics(reportP, data)
 }

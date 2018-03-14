@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"io/ioutil"
 	"net/http"
+	"path"
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
 
+// URL server to send metrics to
 const URL = "https://metrics.ubuntu.com"
 
 // Send to url the json data
@@ -33,4 +35,9 @@ func Send(url string, data []byte) error {
 
 	_, err = ioutil.ReadAll(resp.Body)
 	return errors.Wrap(err, "POST body answer contained an error")
+}
+
+// GetURL with distro and version marshalling
+func GetURL(url, distro, version string) string {
+	return path.Join(url, distro, "desktop", version)
 }
