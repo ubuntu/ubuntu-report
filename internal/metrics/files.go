@@ -15,7 +15,7 @@ import (
 func getVersion(root string) string {
 	v, err := matchFromFile(filepath.Join(root, "etc/os-release"), `^VERSION_ID="(.*)"$`, false)
 	if err != nil {
-		log.Infof("couldn't get version information from os-release: "+utils.ErrorFormat, err)
+		log.Infof("couldn't get version information from os-release: "+utils.ErrFormat, err)
 		return ""
 	}
 	return v
@@ -24,7 +24,7 @@ func getVersion(root string) string {
 func getRAM(root string) string {
 	v, err := matchFromFile(filepath.Join(root, "proc/meminfo"), `^MemTotal: +(\d+) kB$`, false)
 	if err != nil {
-		log.Infof("couldn't get RAM information from meminfo: "+utils.ErrorFormat, err)
+		log.Infof("couldn't get RAM information from meminfo: "+utils.ErrFormat, err)
 		return ""
 	}
 	return v
@@ -33,7 +33,7 @@ func getRAM(root string) string {
 func getTimeZone(root string) string {
 	v, err := getFromFileTrimmed(filepath.Join(root, "etc/timezone"))
 	if err != nil {
-		log.Infof("couldn't get timezone information: "+utils.ErrorFormat, err)
+		log.Infof("couldn't get timezone information: "+utils.ErrFormat, err)
 		return ""
 	}
 	return v
@@ -42,7 +42,7 @@ func getTimeZone(root string) string {
 func getAutologin(root string) bool {
 	v, err := matchFromFile(filepath.Join(root, "etc/gdm3/custom.conf"), `^AutomaticLoginEnable ?= ?(true)$`, true)
 	if err != nil {
-		log.Infof("couldn't get autologin information from gdm: "+utils.ErrorFormat, err)
+		log.Infof("couldn't get autologin information from gdm: "+utils.ErrFormat, err)
 		return false
 	}
 	if strings.ToLower(v) != "true" {
@@ -54,12 +54,12 @@ func getAutologin(root string) bool {
 func getOEM(root string) (string, string) {
 	v, err := getFromFileTrimmed(filepath.Join(root, "sys/class/dmi/id/chassis_vendor"))
 	if err != nil {
-		log.Infof("couldn't get chassis vendor information: "+utils.ErrorFormat, err)
+		log.Infof("couldn't get chassis vendor information: "+utils.ErrFormat, err)
 		return "", ""
 	}
 	p, err := getFromFileTrimmed(filepath.Join(root, "sys/class/dmi/id/product_name"))
 	if err != nil {
-		log.Infof("couldn't get chassis product name information: "+utils.ErrorFormat, err)
+		log.Infof("couldn't get chassis product name information: "+utils.ErrFormat, err)
 		return "", ""
 	}
 	return v, p
@@ -72,7 +72,7 @@ func getCPUInfo(root string) []cpuInfo {
 	f, err := os.Open(p)
 	if err != nil {
 		err = errors.Wrapf(err, "couldn't open %s", p)
-		log.Infof(utils.ErrorFormat, err)
+		log.Infof(utils.ErrFormat, err)
 		return nil
 	}
 	defer f.Close()
@@ -124,12 +124,12 @@ func getCPUInfo(root string) []cpuInfo {
 func getBIOS(root string) (string, string) {
 	vd, err := getFromFileTrimmed(filepath.Join(root, "sys/class/dmi/id/bios_vendor"))
 	if err != nil {
-		log.Infof("couldn't get bios vendor information: "+utils.ErrorFormat, err)
+		log.Infof("couldn't get bios vendor information: "+utils.ErrFormat, err)
 		return "", ""
 	}
 	ve, err := getFromFileTrimmed(filepath.Join(root, "sys/class/dmi/id/bios_version"))
 	if err != nil {
-		log.Infof("couldn't get bios version: "+utils.ErrorFormat, err)
+		log.Infof("couldn't get bios version: "+utils.ErrFormat, err)
 		return "", ""
 	}
 	return vd, ve

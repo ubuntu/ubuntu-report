@@ -17,7 +17,7 @@ func (m Metrics) getGPU() []gpuInfo {
 
 	results, err := filterAll(r, `^.* 0300: (.*) \(rev .*\)$`)
 	if err != nil {
-		log.Infof("couldn't get GPU info: "+utils.ErrorFormat, err)
+		log.Infof("couldn't get GPU info: "+utils.ErrFormat, err)
 		return nil
 	}
 
@@ -40,7 +40,7 @@ func (m Metrics) getScreensInfo() []screenInfo {
 
 	results, err := filterAll(r, `^ +(.*)\*\+$`)
 	if err != nil {
-		log.Infof("couldn't get Screen info: "+utils.ErrorFormat, err)
+		log.Infof("couldn't get Screen info: "+utils.ErrFormat, err)
 		return nil
 	}
 
@@ -63,7 +63,7 @@ func (m Metrics) getPartitions() []string {
 
 	results, err := filterAll(r, `^/dev/([^\s]+ +[^\s]*).*$`)
 	if err != nil {
-		log.Infof("couldn't get Disk info: "+utils.ErrorFormat, err)
+		log.Infof("couldn't get Disk info: "+utils.ErrFormat, err)
 		return nil
 	}
 

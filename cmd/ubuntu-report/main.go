@@ -47,7 +47,7 @@ func generateRootCmd() *cobra.Command {
 				log.SetFormatter(&log.TextFormatter{})
 				log.SetLevel(log.DebugLevel)
 				log.Debug("verbosity set to debug and will print stacktraces")
-				utils.ErrorFormat = "%+v"
+				utils.ErrFormat = "%+v"
 			}
 
 			if flagCollectOnly && flagReportYes {
@@ -57,7 +57,7 @@ func generateRootCmd() *cobra.Command {
 			}
 
 			if err := runTelemetry(flagCollectOnly, flagReportYes, flagForce); err != nil {
-				log.Errorf(utils.ErrorFormat, err)
+				log.Errorf(utils.ErrFormat, err)
 				os.Exit(1)
 			}
 		},

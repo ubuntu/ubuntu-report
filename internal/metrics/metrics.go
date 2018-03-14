@@ -95,7 +95,7 @@ func (m Metrics) Collect() ([]byte, error) {
 func installerInfo(root string) *json.RawMessage {
 	b, err := getFromFile(filepath.Join(root, installerLogsPath))
 	if err != nil {
-		log.Infof("no installer data found: "+utils.ErrorFormat, err)
+		log.Infof("no installer data found: "+utils.ErrFormat, err)
 		b = []byte("{}")
 	}
 	if !json.Valid(b) {
@@ -110,7 +110,7 @@ func installerInfo(root string) *json.RawMessage {
 func upgradeInfo(root string) *json.RawMessage {
 	b, err := getFromFile(filepath.Join(root, upgradeLogsPath))
 	if err != nil {
-		log.Infof("no upgrade data found: "+utils.ErrorFormat, err)
+		log.Infof("no upgrade data found: "+utils.ErrFormat, err)
 		b = []byte("{}")
 	}
 	if !json.Valid(b) {

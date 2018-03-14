@@ -15,8 +15,9 @@ const (
 var (
 	reportPath = filepath.Join("ubuntu-report", "report")
 
-	// ErrorFormat used to print debug messages
-	ErrorFormat = "%v"
+	// ErrFormat used to print debug messages.
+	// Only for log.() msg, not errors.() error wrapping!
+	ErrFormat = "%v"
 )
 
 // ReportPath of last saved report
