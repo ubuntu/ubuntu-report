@@ -1,10 +1,13 @@
 package metrics
 
 import (
+	"bufio"
 	"encoding/json"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
+	"strings"
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -40,6 +43,41 @@ func New(options ...func(*Metrics) error) (Metrics, error) {
 	}
 
 	return m, nil
+}
+
+// GetIDS returns distro and version information
+func (m Metrics) GetIDS() (string, string, error) {
+	p := filepath.Join(m.root, "etc", "os-release")
+	f, err := os.Open(p)
+	if err != nil {
+		return "", "", errors.Wrapf(err, "couldn't open %s", p)
+	}
+	defer f.Close()
+
+	scanner := bufio.NewScanner(f)
+	dRe := regexp.MustCompile(`^ID=(.*)$`)
+	vRe := regexp.MustCompile(`^VERSION_ID="(.*)"$`)
+	var distro, version string
+	for scanner.Scan() {
+		v := dRe.FindStringSubmatch(scanner.Text())
+		if v != nil {
+			distro = strings.TrimSpace(v[1])
+		}
+		v = vRe.FindStringSubmatch(scanner.Text())
+		if v != nil {
+			version = strings.TrimSpace(v[1])
+		}
+	}
+
+	if err := scanner.Err(); (distro == "" || version == "") && err != nil {
+		return "", "", errors.Wrap(err, "error while scanning")
+	}
+
+	if distro == "" || version == "" {
+		return "", "", errors.Errorf("distribution '%s' or version '%s' information missing", distro, version)
+	}
+
+	return distro, version, nil
 }
 
 func setCommand(cmds ...string) *exec.Cmd {

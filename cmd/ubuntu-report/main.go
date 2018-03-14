@@ -73,8 +73,16 @@ func generateRootCmd() *cobra.Command {
 
 func runTelemetry(collectOnly, autoReport, ignorePreviousReport bool) error {
 
+	m, err := metrics.New()
+	if err != nil {
+		return errors.Wrapf(err, "couldn't create a metric collector")
+	}
+	distro, version, err := m.GetIDS()
+	if err != nil {
+		return errors.Wrapf(err, "couldn't get mandatory information")
+	}
 	// this error isn't a stopping us from reporting
-	reportP, err := utils.ReportPath()
+	reportP, err := utils.ReportPath(distro, version)
 	if err != nil {
 		return errors.Wrapf(err, "couldn't get where to save reported metrics on disk")
 	}
@@ -85,11 +93,6 @@ func runTelemetry(collectOnly, autoReport, ignorePreviousReport bool) error {
 				"please use the --force flag if you really want to report them again.", reportP)
 		}
 		log.Debug("ignore previous report flag was set")
-	}
-
-	m, err := metrics.New()
-	if err != nil {
-		return errors.Wrapf(err, "couldn't create a metric collector")
 	}
 
 	data, err := m.Collect()

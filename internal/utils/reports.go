@@ -10,23 +10,23 @@ import (
 
 const (
 	defaultCacheDir = ".cache"
+	reportDir       = "ubuntu-report"
 )
 
 var (
-	reportPath = filepath.Join("ubuntu-report", "report")
-
 	// ErrFormat used to print debug messages.
 	// Only for log.() msg, not errors.() error wrapping!
 	ErrFormat = "%v"
 )
 
 // ReportPath of last saved report
-func ReportPath() (string, error) {
+func ReportPath(distro, version string) (string, error) {
+	// TODO: report path per VERSION
 	d, err := cacheDir()
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(d, reportPath), nil
+	return filepath.Join(d, reportDir, distro+"."+version), nil
 }
 
 func cacheDir() (string, error) {
