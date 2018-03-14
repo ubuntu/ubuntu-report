@@ -1,5 +1,6 @@
-# Generated binaries
+# Generated binaries and corresponding assets
 cmd/ubuntu-report/ubuntu-report
+*/*/build
 
 # Binaries for programs and plugins
 *.so
