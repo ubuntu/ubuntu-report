@@ -64,7 +64,7 @@ func generateRootCmd() *cobra.Command {
 
 	rootCmd.Flags().BoolVarP(&flagCollectOnly, "show-only", "s", false, "only show what would be reported")
 	rootCmd.Flags().BoolVarP(&flagReportYes, "yes", "y", false, "report automatically metrics without prompting")
-	rootCmd.Flags().CountVarP(&flagVerbosity, "verbose", "v", "report issue INFO (-v) or DEBUG (-vv) output")
+	rootCmd.Flags().CountVarP(&flagVerbosity, "verbose", "v", "issue INFO (-v) and DEBUG (-vv) output")
 	rootCmd.Flags().BoolVarP(&flagForce, "force", "f", false, "install if even already reported")
 
 	return rootCmd
