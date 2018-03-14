@@ -10,10 +10,10 @@ import (
 	"github.com/ubuntu/ubuntu-report/internal/utils"
 )
 
-func getGPU() []gpuInfo {
+func (m Metrics) getGPU() []gpuInfo {
 	var gpus []gpuInfo
 
-	r := runCmd("lspci", "-n")
+	r := runCmd(m.gpuInfoCmd)
 
 	results, err := filterAll(r, `^.* 0300: (.*) \(rev .*\)$`)
 	if err != nil {
@@ -33,10 +33,10 @@ func getGPU() []gpuInfo {
 	return gpus
 }
 
-func getScreensInfo() []screenInfo {
+func (m Metrics) getScreensInfo() []screenInfo {
 	var screens []screenInfo
 
-	r := runCmd("xrandr")
+	r := runCmd(m.screenInfoCmd)
 
 	results, err := filterAll(r, `^ +(.*)\*\+$`)
 	if err != nil {
@@ -56,10 +56,10 @@ func getScreensInfo() []screenInfo {
 	return screens
 }
 
-func getPartitions() []string {
+func (m Metrics) getPartitions() []string {
 	var sizes []string
 
-	r := runCmd("df", "-h")
+	r := runCmd(m.spaceInfoCmd)
 
 	results, err := filterAll(r, `^/dev/([^\s]+ +[^\s]*).*$`)
 	if err != nil {
@@ -83,21 +83,14 @@ func getPartitions() []string {
 	return sizes
 }
 
-func runCmd(cmds ...string) io.Reader {
-	var cmd *exec.Cmd
-	if len(cmds) == 1 {
-		cmd = exec.Command(cmds[0])
-	} else {
-		cmd = exec.Command(cmds[0], cmds[1:]...)
-	}
-
+func runCmd(cmd *exec.Cmd) io.Reader {
 	pr, pw := io.Pipe()
 	cmd.Stdout = pw
 
 	go func() {
 		err := cmd.Run()
 		if err != nil {
-			pw.CloseWithError(errors.Wrapf(err, "Running %s return an error", cmds))
+			pw.CloseWithError(errors.Wrapf(err, "'%s' return an error", cmd.Args))
 			return
 		}
 		pw.Close()
