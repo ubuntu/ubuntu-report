@@ -54,27 +54,27 @@ func (m Metrics) Collect() ([]byte, error) {
 	log.Debugf("Collecting metrics on system with root set to %s", m.root)
 	r := metrics{}
 
-	r.Version = getVersion(m.root)
+	r.Version = m.getVersion()
 
-	vendor, product := getOEM(m.root)
+	vendor, product := m.getOEM()
 	r.OEM = struct {
 		Vendor  string
 		Product string
 	}{vendor, product}
-	vendor, version := getBIOS(m.root)
+	vendor, version := m.getBIOS()
 	r.BIOS = struct {
 		Vendor  string
 		Version string
 	}{vendor, version}
 
-	r.CPU = getCPUInfo(m.root)
+	r.CPU = m.getCPUInfo()
 	r.GPU = m.getGPU()
-	r.RAM = getRAM(m.root)
+	r.RAM = m.getRAM()
 	r.Partitions = m.getPartitions()
 	r.Screens = m.getScreensInfo()
 
-	r.Autologin = getAutologin(m.root)
-	r.LivePatch = getLivePatch(m.root)
+	r.Autologin = m.getAutologin()
+	r.LivePatch = m.getLivePatch()
 	r.Session = struct {
 		DE   string
 		Name string
@@ -83,17 +83,17 @@ func (m Metrics) Collect() ([]byte, error) {
 		os.Getenv("XDG_CURRENT_DESKTOP"),
 		os.Getenv("XDG_SESSION_DESKTOP"),
 		os.Getenv("XDG_SESSION_TYPE")}
-	r.Timezone = getTimeZone(m.root)
+	r.Timezone = m.getTimeZone()
 
-	r.Install = installerInfo(m.root)
-	r.Upgrade = upgradeInfo(m.root)
+	r.Install = m.installerInfo()
+	r.Upgrade = m.upgradeInfo()
 
 	d, err := json.Marshal(r)
 	return d, errors.Wrapf(err, "can't be converted to a valid json")
 }
 
-func installerInfo(root string) *json.RawMessage {
-	b, err := getFromFile(filepath.Join(root, installerLogsPath))
+func (m Metrics) installerInfo() *json.RawMessage {
+	b, err := getFromFile(filepath.Join(m.root, installerLogsPath))
 	if err != nil {
 		log.Infof("no installer data found: "+utils.ErrFormat, err)
 		b = []byte("{}")
@@ -107,8 +107,8 @@ func installerInfo(root string) *json.RawMessage {
 	return &c
 }
 
-func upgradeInfo(root string) *json.RawMessage {
-	b, err := getFromFile(filepath.Join(root, upgradeLogsPath))
+func (m Metrics) upgradeInfo() *json.RawMessage {
+	b, err := getFromFile(filepath.Join(m.root, upgradeLogsPath))
 	if err != nil {
 		log.Infof("no upgrade data found: "+utils.ErrFormat, err)
 		b = []byte("{}")

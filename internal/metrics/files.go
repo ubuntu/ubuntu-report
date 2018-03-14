@@ -12,8 +12,8 @@ import (
 	"github.com/ubuntu/ubuntu-report/internal/utils"
 )
 
-func getVersion(root string) string {
-	v, err := matchFromFile(filepath.Join(root, "etc/os-release"), `^VERSION_ID="(.*)"$`, false)
+func (m Metrics) getVersion() string {
+	v, err := matchFromFile(filepath.Join(m.root, "etc/os-release"), `^VERSION_ID="(.*)"$`, false)
 	if err != nil {
 		log.Infof("couldn't get version information from os-release: "+utils.ErrFormat, err)
 		return ""
@@ -21,8 +21,8 @@ func getVersion(root string) string {
 	return v
 }
 
-func getRAM(root string) string {
-	v, err := matchFromFile(filepath.Join(root, "proc/meminfo"), `^MemTotal: +(\d+) kB$`, false)
+func (m Metrics) getRAM() string {
+	v, err := matchFromFile(filepath.Join(m.root, "proc/meminfo"), `^MemTotal: +(\d+) kB$`, false)
 	if err != nil {
 		log.Infof("couldn't get RAM information from meminfo: "+utils.ErrFormat, err)
 		return ""
@@ -30,8 +30,8 @@ func getRAM(root string) string {
 	return v
 }
 
-func getTimeZone(root string) string {
-	v, err := getFromFileTrimmed(filepath.Join(root, "etc/timezone"))
+func (m Metrics) getTimeZone() string {
+	v, err := getFromFileTrimmed(filepath.Join(m.root, "etc/timezone"))
 	if err != nil {
 		log.Infof("couldn't get timezone information: "+utils.ErrFormat, err)
 		return ""
@@ -39,8 +39,8 @@ func getTimeZone(root string) string {
 	return v
 }
 
-func getAutologin(root string) bool {
-	v, err := matchFromFile(filepath.Join(root, "etc/gdm3/custom.conf"), `^AutomaticLoginEnable ?= ?(true)$`, true)
+func (m Metrics) getAutologin() bool {
+	v, err := matchFromFile(filepath.Join(m.root, "etc/gdm3/custom.conf"), `^AutomaticLoginEnable ?= ?(true)$`, true)
 	if err != nil {
 		log.Infof("couldn't get autologin information from gdm: "+utils.ErrFormat, err)
 		return false
@@ -51,13 +51,13 @@ func getAutologin(root string) bool {
 	return true
 }
 
-func getOEM(root string) (string, string) {
-	v, err := getFromFileTrimmed(filepath.Join(root, "sys/class/dmi/id/chassis_vendor"))
+func (m Metrics) getOEM() (string, string) {
+	v, err := getFromFileTrimmed(filepath.Join(m.root, "sys/class/dmi/id/chassis_vendor"))
 	if err != nil {
 		log.Infof("couldn't get chassis vendor information: "+utils.ErrFormat, err)
 		return "", ""
 	}
-	p, err := getFromFileTrimmed(filepath.Join(root, "sys/class/dmi/id/product_name"))
+	p, err := getFromFileTrimmed(filepath.Join(m.root, "sys/class/dmi/id/product_name"))
 	if err != nil {
 		log.Infof("couldn't get chassis product name information: "+utils.ErrFormat, err)
 		return "", ""
@@ -65,10 +65,10 @@ func getOEM(root string) (string, string) {
 	return v, p
 }
 
-func getCPUInfo(root string) []cpuInfo {
+func (m Metrics) getCPUInfo() []cpuInfo {
 	indexedCPUInfo := make(map[string]cpuInfo)
 
-	p := filepath.Join(root, "proc/cpuinfo")
+	p := filepath.Join(m.root, "proc/cpuinfo")
 	f, err := os.Open(p)
 	if err != nil {
 		err = errors.Wrapf(err, "couldn't open %s", p)
@@ -121,13 +121,13 @@ func getCPUInfo(root string) []cpuInfo {
 	return r
 }
 
-func getBIOS(root string) (string, string) {
-	vd, err := getFromFileTrimmed(filepath.Join(root, "sys/class/dmi/id/bios_vendor"))
+func (m Metrics) getBIOS() (string, string) {
+	vd, err := getFromFileTrimmed(filepath.Join(m.root, "sys/class/dmi/id/bios_vendor"))
 	if err != nil {
 		log.Infof("couldn't get bios vendor information: "+utils.ErrFormat, err)
 		return "", ""
 	}
-	ve, err := getFromFileTrimmed(filepath.Join(root, "sys/class/dmi/id/bios_version"))
+	ve, err := getFromFileTrimmed(filepath.Join(m.root, "sys/class/dmi/id/bios_version"))
 	if err != nil {
 		log.Infof("couldn't get bios version: "+utils.ErrFormat, err)
 		return "", ""
@@ -135,8 +135,8 @@ func getBIOS(root string) (string, string) {
 	return vd, ve
 }
 
-func getLivePatch(root string) bool {
-	if _, err := os.Stat(filepath.Join(root, "var/snap/canonical-livepatch/common/machine-token")); err != nil {
+func (m Metrics) getLivePatch() bool {
+	if _, err := os.Stat(filepath.Join(m.root, "var/snap/canonical-livepatch/common/machine-token")); err != nil {
 		return false
 	}
 	return true
