@@ -82,14 +82,14 @@ func runTelemetry(collectOnly, autoReport, ignorePreviousReport bool) error {
 	if err != nil {
 		return errors.Wrapf(err, "couldn't get mandatory information")
 	}
-	// this error isn't a stopping us from reporting
+
 	reportP, err := utils.ReportPath(distro, version)
 	if err != nil {
 		return errors.Wrapf(err, "couldn't get where to save reported metrics on disk")
 	}
 	if _, err := os.Stat(reportP); !os.IsNotExist(err) {
 		log.Infof("previous report found in %s", reportP)
-		if !ignorePreviousReport {
+		if !ignorePreviousReport && !collectOnly {
 			return errors.Errorf("metrics from this machine have already been reported and can be found in: %s, "+
 				"please use the --force flag if you really want to report them again.", reportP)
 		}
