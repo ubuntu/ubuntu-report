@@ -19,8 +19,8 @@ type metrics struct {
 	Partitions []string
 	Screens    []screenInfo
 
-	Autologin bool
-	LivePatch bool
+	Autologin string
+	LivePatch string
 	Session   struct {
 		DE   string
 		Name string

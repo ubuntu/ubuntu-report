@@ -39,16 +39,16 @@ func (m Metrics) getTimeZone() string {
 	return v
 }
 
-func (m Metrics) getAutologin() bool {
+func (m Metrics) getAutologin() string {
 	v, err := matchFromFile(filepath.Join(m.root, "etc/gdm3/custom.conf"), `^AutomaticLoginEnable ?= ?(true)$`, true)
 	if err != nil {
 		log.Infof("couldn't get autologin information from gdm: "+utils.ErrFormat, err)
-		return false
+		return ""
 	}
 	if strings.ToLower(v) != "true" {
-		return false
+		return "false"
 	}
-	return true
+	return "true"
 }
 
 func (m Metrics) getOEM() (string, string) {
@@ -135,11 +135,11 @@ func (m Metrics) getBIOS() (string, string) {
 	return vd, ve
 }
 
-func (m Metrics) getLivePatch() bool {
+func (m Metrics) getLivePatch() string {
 	if _, err := os.Stat(filepath.Join(m.root, "var/snap/canonical-livepatch/common/machine-token")); err != nil {
-		return false
+		return "false"
 	}
-	return true
+	return "true"
 }
 
 func matchFromFile(p, regex string, notFoundOk bool) (string, error) {
