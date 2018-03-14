@@ -50,7 +50,7 @@ func getHomeDir() (string, error) {
 	if d == "" {
 		usr, err := user.Current()
 		if err != nil {
-			return "", errors.Wrapf(err, "can't get home directory")
+			return "", errors.Wrapf(err, "couldn't get user home directory")
 		}
 		d = usr.HomeDir
 	}

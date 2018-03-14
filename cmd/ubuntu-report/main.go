@@ -55,8 +55,8 @@ func generateRootCmd() *cobra.Command {
 				os.Exit(1)
 			}
 
-			if err := runTelemetry(flagCollectOnly, flagReportYes, flagForce, utils.ErrorFormat); err != nil {
-				log.Error(err)
+			if err := runTelemetry(flagCollectOnly, flagReportYes, flagForce); err != nil {
+				log.Errorf(utils.ErrorFormat, err)
 				os.Exit(1)
 			}
 		},
@@ -70,27 +70,30 @@ func generateRootCmd() *cobra.Command {
 	return rootCmd
 }
 
-func runTelemetry(collectOnly, autoReport, ignorePreviousReport bool, errorFormat string) error {
+func runTelemetry(collectOnly, autoReport, ignorePreviousReport bool) error {
 
 	// this error isn't a stopping us from reporting
-	p, _ := utils.ReportPath()
-	if _, err := os.Stat(p); !os.IsNotExist(err) {
-		log.Infof("previous report found in %s", p)
+	reportP, err := utils.ReportPath()
+	if err != nil {
+		return errors.Wrapf(err, "couldn't get where to save reported metrics on disk")
+	}
+	if _, err := os.Stat(reportP); !os.IsNotExist(err) {
+		log.Infof("previous report found in %s", reportP)
 		if !ignorePreviousReport {
 			return errors.Errorf("metrics from this machine have already been reported and can be found in: %s, "+
-				"please use the --force flag if you really want to report them again.", p)
+				"please use the --force flag if you really want to report them again.", reportP)
 		}
 		log.Debug("ignore previous report flag was set")
 	}
 
 	m, err := metrics.New()
 	if err != nil {
-		return errors.Errorf("couldn't create a metric collector: "+errorFormat, err)
+		return errors.Wrapf(err, "couldn't create a metric collector")
 	}
 
 	data, err := m.Collect()
 	if err != nil {
-		return errors.Errorf("couldn't collect system minimal info: "+errorFormat, err)
+		return errors.Wrapf(err, "couldn't collect system minimal info")
 	}
 
 	if !collectOnly {
@@ -98,7 +101,7 @@ func runTelemetry(collectOnly, autoReport, ignorePreviousReport bool, errorForma
 	}
 
 	if err := displayToUser(data); err != nil {
-		return errors.Errorf("couldn't prettify json data: "+errorFormat, err)
+		return errors.Wrapf(err, "couldn't prettify json data")
 	}
 
 	if collectOnly {
@@ -136,10 +139,10 @@ func runTelemetry(collectOnly, autoReport, ignorePreviousReport bool, errorForma
 	}*/
 
 	if p, err = utils.ReportPath(); err != nil {
-		return errors.Errorf("couldn't get where to save reported metrics on disk: "+errorFormat, err)
+		return errors.Wrapf(err, "couldn't get where to save reported metrics on disk")
 	}
 	if err := ioutil.WriteFile(p, data, 0666); err != nil {
-		return errors.Errorf("couldn't save reported metrics on disk: "+errorFormat, err)
+		return errors.Wrapf(err, "couldn't save reported metrics on disk")
 	}
 
 	return nil
