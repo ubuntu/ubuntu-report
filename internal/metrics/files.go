@@ -135,6 +135,13 @@ func getBIOS(root string) (string, string) {
 	return vd, ve
 }
 
+func getLivePatch(root string) bool {
+	if _, err := os.Stat(filepath.Join(root, "var/snap/canonical-livepatch/common/machine-token")); err != nil {
+		return false
+	}
+	return true
+}
+
 func matchFromFile(p, regex string, notFoundOk bool) (string, error) {
 	f, err := os.Open(p)
 	if err != nil {

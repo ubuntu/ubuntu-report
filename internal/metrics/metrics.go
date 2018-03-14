@@ -74,7 +74,7 @@ func (m Metrics) Collect() ([]byte, error) {
 	r.Screens = m.getScreensInfo()
 
 	r.Autologin = getAutologin(m.root)
-	// TODO: LivePatch
+	r.LivePatch = getLivePatch(m.root)
 	r.Session = struct {
 		DE   string
 		Name string
