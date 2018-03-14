@@ -20,6 +20,15 @@ func main() {
 	log.SetFormatter(&log.TextFormatter{DisableTimestamp: true})
 	log.SetLevel(log.ErrorLevel)
 
+	rootCmd := generateRootCmd()
+
+	if err := rootCmd.Execute(); err != nil {
+		log.Error(err)
+		os.Exit(1)
+	}
+}
+
+func generateRootCmd() *cobra.Command {
 	var flagCollectOnly, flagReportYes, flagForce bool
 	var flagVerbosity int
 
@@ -58,10 +67,7 @@ func main() {
 	rootCmd.Flags().CountVarP(&flagVerbosity, "verbose", "v", "report issue INFO (-v) or DEBUG (-vv) output")
 	rootCmd.Flags().BoolVarP(&flagForce, "force", "f", false, "install if even already reported")
 
-	if err := rootCmd.Execute(); err != nil {
-		log.Error(err)
-		os.Exit(1)
-	}
+	return rootCmd
 }
 
 func runTelemetry(collectOnly, autoReport, ignorePreviousReport bool, errorFormat string) error {
