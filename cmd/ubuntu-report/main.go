@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -138,14 +139,7 @@ func runTelemetry(collectOnly, autoReport, ignorePreviousReport bool) error {
 		return errors.Errorf("data were not delivered successfully to metrics server: "+errorFormat, err)
 	}*/
 
-	if p, err = utils.ReportPath(); err != nil {
-		return errors.Wrapf(err, "couldn't get where to save reported metrics on disk")
-	}
-	if err := ioutil.WriteFile(p, data, 0666); err != nil {
-		return errors.Wrapf(err, "couldn't save reported metrics on disk")
-	}
-
-	return nil
+	return saveMetrics(reportP, data)
 }
 
 func displayToUser(d []byte) error {
@@ -157,5 +151,20 @@ func displayToUser(d []byte) error {
 	}
 	os.Stdout.Write(b)
 	fmt.Println()
+	return nil
+}
+
+func saveMetrics(p string, data []byte) error {
+	log.Debugf("save sent metrics to %s", p)
+
+	d := filepath.Dir(p)
+	if err := os.MkdirAll(d, 0700); err != nil {
+		return errors.Wrap(err, "couldn't create parent directory to save reported metrics")
+	}
+
+	if err := ioutil.WriteFile(p, data, 0666); err != nil {
+		return errors.Wrap(err, "couldn't save reported metrics on disk")
+	}
+
 	return nil
 }
