@@ -3,6 +3,7 @@ package metrics_test
 import (
 	"testing"
 
+	"github.com/ubuntu/ubuntu-report/internal/helper"
 	"github.com/ubuntu/ubuntu-report/internal/metrics"
 )
 
@@ -31,6 +32,7 @@ func TestGetIDS(t *testing.T) {
 		tc := tc // capture range variable for parallel execution
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
+			a := helper.Asserter{T: t}
 
 			m, err := metrics.New(metrics.WithRootAt(tc.root))
 			if err != nil {
@@ -38,19 +40,9 @@ func TestGetIDS(t *testing.T) {
 			}
 			d, v, err := m.GetIDS()
 
-			if err != nil && !tc.wantErr {
-				t.Fatal("got an unexpected err:", err)
-			}
-			if err == nil && tc.wantErr {
-				t.Error("expected an error and got none")
-			}
-
-			if d != tc.wantDistro {
-				t.Errorf("got for distro: %s; want %s", d, tc.wantDistro)
-			}
-			if v != tc.wantVersion {
-				t.Errorf("got for version: %s; want %s", v, tc.wantVersion)
-			}
+			a.CheckWantedErr(err, tc.wantErr)
+			a.Equal(d, tc.wantDistro)
+			a.Equal(v, tc.wantVersion)
 		})
 	}
 }

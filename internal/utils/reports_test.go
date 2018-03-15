@@ -5,6 +5,7 @@ import (
 	"os/user"
 	"testing"
 
+	"github.com/ubuntu/ubuntu-report/internal/helper"
 	"github.com/ubuntu/ubuntu-report/internal/utils"
 )
 
@@ -37,18 +38,12 @@ func TestReportPath(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			defer changeEnv(t, "HOME", tc.home)()
 			defer changeEnv(t, "XDG_CACHE_HOME", tc.xdg_cache_dir)()
+			a := helper.Asserter{T: t}
 
 			got, err := utils.ReportPath(tc.distro, tc.version)
 
-			if err != nil && !tc.wantErr {
-				t.Fatal("got an unexpected err:", err)
-			}
-			if err == nil && tc.wantErr {
-				t.Error("expected an error and got none")
-			}
-			if got != tc.want {
-				t.Errorf("got %s; want %s", got, tc.want)
-			}
+			a.CheckWantedErr(err, tc.wantErr)
+			a.Equal(got, tc.want)
 		})
 	}
 }

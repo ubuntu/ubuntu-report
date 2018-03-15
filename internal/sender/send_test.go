@@ -5,6 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/ubuntu/ubuntu-report/internal/helper"
 	"github.com/ubuntu/ubuntu-report/internal/sender"
 )
 
@@ -36,18 +37,15 @@ func TestSend(t *testing.T) {
 		tc := tc // capture range variable for parallel execution
 		t.Run(string(tc.status), func(t *testing.T) {
 			t.Parallel()
+			a := helper.Asserter{T: t}
 
 			status := statusHandler(tc.status)
 			ts := httptest.NewServer(&status)
 			defer ts.Close()
 
 			err := sender.Send(ts.URL, []byte("some content"))
-			if err != nil && !tc.wantErr {
-				t.Fatal("got an unexpected err:", err)
-			}
-			if err == nil && tc.wantErr {
-				t.Error("expected an error and got none")
-			}
+
+			a.CheckWantedErr(err, tc.wantErr)
 		})
 	}
 }
