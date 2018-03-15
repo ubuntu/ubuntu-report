@@ -35,11 +35,7 @@ func TestInstallerInfo(t *testing.T) {
 			t.Parallel()
 			a := helper.Asserter{T: t}
 
-			m, err := New(WithRootAt(tc.root))
-			if err != nil {
-				t.Fatal("can't create metrics object:", err)
-			}
-
+			m := newTestMetrics(t, WithRootAt(tc.root))
 			got := []byte(*m.installerInfo())
 			want := helper.LoadOrUpdateGolden(path.Join(m.root, "gold", "intallerInfo"), got, *update, t)
 
@@ -66,11 +62,7 @@ func TestUpgradeInfo(t *testing.T) {
 			t.Parallel()
 			a := helper.Asserter{T: t}
 
-			m, err := New(WithRootAt(tc.root))
-			if err != nil {
-				t.Fatal("can't create metrics object:", err)
-			}
-
+			m := newTestMetrics(t, WithRootAt(tc.root))
 			got := []byte(*m.upgradeInfo())
 			want := helper.LoadOrUpdateGolden(path.Join(m.root, "gold", "upgradeInfo"), got, *update, t)
 
@@ -99,14 +91,19 @@ func TestGetVersion(t *testing.T) {
 			t.Parallel()
 			a := helper.Asserter{T: t}
 
-			m, err := New(WithRootAt(tc.root))
-			if err != nil {
-				t.Fatal("can't create metrics object:", err)
-			}
-
+			m := newTestMetrics(t, WithRootAt(tc.root))
 			got := m.getVersion()
 
 			a.Equal(got, tc.want)
 		})
 	}
+}
+
+func newTestMetrics(t *testing.T, fixtures ...func(m *Metrics) error) Metrics {
+	t.Helper()
+	m, err := New(fixtures...)
+	if err != nil {
+		t.Fatal("can't create metrics object", err)
+	}
+	return m
 }

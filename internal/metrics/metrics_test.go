@@ -34,10 +34,7 @@ func TestGetIDS(t *testing.T) {
 			t.Parallel()
 			a := helper.Asserter{T: t}
 
-			m, err := metrics.New(metrics.WithRootAt(tc.root))
-			if err != nil {
-				t.Fatal("can't create metrics object", err)
-			}
+			m := newTestMetrics(t, metrics.WithRootAt(tc.root))
 			d, v, err := m.GetIDS()
 
 			a.CheckWantedErr(err, tc.wantErr)
@@ -45,4 +42,13 @@ func TestGetIDS(t *testing.T) {
 			a.Equal(v, tc.wantVersion)
 		})
 	}
+}
+
+func newTestMetrics(t *testing.T, fixtures ...func(m *metrics.Metrics) error) metrics.Metrics {
+	t.Helper()
+	m, err := metrics.New(fixtures...)
+	if err != nil {
+		t.Fatal("can't create metrics object", err)
+	}
+	return m
 }
