@@ -46,3 +46,33 @@ func TestInstallerInfo(t *testing.T) {
 		})
 	}
 }
+
+func TestUpgradeInfo(t *testing.T) {
+
+	testCases := []struct {
+		name string
+		root string
+	}{
+		{"regular", "testdata/good"},
+		{"empty file", "testdata/empty"},
+		{"doesn't exist", "testdata/none"},
+		{"garbage content", "testdata/garbage"},
+	}
+	for _, tc := range testCases {
+		tc := tc // capture range variable for parallel execution
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			a := helper.Asserter{T: t}
+
+			m, err := New(WithRootAt(tc.root))
+			if err != nil {
+				t.Fatal("can't create metrics object:", err)
+			}
+
+			got := []byte(*m.upgradeInfo())
+			want := helper.LoadOrUpdateGolden(path.Join(m.root, "gold", "upgradeInfo"), got, *update, t)
+
+			a.Equal(string(got), string(want))
+		})
+	}
+}
