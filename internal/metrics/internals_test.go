@@ -82,6 +82,8 @@ func TestGetVersion(t *testing.T) {
 	}{
 		{"regular", "testdata/good", "18.04"},
 		{"empty file", "testdata/empty", ""},
+		{"missing", "testdata/missing-fields/ids/version", ""},
+		{"empty", "testdata/empty-fields/ids/version", ""},
 		{"doesn't exist", "testdata/none", ""},
 		{"garbage content", "testdata/garbage", ""},
 	}
@@ -110,6 +112,8 @@ func TestGetRAM(t *testing.T) {
 	}{
 		{"regular", "testdata/good", "8048100"},
 		{"empty file", "testdata/empty", ""},
+		{"missing", "testdata/missing-fields/ram", ""},
+		{"empty", "testdata/empty-fields/ram", ""},
 		{"doesn't exist", "testdata/none", ""},
 		{"garbage content", "testdata/garbage", ""},
 	}
