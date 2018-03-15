@@ -139,7 +139,11 @@ func runTelemetry(collectOnly, autoReport, ignorePreviousReport bool) error {
 		log.Debug("report yes flag was set")
 	}
 
-	if err := sender.Send(sender.GetURL(sender.URL, distro, version), data); err != nil {
+	u, err := sender.GetURL(sender.URL, distro, version)
+	if err != nil {
+		return errors.Wrapf(err, "report destination url is invalid")
+	}
+	if err := sender.Send(u, data); err != nil {
 		return errors.Wrapf(err, "data were not delivered successfully to metrics server")
 	}
 

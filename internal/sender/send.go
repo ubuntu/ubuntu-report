@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"path"
 
 	"github.com/pkg/errors"
@@ -38,6 +39,11 @@ func Send(url string, data []byte) error {
 }
 
 // GetURL with distro and version marshalling
-func GetURL(url, distro, version string) string {
-	return path.Join(url, distro, "desktop", version)
+func GetURL(URL, distro, version string) (string, error) {
+	u, err := url.Parse(URL)
+	if err != nil {
+		return "", errors.Wrapf(err, "invalid base URL: %s", URL)
+	}
+	u.Path = path.Join(u.Path, distro, "desktop", version)
+	return u.String(), nil
 }
