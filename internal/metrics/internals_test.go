@@ -193,6 +193,38 @@ func TestGetAutologin(t *testing.T) {
 	}
 }
 
+func TestGetOEM(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		name string
+		root string
+
+		wantVendor  string
+		wantProduct string
+	}{
+		{"regular", "testdata/good", "DID", "4287CTO"},
+		{"empty vendor", "testdata/empty-fields/oem/vendor", "", "4287CTO"},
+		{"empty product", "testdata/empty-fields/oem/product", "DID", ""},
+		{"empty both", "testdata/empty", "", ""},
+		{"doesn't exist", "testdata/none", "", ""},
+		{"garbage content", "testdata/garbage", "", ""},
+	}
+	for _, tc := range testCases {
+		tc := tc // capture range variable for parallel execution
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			a := helper.Asserter{T: t}
+
+			m := newTestMetrics(t, WithRootAt(tc.root))
+			vendor, product := m.getOEM()
+
+			a.Equal(vendor, tc.wantVendor)
+			a.Equal(product, tc.wantProduct)
+		})
+	}
+}
+
 func newTestMetrics(t *testing.T, fixtures ...func(m *Metrics) error) Metrics {
 	t.Helper()
 	m, err := New(fixtures...)
