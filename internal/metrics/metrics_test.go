@@ -18,6 +18,7 @@ func TestGetIDS(t *testing.T) {
 	}{
 		{"regular", "testdata/good", "ubuntu", "18.04", false},
 		{"doesn't exist", "testdata/none", "", "", true},
+		{"empty file", "testdata/empty", "", "", true},
 		{"missing distro", "testdata/missing/ids/distro", "", "", true},
 		{"missing version", "testdata/missing/ids/version", "", "", true},
 		{"missing both", "testdata/missing/ids/both", "", "", true},
@@ -52,6 +53,4 @@ func TestGetIDS(t *testing.T) {
 			}
 		})
 	}
-
-	// TODO: empty should err out
 }
