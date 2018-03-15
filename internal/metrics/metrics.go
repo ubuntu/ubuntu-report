@@ -25,6 +25,7 @@ type Metrics struct {
 	screenInfoCmd *exec.Cmd
 	spaceInfoCmd  *exec.Cmd
 	gpuInfoCmd    *exec.Cmd
+	getenv        func(string) string
 }
 
 // New return a new metrics element with optional testing functions
@@ -34,6 +35,7 @@ func New(options ...func(*Metrics) error) (Metrics, error) {
 		screenInfoCmd: setCommand("xrandr"),
 		spaceInfoCmd:  setCommand("df", "-h"),
 		gpuInfoCmd:    setCommand("lspci", "-n"),
+		getenv:        os.Getenv,
 	}
 
 	for _, options := range options {
@@ -118,9 +120,9 @@ func (m Metrics) Collect() ([]byte, error) {
 		Name string
 		Type string
 	}{
-		os.Getenv("XDG_CURRENT_DESKTOP"),
-		os.Getenv("XDG_SESSION_DESKTOP"),
-		os.Getenv("XDG_SESSION_TYPE")}
+		m.getenv("XDG_CURRENT_DESKTOP"),
+		m.getenv("XDG_SESSION_DESKTOP"),
+		m.getenv("XDG_SESSION_TYPE")}
 	r.Timezone = m.getTimeZone()
 
 	r.Install = m.installerInfo()

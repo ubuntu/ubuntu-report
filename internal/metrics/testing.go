@@ -41,3 +41,18 @@ func WithSpaceInfoCommand(cmd *exec.Cmd) func(*Metrics) error {
 		return nil
 	}
 }
+
+// WithMapForEnv replace system getenv with given environ hashmap
+func WithMapForEnv(env map[string]string) func(*Metrics) error {
+	log.Debugf("Setting new environment to '%v'", env)
+	return func(m *Metrics) error {
+		m.getenv = func(key string) string {
+			value, ok := env[key]
+			if !ok {
+				value = ""
+			}
+			return value
+		}
+		return nil
+	}
+}
