@@ -18,6 +18,7 @@ import (
 var update = flag.Bool("update", false, "update golden files")
 
 func TestInstallerInfo(t *testing.T) {
+	t.Parallel()
 
 	testCases := []struct {
 		name string
@@ -48,6 +49,7 @@ func TestInstallerInfo(t *testing.T) {
 }
 
 func TestUpgradeInfo(t *testing.T) {
+	t.Parallel()
 
 	testCases := []struct {
 		name string
