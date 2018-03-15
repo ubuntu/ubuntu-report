@@ -1,6 +1,13 @@
 package helper
 
-import "testing"
+import (
+	"io/ioutil"
+	"testing"
+)
+
+/*
+ * Contains test helpers across package
+ */
 
 // Asserter for testing purposes
 type Asserter struct {
@@ -24,4 +31,24 @@ func (m Asserter) CheckWantedErr(err error, wantErr bool) {
 	if err == nil && wantErr {
 		m.Error("expected an error and got none")
 	}
+}
+
+// LoadOrUpdateGolden returns golden file content.
+// It will update it beforehand if requested.
+func LoadOrUpdateGolden(p string, data []byte, update bool, t *testing.T) []byte {
+	t.Helper()
+
+	if update {
+		t.Log("update golden file at", p)
+		if err := ioutil.WriteFile(p, data, 0666); err != nil {
+			t.Fatalf("can't update golden file %s: %v", p, err)
+		}
+	}
+
+	var content []byte
+	var err error
+	if content, err = ioutil.ReadFile(p); err != nil {
+		t.Fatalf("got an error loading golden file %s: %v", p, err)
+	}
+	return content
 }
