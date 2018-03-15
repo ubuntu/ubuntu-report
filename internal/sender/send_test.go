@@ -33,6 +33,7 @@ func TestSend(t *testing.T) {
 		{http.StatusNotFound, true},
 	}
 	for _, tc := range testCases {
+		tc := tc // capture range variable for parallel execution
 		t.Run(string(tc.status), func(t *testing.T) {
 			t.Parallel()
 
