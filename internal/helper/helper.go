@@ -15,10 +15,10 @@ type Asserter struct {
 }
 
 // Equal checks that the 2 values are equals
-func (m Asserter) Equal(a, b interface{}) {
+func (m Asserter) Equal(got, want interface{}) {
 	m.Helper()
-	if a != b {
-		m.Errorf("got: %#v (%T), was %#v (%T)", a, a, b, b)
+	if got != want {
+		m.Errorf("got: %#v (%T), was %#v (%T)", got, got, want, want)
 	}
 }
 
