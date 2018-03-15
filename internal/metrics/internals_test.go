@@ -159,6 +159,40 @@ func TestGetTimeZone(t *testing.T) {
 	}
 }
 
+func TestGetAutologin(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		name string
+		root string
+
+		want string
+	}{
+		{"regular", "testdata/good", "false"},
+		{"empty file", "testdata/empty", "false"},
+		{"missing", "testdata/missing-fields/autologin", "false"},
+		{"empty", "testdata/empty-fields/autologin", "false"},
+		{"enabled", "testdata/special/autologin/true", "true"},
+		{"disabled", "testdata/special/autologin/false", "false"},
+		{"enabled no space", "testdata/special/autologin/true-no-space", "true"},
+		{"uppercase", "testdata/special/autologin/true-uppercase", "true"},
+		{"doesn't exist", "testdata/none", "false"},
+		{"garbage content", "testdata/garbage", "false"},
+	}
+	for _, tc := range testCases {
+		tc := tc // capture range variable for parallel execution
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			a := helper.Asserter{T: t}
+
+			m := newTestMetrics(t, WithRootAt(tc.root))
+			got := m.getAutologin()
+
+			a.Equal(got, tc.want)
+		})
+	}
+}
+
 func newTestMetrics(t *testing.T, fixtures ...func(m *Metrics) error) Metrics {
 	t.Helper()
 	m, err := New(fixtures...)

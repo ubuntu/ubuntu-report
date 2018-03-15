@@ -45,10 +45,10 @@ func (m Metrics) getTimeZone() string {
 }
 
 func (m Metrics) getAutologin() string {
-	v, err := matchFromFile(filepath.Join(m.root, "etc/gdm3/custom.conf"), `^AutomaticLoginEnable ?= ?(true)$`, true)
+	v, err := matchFromFile(filepath.Join(m.root, "etc/gdm3/custom.conf"), `^AutomaticLoginEnable ?= ?(.*)$`, true)
 	if err != nil {
 		log.Infof("couldn't get autologin information from gdm: "+utils.ErrFormat, err)
-		return ""
+		return "false"
 	}
 	if strings.ToLower(v) != "true" {
 		return "false"
