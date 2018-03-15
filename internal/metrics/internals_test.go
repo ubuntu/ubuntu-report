@@ -99,6 +99,34 @@ func TestGetVersion(t *testing.T) {
 	}
 }
 
+func TestGetRAM(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		name string
+		root string
+
+		want string
+	}{
+		{"regular", "testdata/good", "8048100"},
+		{"empty file", "testdata/empty", ""},
+		{"doesn't exist", "testdata/none", ""},
+		{"garbage content", "testdata/garbage", ""},
+	}
+	for _, tc := range testCases {
+		tc := tc // capture range variable for parallel execution
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			a := helper.Asserter{T: t}
+
+			m := newTestMetrics(t, WithRootAt(tc.root))
+			got := m.getRAM()
+
+			a.Equal(got, tc.want)
+		})
+	}
+}
+
 func newTestMetrics(t *testing.T, fixtures ...func(m *Metrics) error) Metrics {
 	t.Helper()
 	m, err := New(fixtures...)
