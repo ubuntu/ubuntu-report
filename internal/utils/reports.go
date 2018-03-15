@@ -21,7 +21,6 @@ var (
 
 // ReportPath of last saved report
 func ReportPath(distro, version string) (string, error) {
-	// TODO: report path per VERSION
 	d, err := cacheDir()
 	if err != nil {
 		return "", err

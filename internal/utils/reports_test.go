@@ -49,6 +49,7 @@ func TestReportPath(t *testing.T) {
 }
 
 func changeEnv(t *testing.T, key, value string) func() {
+	t.Helper()
 	orig := os.Getenv(key)
 	if err := os.Setenv(key, value); err != nil {
 		t.Fatalf("Couldn't change %s env to %s: %v", key, value, err)
