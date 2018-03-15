@@ -76,3 +76,35 @@ func TestUpgradeInfo(t *testing.T) {
 		})
 	}
 }
+
+func TestGetVersion(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		name string
+		root string
+
+		want string
+	}{
+		{"regular", "testdata/good", "18.04"},
+		{"empty file", "testdata/empty", ""},
+		{"doesn't exist", "testdata/none", ""},
+		{"garbage content", "testdata/garbage", ""},
+	}
+	for _, tc := range testCases {
+		tc := tc // capture range variable for parallel execution
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			a := helper.Asserter{T: t}
+
+			m, err := New(WithRootAt(tc.root))
+			if err != nil {
+				t.Fatal("can't create metrics object:", err)
+			}
+
+			got := m.getVersion()
+
+			a.Equal(got, tc.want)
+		})
+	}
+}
