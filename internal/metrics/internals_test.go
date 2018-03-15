@@ -225,6 +225,38 @@ func TestGetOEM(t *testing.T) {
 	}
 }
 
+func TestGetBIOS(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		name string
+		root string
+
+		wantVendor  string
+		wantVersion string
+	}{
+		{"regular", "testdata/good", "DID", "42 (maybe 43)"},
+		{"empty vendor", "testdata/empty-fields/bios/vendor", "", "42 (maybe 43)"},
+		{"empty product", "testdata/empty-fields/bios/version", "DID", ""},
+		{"empty both", "testdata/empty", "", ""},
+		{"doesn't exist", "testdata/none", "", ""},
+		{"garbage content", "testdata/garbage", "", ""},
+	}
+	for _, tc := range testCases {
+		tc := tc // capture range variable for parallel execution
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			a := helper.Asserter{T: t}
+
+			m := newTestMetrics(t, WithRootAt(tc.root))
+			vendor, version := m.getBIOS()
+
+			a.Equal(vendor, tc.wantVendor)
+			a.Equal(version, tc.wantVersion)
+		})
+	}
+}
+
 func newTestMetrics(t *testing.T, fixtures ...func(m *Metrics) error) Metrics {
 	t.Helper()
 	m, err := New(fixtures...)

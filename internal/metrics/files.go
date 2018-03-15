@@ -136,12 +136,20 @@ func (m Metrics) getBIOS() (string, string) {
 	vd, err := getFromFileTrimmed(filepath.Join(m.root, "sys/class/dmi/id/bios_vendor"))
 	if err != nil {
 		log.Infof("couldn't get bios vendor information: "+utils.ErrFormat, err)
-		return "", ""
+		vd = ""
+	}
+	if strings.Contains(vd, "\n") {
+		log.Infof(utils.ErrFormat, errors.Errorf("malformed bios vendor information, file contains: %s", vd))
+		vd = ""
 	}
 	ve, err := getFromFileTrimmed(filepath.Join(m.root, "sys/class/dmi/id/bios_version"))
 	if err != nil {
 		log.Infof("couldn't get bios version: "+utils.ErrFormat, err)
-		return "", ""
+		ve = ""
+	}
+	if strings.Contains(ve, "\n") {
+		log.Infof(utils.ErrFormat, errors.Errorf("malformed bios version information, file contains: %s", ve))
+		ve = ""
 	}
 	return vd, ve
 }
