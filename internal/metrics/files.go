@@ -37,6 +37,10 @@ func (m Metrics) getTimeZone() string {
 		log.Infof("couldn't get timezone information: "+utils.ErrFormat, err)
 		return ""
 	}
+	if strings.Contains(v, "\n") {
+		log.Infof(utils.ErrFormat, errors.Errorf("malformed timezone information, file contains: %s", v))
+		return ""
+	}
 	return v
 }
 
