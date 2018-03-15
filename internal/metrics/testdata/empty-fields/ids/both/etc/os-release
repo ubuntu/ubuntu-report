@@ -1,0 +1,12 @@
+NAME="Ubuntu"
+VERSION="18.04 LTS (Bionic Beaver)"
+ID=
+ID_LIKE=debian
+PRETTY_NAME="Ubuntu Bionic Beaver (development branch)"
+VERSION_ID=""
+HOME_URL="https://www.ubuntu.com/"
+SUPPORT_URL="https://help.ubuntu.com/"
+BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"
+PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
+VERSION_CODENAME=bionic
+UBUNTU_CODENAME=bionic
