@@ -257,6 +257,32 @@ func TestGetBIOS(t *testing.T) {
 	}
 }
 
+func TestGetLivePatch(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		name string
+		root string
+
+		want string
+	}{
+		{"regular", "testdata/good", "true"},
+		{"disabled", "testdata/none", "false"},
+	}
+	for _, tc := range testCases {
+		tc := tc // capture range variable for parallel execution
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			a := helper.Asserter{T: t}
+
+			m := newTestMetrics(t, WithRootAt(tc.root))
+			enabled := m.getLivePatch()
+
+			a.Equal(enabled, tc.want)
+		})
+	}
+}
+
 func newTestMetrics(t *testing.T, fixtures ...func(m *Metrics) error) Metrics {
 	t.Helper()
 	m, err := New(fixtures...)
