@@ -18,7 +18,7 @@ type Asserter struct {
 func (m Asserter) Equal(got, want interface{}) {
 	m.Helper()
 	if got != want {
-		m.Errorf("got: %#v (%T), was %#v (%T)", got, got, want, want)
+		m.Errorf("got: %#v (%T), wants %#v (%T)", got, got, want, want)
 	}
 }
 

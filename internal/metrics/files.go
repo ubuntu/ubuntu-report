@@ -62,7 +62,7 @@ func (m Metrics) getOEM() (string, string) {
 		log.Infof("couldn't get chassis vendor information: "+utils.ErrFormat, err)
 	}
 	if strings.Contains(v, "\n") {
-		log.Infof(utils.ErrFormat, errors.Errorf("malformed timezone information, file contains: %s", v))
+		log.Infof(utils.ErrFormat, errors.Errorf("malformed chassis vendor information, file contains: %s", v))
 		v = ""
 	}
 	p, err := getFromFileTrimmed(filepath.Join(m.root, "sys/class/dmi/id/product_name"))
@@ -70,7 +70,7 @@ func (m Metrics) getOEM() (string, string) {
 		log.Infof("couldn't get chassis product name information: "+utils.ErrFormat, err)
 	}
 	if strings.Contains(p, "\n") {
-		log.Infof(utils.ErrFormat, errors.Errorf("malformed timezone information, file contains: %s", v))
+		log.Infof(utils.ErrFormat, errors.Errorf("malformed chassis product name information, file contains: %s", p))
 		p = ""
 	}
 	return v, p
