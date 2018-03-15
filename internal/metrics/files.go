@@ -2,6 +2,7 @@ package metrics
 
 import (
 	"bufio"
+	"encoding/json"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -173,4 +174,18 @@ func getFromFileTrimmed(p string) (string, error) {
 		return "", err
 	}
 	return strings.TrimSpace(string(b)), nil
+}
+
+func getAndValidateJSONFromFile(p string, errmsg string) *json.RawMessage {
+	b, err := getFromFile(p)
+	if err != nil {
+		log.Infof("no %s data found: "+utils.ErrFormat, errmsg, err)
+		b = []byte("{}")
+	}
+	if !json.Valid(b) {
+		log.Infof("%s data found, but not valid json.", errmsg)
+		b = []byte("{}")
+	}
+	c := json.RawMessage(b)
+	return &c
 }

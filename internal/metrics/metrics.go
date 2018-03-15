@@ -11,7 +11,6 @@ import (
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	"github.com/ubuntu/ubuntu-report/internal/utils"
 )
 
 const (
@@ -133,30 +132,9 @@ func (m Metrics) Collect() ([]byte, error) {
 }
 
 func (m Metrics) installerInfo() *json.RawMessage {
-	b, err := getFromFile(filepath.Join(m.root, installerLogsPath))
-	if err != nil {
-		log.Infof("no installer data found: "+utils.ErrFormat, err)
-		b = []byte("{}")
-	}
-	if !json.Valid(b) {
-		log.Infof("installer data found, but not valid json.")
-		b = []byte("{}")
-	}
-	c := json.RawMessage(b)
-	json.Valid(b)
-	return &c
+	return getAndValidateJSONFromFile(filepath.Join(m.root, installerLogsPath), "install")
 }
 
 func (m Metrics) upgradeInfo() *json.RawMessage {
-	b, err := getFromFile(filepath.Join(m.root, upgradeLogsPath))
-	if err != nil {
-		log.Infof("no upgrade data found: "+utils.ErrFormat, err)
-		b = []byte("{}")
-	}
-	if !json.Valid(b) {
-		log.Infof("upgrade data found, but not valid json.")
-		b = []byte("{}")
-	}
-	c := json.RawMessage(b)
-	return &c
+	return getAndValidateJSONFromFile(filepath.Join(m.root, upgradeLogsPath), "upgrade")
 }
