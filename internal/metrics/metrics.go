@@ -130,11 +130,3 @@ func (m Metrics) Collect() ([]byte, error) {
 	d, err := json.Marshal(r)
 	return d, errors.Wrapf(err, "can't be converted to a valid json")
 }
-
-func (m Metrics) installerInfo() *json.RawMessage {
-	return getAndValidateJSONFromFile(filepath.Join(m.root, installerLogsPath), "install")
-}
-
-func (m Metrics) upgradeInfo() *json.RawMessage {
-	return getAndValidateJSONFromFile(filepath.Join(m.root, upgradeLogsPath), "upgrade")
-}

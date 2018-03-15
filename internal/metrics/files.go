@@ -143,6 +143,14 @@ func (m Metrics) getLivePatch() string {
 	return "true"
 }
 
+func (m Metrics) installerInfo() *json.RawMessage {
+	return getAndValidateJSONFromFile(filepath.Join(m.root, installerLogsPath), "install")
+}
+
+func (m Metrics) upgradeInfo() *json.RawMessage {
+	return getAndValidateJSONFromFile(filepath.Join(m.root, upgradeLogsPath), "upgrade")
+}
+
 func matchFromFile(p, regex string, notFoundOk bool) (string, error) {
 	f, err := os.Open(p)
 	if err != nil {
