@@ -16,15 +16,16 @@ type Asserter struct {
 }
 
 // Equal checks that the 2 values are equals
+// slices and arrays can be of different orders
 func (m Asserter) Equal(got, want interface{}) {
 	m.Helper()
 
 	same := false
 	switch t := reflect.TypeOf(got); t.Kind() {
 	case reflect.Slice:
-		same = reflect.DeepEqual(got, want)
+		same = unsortedEqualsSliceArray(got, want)
 	case reflect.Array:
-		same = reflect.DeepEqual(got, want)
+		same = unsortedEqualsSliceArray(got, want)
 	case reflect.Map:
 		same = reflect.DeepEqual(got, want)
 	default:
@@ -65,4 +66,41 @@ func LoadOrUpdateGolden(p string, data []byte, update bool, t *testing.T) []byte
 		t.Fatalf("got an error loading golden file %s: %v", p, err)
 	}
 	return content
+}
+
+func unsortedEqualsSliceArray(a, b interface{}) bool {
+	if a == nil || b == nil {
+		return a == b
+	}
+
+	a1 := reflect.ValueOf(a)
+	a2 := reflect.ValueOf(b)
+
+	if a1.Len() != a2.Len() {
+		return false
+	}
+
+	// mark indexes in b that we already matched against
+	seen := make([]bool, a2.Len())
+	for i := 0; i < a1.Len(); i++ {
+		cur := a1.Index(i).Interface()
+
+		found := false
+		for j := 0; j < a2.Len(); j++ {
+			if seen[j] {
+				continue
+			}
+
+			if reflect.DeepEqual(a2.Index(j).Interface(), cur) {
+				seen[j] = true
+				found = true
+				break
+			}
+		}
+		if !found {
+			return false
+		}
+	}
+
+	return true
 }
