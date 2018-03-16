@@ -2,6 +2,7 @@ package helper
 
 import (
 	"io/ioutil"
+	"reflect"
 	"testing"
 )
 
@@ -17,7 +18,20 @@ type Asserter struct {
 // Equal checks that the 2 values are equals
 func (m Asserter) Equal(got, want interface{}) {
 	m.Helper()
-	if got != want {
+
+	same := false
+	switch t := reflect.TypeOf(got); t.Kind() {
+	case reflect.Slice:
+		same = reflect.DeepEqual(got, want)
+	case reflect.Array:
+		same = reflect.DeepEqual(got, want)
+	case reflect.Map:
+		same = reflect.DeepEqual(got, want)
+	default:
+		same = got == want
+	}
+
+	if !same {
 		m.Errorf("got: %#v (%T), wants %#v (%T)", got, got, want, want)
 	}
 }
