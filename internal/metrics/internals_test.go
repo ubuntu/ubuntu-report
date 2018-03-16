@@ -1,7 +1,9 @@
 package metrics
 
 import (
+	"context"
 	"flag"
+	"os/exec"
 	"path"
 	"testing"
 
@@ -342,4 +344,9 @@ func newTestMetrics(t *testing.T, fixtures ...func(m *Metrics) error) Metrics {
 		t.Fatal("can't create metrics object", err)
 	}
 	return m
+}
+
+func newMockShortCmd(t *testing.T, s ...string) (*exec.Cmd, context.CancelFunc) {
+	t.Helper()
+	return helper.ShortProcess(t, "TestMetricsHelperProcess", s...)
 }

@@ -1,6 +1,8 @@
 package metrics_test
 
 import (
+	"context"
+	"os/exec"
 	"testing"
 
 	"github.com/ubuntu/ubuntu-report/internal/helper"
@@ -51,4 +53,9 @@ func newTestMetrics(t *testing.T, fixtures ...func(m *metrics.Metrics) error) me
 		t.Fatal("can't create metrics object", err)
 	}
 	return m
+}
+
+func newMockShortCmd(t *testing.T, s ...string) (*exec.Cmd, context.CancelFunc) {
+	t.Helper()
+	return helper.ShortProcess(t, "TestMetricsHelperProcess", s...)
 }

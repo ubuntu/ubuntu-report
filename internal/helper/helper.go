@@ -1,9 +1,13 @@
 package helper
 
 import (
+	"context"
 	"io/ioutil"
+	"os"
+	"os/exec"
 	"reflect"
 	"testing"
+	"time"
 )
 
 /*
@@ -103,4 +107,22 @@ func unsortedEqualsSliceArray(a, b interface{}) bool {
 	}
 
 	return true
+}
+
+// ShortProcess helper is mocking a command supposed to return quickly
+// (within 100 milliseconds)
+// (inspired by stdlib)
+func ShortProcess(t *testing.T, helper string, s ...string) (*exec.Cmd, context.CancelFunc) {
+	t.Helper()
+
+	cs := []string{"-test.run=" + helper, "--"}
+	cs = append(cs, s...)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+
+	cmd := exec.CommandContext(ctx, os.Args[0], cs...)
+	println(os.Args[0])
+	cmd.Env = []string{"GO_WANT_HELPER_PROCESS=1"}
+
+	return cmd, cancel
 }
