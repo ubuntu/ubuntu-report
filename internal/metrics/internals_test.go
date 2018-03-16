@@ -337,6 +337,38 @@ func TestGetCPU(t *testing.T) {
 	}
 }
 
+func TestGetGPU(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		name string
+
+		want []gpuInfo
+	}{
+		{"onegpu", []gpuInfo{{"8086", "0126"}}},
+		{"multiplegpus", []gpuInfo{{"8086", "0126"}, {"8086", "0127"}}},
+		{"nogpu", nil},
+		{"empty", nil},
+		{"garbage", nil},
+		{"fail", nil},
+	}
+	for _, tc := range testCases {
+		tc := tc // capture range variable for parallel execution
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			a := helper.Asserter{T: t}
+
+			cmd, cancel := newMockShortCmd(t, "lspci", "-n", tc.name)
+			defer cancel()
+
+			m := newTestMetrics(t, WithGPUInfoCommand(cmd))
+			info := m.getGPU()
+
+			a.Equal(info, tc.want)
+		})
+	}
+}
+
 func newTestMetrics(t *testing.T, fixtures ...func(m *Metrics) error) Metrics {
 	t.Helper()
 	m, err := New(fixtures...)
