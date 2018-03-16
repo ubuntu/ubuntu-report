@@ -121,6 +121,10 @@ func (m Metrics) getCPUInfo() []cpuInfo {
 			physicalID = v
 		}
 	}
+	// Store last cpu
+	if (i != cpuInfo{}) {
+		indexedCPUInfo[physicalID] = i
+	}
 
 	var r []cpuInfo
 	for _, v := range indexedCPUInfo {

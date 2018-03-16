@@ -282,6 +282,58 @@ func TestGetLivePatch(t *testing.T) {
 		})
 	}
 }
+func TestGetCPU(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		name string
+		root string
+
+		wantInfo []cpuInfo
+	}{
+		{"regular multi-core", "testdata/good", []cpuInfo{{"Genuine", "6", "42", "7"}}},
+		{"one cpu one core", "testdata/specials/cpu/onecpu-onecore", []cpuInfo{{"Genuine", "6", "42", "7"}}},
+		{"multi cpus", "testdata/specials/cpu/multicpus",
+			[]cpuInfo{
+				{"Genuine", "6", "42", "7"},
+				{"Genuine2", "7", "42", "7"},
+				{"Genuine3", "6", "1337", "7"},
+				{"Genuine4", "6", "42", "8"},
+			}},
+		{"multi cpus multi core", "testdata/specials/cpu/multicpus-multicores",
+			[]cpuInfo{
+				{"Genuine", "6", "42", "7"},
+				{"Genuine2", "7", "42", "7"},
+				{"Genuine4", "6", "42", "8"},
+			}},
+		{"missing physical id", "testdata/missing-fields/cpu/physical-id", []cpuInfo{{"Genuine", "6", "42", "7"}}},
+		{"missing vendor", "testdata/missing-fields/cpu/vendor", []cpuInfo{{"", "6", "42", "7"}}},
+		{"missing family", "testdata/missing-fields/cpu/family", []cpuInfo{{"Genuine", "", "42", "7"}}},
+		{"missing model", "testdata/missing-fields/cpu/model", []cpuInfo{{"Genuine", "6", "", "7"}}},
+		{"missing stepping", "testdata/missing-fields/cpu/stepping", []cpuInfo{{"Genuine", "6", "42", ""}}},
+		{"missing all", "testdata/missing-fields/cpu/all", nil},
+		{"empty physical id", "testdata/empty-fields/cpu/physical-id", []cpuInfo{{"Genuine", "6", "42", "7"}}},
+		{"empty vendor", "testdata/empty-fields/cpu/vendor", []cpuInfo{{"", "6", "42", "7"}}},
+		{"empty family", "testdata/empty-fields/cpu/family", []cpuInfo{{"Genuine", "", "42", "7"}}},
+		{"empty model", "testdata/empty-fields/cpu/model", []cpuInfo{{"Genuine", "6", "", "7"}}},
+		{"empty stepping", "testdata/empty-fields/cpu/stepping", []cpuInfo{{"Genuine", "6", "42", ""}}},
+		{"empty all", "testdata/empty-fields/cpu/all", nil},
+		{"doesn't exist", "testdata/none", nil},
+		{"garbage content", "testdata/garbage", nil},
+	}
+	for _, tc := range testCases {
+		tc := tc // capture range variable for parallel execution
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			a := helper.Asserter{T: t}
+
+			m := newTestMetrics(t, WithRootAt(tc.root))
+			info := m.getCPUInfo()
+
+			a.Equal(info, tc.wantInfo)
+		})
+	}
+}
 
 func newTestMetrics(t *testing.T, fixtures ...func(m *Metrics) error) Metrics {
 	t.Helper()
