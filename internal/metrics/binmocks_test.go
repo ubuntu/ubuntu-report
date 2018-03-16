@@ -59,6 +59,8 @@ func TestMetricsHelperProcess(*testing.T) {
 00:16.3 0700: 8086:1c3d (rev 04)
 00:19.0 0200: 8086:1502 (rev 04)`)
 		case "empty":
+		case "malformed gpu line":
+			fmt.Println("00:02.0 0300: 80860127 (rev 09)")
 		case "garbage":
 			fmt.Println(garbageOutput)
 		case "fail":

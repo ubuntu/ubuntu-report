@@ -349,6 +349,7 @@ func TestGetGPU(t *testing.T) {
 		{"multiplegpus", []gpuInfo{{"8086", "0126"}, {"8086", "0127"}}},
 		{"nogpu", nil},
 		{"empty", nil},
+		{"malformed gpu line", nil},
 		{"garbage", nil},
 		{"fail", nil},
 	}
