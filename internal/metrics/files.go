@@ -76,7 +76,7 @@ func (m Metrics) getOEM() (string, string) {
 	return v, p
 }
 
-func (m Metrics) getCPUInfo() []cpuInfo {
+func (m Metrics) getCPU() []cpuInfo {
 	indexedCPUInfo := make(map[string]cpuInfo)
 
 	p := filepath.Join(m.root, "proc/cpuinfo")
@@ -96,7 +96,7 @@ func (m Metrics) getCPUInfo() []cpuInfo {
 
 		fields := strings.Split(t, ":")
 		if len(fields) > 2 {
-			log.Debug("fields are expected to have one ")
+			log.Debug("fields are expected to have one element only")
 			continue
 		} else if len(fields) < 2 {
 			if (i != cpuInfo{}) {

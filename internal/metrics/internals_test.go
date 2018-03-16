@@ -328,7 +328,7 @@ func TestGetCPU(t *testing.T) {
 			a := helper.Asserter{T: t}
 
 			m := newTestMetrics(t, WithRootAt(tc.root))
-			info := m.getCPUInfo()
+			info := m.getCPU()
 
 			a.Equal(info, tc.wantInfo)
 		})

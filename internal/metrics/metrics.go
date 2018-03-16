@@ -106,11 +106,11 @@ func (m Metrics) Collect() ([]byte, error) {
 		Version string
 	}{vendor, version}
 
-	r.CPU = m.getCPUInfo()
+	r.CPU = m.getCPU()
 	r.GPU = m.getGPU()
 	r.RAM = m.getRAM()
 	r.Partitions = m.getPartitions()
-	r.Screens = m.getScreensInfo()
+	r.Screens = m.getScreens()
 
 	r.Autologin = m.getAutologin()
 	r.LivePatch = m.getLivePatch()

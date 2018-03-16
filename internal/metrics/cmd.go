@@ -33,7 +33,7 @@ func (m Metrics) getGPU() []gpuInfo {
 	return gpus
 }
 
-func (m Metrics) getScreensInfo() []screenInfo {
+func (m Metrics) getScreens() []screenInfo {
 	var screens []screenInfo
 
 	r := runCmd(m.screenInfoCmd)
