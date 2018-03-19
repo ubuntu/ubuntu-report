@@ -3,7 +3,6 @@ package metrics_test
 import (
 	"fmt"
 	"os"
-	"strings"
 	"testing"
 )
 
@@ -101,7 +100,8 @@ DP-1 disconnected (normal left inverted right x axis y axis)`
    1680x1050     59.95  `)
 		case "empty":
 		case "malformed screen line":
-			fmt.Println(strings.Replace(regularOutput, " ", "", -1))
+			fmt.Println(`VGA-1 connected 1920x1080+0+0 (normal left inverted right x axis y axis) 510mm x 287mm
+   1920x108160.00*+`)
 		case "garbage":
 			fmt.Println(garbageOutput)
 		case "fail":
@@ -129,8 +129,10 @@ tmpfs                   5120         4       5116   1% /run/lock`
 			fmt.Println(`/dev/loop0            132480    132480          0 100% /snap/gnome-3-26-1604/27
 /dev/loop2             83584     83584          0 100% /snap/core/4110`)
 		case "empty":
-		case "malformed partition line":
-			fmt.Println(strings.Replace(regularOutput, "/dev", "/other", -1))
+		case "malformed partition line string":
+			fmt.Println(`/dev/sda5          a159431364 142492784    8816880  95% /`)
+		case "malformed partition line one field":
+			fmt.Println(`/dev/sda5`)
 		case "garbage":
 			fmt.Println(garbageOutput)
 		case "fail":

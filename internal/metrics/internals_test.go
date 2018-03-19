@@ -116,6 +116,7 @@ func TestGetRAM(t *testing.T) {
 		{"empty file", "testdata/empty", ""},
 		{"missing", "testdata/missing-fields/ram", ""},
 		{"empty", "testdata/empty-fields/ram", ""},
+		{"malformed", "testdata/specials/ram/malformed", ""},
 		{"doesn't exist", "testdata/none", ""},
 		{"garbage content", "testdata/garbage", ""},
 	}
@@ -314,6 +315,7 @@ func TestGetCPU(t *testing.T) {
 		{"missing model", "testdata/missing-fields/cpu/model", []cpuInfo{{"Genuine", "6", "", "7"}}},
 		{"missing stepping", "testdata/missing-fields/cpu/stepping", []cpuInfo{{"Genuine", "6", "42", ""}}},
 		{"missing all", "testdata/missing-fields/cpu/all", nil},
+		{"malformed", "testdata/specials/cpu/malformed", nil},
 		{"empty physical id", "testdata/empty-fields/cpu/physical-id", []cpuInfo{{"Genuine", "6", "42", "7"}}},
 		{"empty vendor", "testdata/empty-fields/cpu/vendor", []cpuInfo{{"", "6", "42", "7"}}},
 		{"empty family", "testdata/empty-fields/cpu/family", []cpuInfo{{"Genuine", "", "42", "7"}}},
@@ -418,7 +420,8 @@ func TestGetPartitions(t *testing.T) {
 		{"no partitions", nil},
 		{"filters loop devices", []string{"159.4"}},
 		{"empty", nil},
-		{"malformed partition line", nil},
+		{"malformed partition line string", nil},
+		{"malformed partition line one field", nil},
 		{"garbage", nil},
 		{"fail", nil},
 	}
