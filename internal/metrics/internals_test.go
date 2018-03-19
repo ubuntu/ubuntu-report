@@ -17,7 +17,7 @@ import (
  * for finer-graind results in case of failure.
  */
 
-var update = flag.Bool("update", false, "update golden files")
+var Update = flag.Bool("update", false, "update golden files")
 
 func TestInstallerInfo(t *testing.T) {
 	t.Parallel()
@@ -39,7 +39,7 @@ func TestInstallerInfo(t *testing.T) {
 
 			m := newTestMetrics(t, WithRootAt(tc.root))
 			got := []byte(*m.installerInfo())
-			want := helper.LoadOrUpdateGolden(path.Join(m.root, "gold", "intallerInfo"), got, *update, t)
+			want := helper.LoadOrUpdateGolden(path.Join(m.root, "gold", "intallerInfo"), got, *Update, t)
 
 			a.Equal(string(got), string(want))
 		})
@@ -66,7 +66,7 @@ func TestUpgradeInfo(t *testing.T) {
 
 			m := newTestMetrics(t, WithRootAt(tc.root))
 			got := []byte(*m.upgradeInfo())
-			want := helper.LoadOrUpdateGolden(path.Join(m.root, "gold", "upgradeInfo"), got, *update, t)
+			want := helper.LoadOrUpdateGolden(path.Join(m.root, "gold", "upgradeInfo"), got, *Update, t)
 
 			a.Equal(string(got), string(want))
 		})
