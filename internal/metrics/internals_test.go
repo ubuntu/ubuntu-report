@@ -112,7 +112,7 @@ func TestGetRAM(t *testing.T) {
 
 		want string
 	}{
-		{"regular", "testdata/good", "8048100"},
+		{"regular", "testdata/good", "8.0"},
 		{"empty file", "testdata/empty", ""},
 		{"missing", "testdata/missing-fields/ram", ""},
 		{"empty", "testdata/empty-fields/ram", ""},

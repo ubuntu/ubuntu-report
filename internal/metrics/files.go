@@ -23,9 +23,14 @@ func (m Metrics) getVersion() string {
 }
 
 func (m Metrics) getRAM() string {
-	v, err := matchFromFile(filepath.Join(m.root, "proc/meminfo"), `^MemTotal: +(\d+) kB$`, false)
+	s, err := matchFromFile(filepath.Join(m.root, "proc/meminfo"), `^MemTotal: +(\d+) kB$`, false)
 	if err != nil {
 		log.Infof("couldn't get RAM information from meminfo: "+utils.ErrFormat, err)
+		return ""
+	}
+	v, err := convKBToGB(s)
+	if err != nil {
+		log.Infof("partition size should be an integer: "+utils.ErrFormat, err)
 		return ""
 	}
 	return v
