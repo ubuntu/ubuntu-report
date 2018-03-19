@@ -370,6 +370,41 @@ func TestGetGPU(t *testing.T) {
 	}
 }
 
+func TestGetScreens(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		name string
+
+		want []screenInfo
+	}{
+		{"one screen", []screenInfo{{"1366x768", "60.02"}}},
+		{"multiple screens", []screenInfo{{"1366x768", "60.02"}, {"1920x1080", "60.00"}}},
+		{"no screen", nil},
+		{"chosen resolution not first", []screenInfo{{"1600x1200", "60.00"}}},
+		{"no chosen resolution", nil},
+		{"empty", nil},
+		{"malformed screen line", nil},
+		{"garbage", nil},
+		{"fail", nil},
+	}
+	for _, tc := range testCases {
+		tc := tc // capture range variable for parallel execution
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			a := helper.Asserter{T: t}
+
+			cmd, cancel := newMockShortCmd(t, "xrandr", tc.name)
+			defer cancel()
+
+			m := newTestMetrics(t, WithScreenInfoCommand(cmd))
+			info := m.getScreens()
+
+			a.Equal(info, tc.want)
+		})
+	}
+}
+
 func newTestMetrics(t *testing.T, fixtures ...func(m *Metrics) error) Metrics {
 	t.Helper()
 	m, err := New(fixtures...)
