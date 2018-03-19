@@ -3,6 +3,7 @@ package metrics_test
 import (
 	"context"
 	"os/exec"
+	"path"
 	"testing"
 
 	"github.com/ubuntu/ubuntu-report/internal/helper"
@@ -42,6 +43,54 @@ func TestGetIDS(t *testing.T) {
 			a.CheckWantedErr(err, tc.wantErr)
 			a.Equal(d, tc.wantDistro)
 			a.Equal(v, tc.wantVersion)
+		})
+	}
+}
+
+func TestCollect(t *testing.T) {
+	testCases := []struct {
+		name          string
+		root          string
+		caseGPU       string
+		caseScreen    string
+		casePartition string
+		env           map[string]string
+
+		// note that only an internal json package error can make it returning an error
+		wantErr bool
+	}{
+		{"regular",
+			"testdata/good", "one gpu", "one screen", "one partition",
+			map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12"},
+			false},
+		{"empty",
+			"testdata/none", "empty", "empty", "empty",
+			nil,
+			false},
+	}
+	for _, tc := range testCases {
+		tc := tc // capture range variable for parallel execution
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			a := helper.Asserter{T: t}
+
+			cmdGPU, cancel := newMockShortCmd(t, "lspci", "-n", tc.caseGPU)
+			defer cancel()
+			cmdScreen, cancel := newMockShortCmd(t, "xrandr", tc.caseScreen)
+			defer cancel()
+			cmdPartition, cancel := newMockShortCmd(t, "df", tc.casePartition)
+			defer cancel()
+
+			m := newTestMetrics(t, metrics.WithRootAt(tc.root),
+				metrics.WithGPUInfoCommand(cmdGPU),
+				metrics.WithScreenInfoCommand(cmdScreen),
+				metrics.WithSpaceInfoCommand(cmdPartition),
+				metrics.WithMapForEnv(tc.env))
+			got, err := m.Collect()
+
+			want := helper.LoadOrUpdateGolden(path.Join(tc.root, "gold", "collect"), got, *metrics.Update, t)
+			a.CheckWantedErr(err, tc.wantErr)
+			a.Equal(got, want)
 		})
 	}
 }
