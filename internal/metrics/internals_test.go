@@ -106,19 +106,20 @@ func TestGetVersion(t *testing.T) {
 func TestGetRAM(t *testing.T) {
 	t.Parallel()
 
+	normalRAM := 8.0
 	testCases := []struct {
 		name string
 		root string
 
-		want string
+		want *float64
 	}{
-		{"regular", "testdata/good", "8.0"},
-		{"empty file", "testdata/empty", ""},
-		{"missing", "testdata/missing-fields/ram", ""},
-		{"empty", "testdata/empty-fields/ram", ""},
-		{"malformed", "testdata/specials/ram/malformed", ""},
-		{"doesn't exist", "testdata/none", ""},
-		{"garbage content", "testdata/garbage", ""},
+		{"regular", "testdata/good", &normalRAM},
+		{"empty file", "testdata/empty", nil},
+		{"missing", "testdata/missing-fields/ram", nil},
+		{"empty", "testdata/empty-fields/ram", nil},
+		{"malformed", "testdata/specials/ram/malformed", nil},
+		{"doesn't exist", "testdata/none", nil},
+		{"garbage content", "testdata/garbage", nil},
 	}
 	for _, tc := range testCases {
 		tc := tc // capture range variable for parallel execution
@@ -413,12 +414,12 @@ func TestGetPartitions(t *testing.T) {
 	testCases := []struct {
 		name string
 
-		want []string
+		want []float64
 	}{
-		{"one partition", []string{"159.4"}},
-		{"multiple partitions", []string{"159.4", "309.7"}},
+		{"one partition", []float64{159.4}},
+		{"multiple partitions", []float64{159.4, 309.7}},
 		{"no partitions", nil},
-		{"filters loop devices", []string{"159.4"}},
+		{"filters loop devices", []float64{159.4}},
 		{"empty", nil},
 		{"malformed partition line string", nil},
 		{"malformed partition line one field", nil},

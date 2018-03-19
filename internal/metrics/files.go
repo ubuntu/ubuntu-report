@@ -22,18 +22,18 @@ func (m Metrics) getVersion() string {
 	return v
 }
 
-func (m Metrics) getRAM() string {
+func (m Metrics) getRAM() *float64 {
 	s, err := matchFromFile(filepath.Join(m.root, "proc/meminfo"), `^MemTotal: +(\d+) kB$`, false)
 	if err != nil {
 		log.Infof("couldn't get RAM information from meminfo: "+utils.ErrFormat, err)
-		return ""
+		return nil
 	}
 	v, err := convKBToGB(s)
 	if err != nil {
 		log.Infof("partition size should be an integer: "+utils.ErrFormat, err)
-		return ""
+		return nil
 	}
-	return v
+	return &v
 }
 
 func (m Metrics) getTimeZone() string {

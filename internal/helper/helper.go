@@ -41,7 +41,7 @@ func (m Asserter) Equal(got, want interface{}) {
 		same = unsortedEqualsSliceArray(got, want)
 	case reflect.Array:
 		same = unsortedEqualsSliceArray(got, want)
-	case reflect.Map:
+	case reflect.Map, reflect.Ptr:
 		same = reflect.DeepEqual(got, want)
 	default:
 		same = got == want

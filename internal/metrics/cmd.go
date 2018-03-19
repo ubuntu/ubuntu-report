@@ -56,8 +56,8 @@ func (m Metrics) getScreens() []screenInfo {
 	return screens
 }
 
-func (m Metrics) getPartitions() []string {
-	var sizes []string
+func (m Metrics) getPartitions() []float64 {
+	var sizes []float64
 
 	r := runCmd(m.spaceInfoCmd)
 

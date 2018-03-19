@@ -15,8 +15,8 @@ type metrics struct {
 	} `json:",omitempty"`
 	CPU        []cpuInfo    `json:",omitempty"`
 	GPU        []gpuInfo    `json:",omitempty"`
-	RAM        string       `json:",omitempty"`
-	Partitions []string     `json:",omitempty"`
+	RAM        *float64     `json:",omitempty"`
+	Partitions []float64    `json:",omitempty"`
 	Screens    []screenInfo `json:",omitempty"`
 
 	Autologin string `json:",omitempty"`
