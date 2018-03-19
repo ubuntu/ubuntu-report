@@ -170,18 +170,18 @@ func TestGetAutologin(t *testing.T) {
 		name string
 		root string
 
-		want string
+		want bool
 	}{
-		{"regular", "testdata/good", "false"},
-		{"empty file", "testdata/empty", "false"},
-		{"missing", "testdata/missing-fields/autologin", "false"},
-		{"empty", "testdata/empty-fields/autologin", "false"},
-		{"enabled", "testdata/specials/autologin/true", "true"},
-		{"disabled", "testdata/specials/autologin/false", "false"},
-		{"enabled no space", "testdata/specials/autologin/true-no-space", "true"},
-		{"uppercase", "testdata/specials/autologin/true-uppercase", "true"},
-		{"doesn't exist", "testdata/none", "false"},
-		{"garbage content", "testdata/garbage", "false"},
+		{"regular", "testdata/good", false},
+		{"empty file", "testdata/empty", false},
+		{"missing", "testdata/missing-fields/autologin", false},
+		{"empty", "testdata/empty-fields/autologin", false},
+		{"enabled", "testdata/specials/autologin/true", true},
+		{"disabled", "testdata/specials/autologin/false", false},
+		{"enabled no space", "testdata/specials/autologin/true-no-space", true},
+		{"uppercase", "testdata/specials/autologin/true-uppercase", true},
+		{"doesn't exist", "testdata/none", false},
+		{"garbage content", "testdata/garbage", false},
 	}
 	for _, tc := range testCases {
 		tc := tc // capture range variable for parallel execution
@@ -268,10 +268,10 @@ func TestGetLivePatch(t *testing.T) {
 		name string
 		root string
 
-		want string
+		want bool
 	}{
-		{"regular", "testdata/good", "true"},
-		{"disabled", "testdata/none", "false"},
+		{"regular", "testdata/good", true},
+		{"disabled", "testdata/none", false},
 	}
 	for _, tc := range testCases {
 		tc := tc // capture range variable for parallel execution

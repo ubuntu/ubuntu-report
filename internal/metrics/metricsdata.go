@@ -19,8 +19,8 @@ type metrics struct {
 	Partitions []float64    `json:",omitempty"`
 	Screens    []screenInfo `json:",omitempty"`
 
-	Autologin string `json:",omitempty"`
-	LivePatch string `json:",omitempty"`
+	Autologin *bool `json:",omitempty"`
+	LivePatch *bool `json:",omitempty"`
 	Session   *struct {
 		DE   string
 		Name string

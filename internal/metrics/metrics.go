@@ -116,8 +116,10 @@ func (m Metrics) Collect() ([]byte, error) {
 	r.Partitions = m.getPartitions()
 	r.Screens = m.getScreens()
 
-	r.Autologin = m.getAutologin()
-	r.LivePatch = m.getLivePatch()
+	a := m.getAutologin()
+	r.Autologin = &a
+	l := m.getLivePatch()
+	r.LivePatch = &l
 
 	de := m.getenv("XDG_CURRENT_DESKTOP")
 	sessionName := m.getenv("XDG_SESSION_DESKTOP")

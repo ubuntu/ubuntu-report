@@ -8,6 +8,8 @@ import (
 	"reflect"
 	"testing"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 )
 
 /*
@@ -70,6 +72,11 @@ func LoadOrUpdateGolden(p string, data []byte, update bool, t *testing.T) []byte
 
 	if update {
 		t.Log("update golden file at", p)
+		if data == nil {
+			log.Info("No file to create as data is nil")
+			os.Remove(p)
+			return nil
+		}
 		if err := ioutil.WriteFile(p, data, 0666); err != nil {
 			t.Fatalf("can't update golden file %s: %v", p, err)
 		}
@@ -77,7 +84,7 @@ func LoadOrUpdateGolden(p string, data []byte, update bool, t *testing.T) []byte
 
 	var content []byte
 	var err error
-	if content, err = ioutil.ReadFile(p); err != nil {
+	if content, err = ioutil.ReadFile(p); os.IsExist(err) && err != nil {
 		t.Fatalf("got an error loading golden file %s: %v", p, err)
 	}
 	return content
