@@ -3,33 +3,33 @@ package metrics
 import "encoding/json"
 
 type metrics struct {
-	Version string
+	Version string `json:",omitempty"`
 
-	OEM struct {
+	OEM *struct {
 		Vendor  string
 		Product string
-	}
-	BIOS struct {
+	} `json:",omitempty"`
+	BIOS *struct {
 		Vendor  string
 		Version string
-	}
-	CPU        []cpuInfo
-	GPU        []gpuInfo
-	RAM        string
-	Partitions []string
-	Screens    []screenInfo
+	} `json:",omitempty"`
+	CPU        []cpuInfo    `json:",omitempty"`
+	GPU        []gpuInfo    `json:",omitempty"`
+	RAM        string       `json:",omitempty"`
+	Partitions []string     `json:",omitempty"`
+	Screens    []screenInfo `json:",omitempty"`
 
-	Autologin string
-	LivePatch string
-	Session   struct {
+	Autologin string `json:",omitempty"`
+	LivePatch string `json:",omitempty"`
+	Session   *struct {
 		DE   string
 		Name string
 		Type string
-	}
-	Timezone string
+	} `json:",omitempty"`
+	Timezone string `json:",omitempty"`
 
-	Install *json.RawMessage
-	Upgrade *json.RawMessage
+	Install *json.RawMessage `json:",omitempty"`
+	Upgrade *json.RawMessage `json:",omitempty"`
 }
 
 type gpuInfo struct {

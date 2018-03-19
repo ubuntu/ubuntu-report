@@ -97,16 +97,18 @@ func (m Metrics) Collect() ([]byte, error) {
 
 	r.Version = m.getVersion()
 
-	vendor, product := m.getOEM()
-	r.OEM = struct {
-		Vendor  string
-		Product string
-	}{vendor, product}
-	vendor, version := m.getBIOS()
-	r.BIOS = struct {
-		Vendor  string
-		Version string
-	}{vendor, version}
+	if vendor, product := m.getOEM(); vendor != "" || product != "" {
+		r.OEM = &struct {
+			Vendor  string
+			Product string
+		}{vendor, product}
+	}
+	if vendor, version := m.getBIOS(); vendor != "" || version != "" {
+		r.BIOS = &struct {
+			Vendor  string
+			Version string
+		}{vendor, version}
+	}
 
 	r.CPU = m.getCPU()
 	r.GPU = m.getGPU()
@@ -116,14 +118,17 @@ func (m Metrics) Collect() ([]byte, error) {
 
 	r.Autologin = m.getAutologin()
 	r.LivePatch = m.getLivePatch()
-	r.Session = struct {
-		DE   string
-		Name string
-		Type string
-	}{
-		m.getenv("XDG_CURRENT_DESKTOP"),
-		m.getenv("XDG_SESSION_DESKTOP"),
-		m.getenv("XDG_SESSION_TYPE")}
+
+	de := m.getenv("XDG_CURRENT_DESKTOP")
+	sessionName := m.getenv("XDG_SESSION_DESKTOP")
+	sessionType := m.getenv("XDG_SESSION_TYPE")
+	if de != "" || sessionName != "" || sessionType != "" {
+		r.Session = &struct {
+			DE   string
+			Name string
+			Type string
+		}{de, sessionName, sessionType}
+	}
 	r.Timezone = m.getTimeZone()
 
 	r.Install = m.installerInfo()
