@@ -8,8 +8,6 @@ import (
 	"reflect"
 	"testing"
 	"time"
-
-	log "github.com/sirupsen/logrus"
 )
 
 /*
@@ -73,7 +71,7 @@ func LoadOrUpdateGolden(p string, data []byte, update bool, t *testing.T) []byte
 	if update {
 		t.Log("update golden file at", p)
 		if data == nil {
-			log.Info("No file to create as data is nil")
+			t.Logf("No file to create as data is nil")
 			os.Remove(p)
 			return nil
 		}
