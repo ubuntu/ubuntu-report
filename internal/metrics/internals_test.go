@@ -39,7 +39,7 @@ func TestInstallerInfo(t *testing.T) {
 
 			m := newTestMetrics(t, WithRootAt(tc.root))
 			got := []byte(m.installerInfo())
-			want := helper.LoadOrUpdateGolden(path.Join(m.root, "gold", "intallerInfo"), got, *Update, t)
+			want := helper.LoadOrUpdateGolden(t, path.Join(m.root, "gold", "intallerInfo"), got, *Update)
 
 			a.Equal(got, want)
 		})
@@ -66,7 +66,7 @@ func TestUpgradeInfo(t *testing.T) {
 
 			m := newTestMetrics(t, WithRootAt(tc.root))
 			got := []byte(m.upgradeInfo())
-			want := helper.LoadOrUpdateGolden(path.Join(m.root, "gold", "upgradeInfo"), got, *Update, t)
+			want := helper.LoadOrUpdateGolden(t, path.Join(m.root, "gold", "upgradeInfo"), got, *Update)
 
 			a.Equal(got, want)
 		})

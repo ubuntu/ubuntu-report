@@ -89,7 +89,7 @@ func TestCollect(t *testing.T) {
 				metrics.WithMapForEnv(tc.env))
 			got, err := m.Collect()
 
-			want := helper.LoadOrUpdateGolden(path.Join(tc.root, "gold", "collect"), got, *metrics.Update, t)
+			want := helper.LoadOrUpdateGolden(t, path.Join(tc.root, "gold", "collect"), got, *metrics.Update)
 			a.CheckWantedErr(err, tc.wantErr)
 			a.Equal(got, want)
 		})

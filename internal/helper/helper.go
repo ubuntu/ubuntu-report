@@ -65,7 +65,7 @@ func (m Asserter) CheckWantedErr(err error, wantErr bool) {
 
 // LoadOrUpdateGolden returns golden file content.
 // It will update it beforehand if requested.
-func LoadOrUpdateGolden(p string, data []byte, update bool, t *testing.T) []byte {
+func LoadOrUpdateGolden(t *testing.T, p string, data []byte, update bool) []byte {
 	t.Helper()
 
 	if update {
