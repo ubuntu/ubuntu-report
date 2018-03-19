@@ -38,10 +38,14 @@ func TestInstallerInfo(t *testing.T) {
 			a := helper.Asserter{T: t}
 
 			m := newTestMetrics(t, WithRootAt(tc.root))
-			got := []byte(*m.installerInfo())
+			g := m.installerInfo()
+			var got []byte
+			if g != nil {
+				got = []byte(*g)
+			}
 			want := helper.LoadOrUpdateGolden(path.Join(m.root, "gold", "intallerInfo"), got, *Update, t)
 
-			a.Equal(string(got), string(want))
+			a.Equal(got, want)
 		})
 	}
 }
@@ -65,10 +69,14 @@ func TestUpgradeInfo(t *testing.T) {
 			a := helper.Asserter{T: t}
 
 			m := newTestMetrics(t, WithRootAt(tc.root))
-			got := []byte(*m.upgradeInfo())
+			g := m.upgradeInfo()
+			var got []byte
+			if g != nil {
+				got = []byte(*g)
+			}
 			want := helper.LoadOrUpdateGolden(path.Join(m.root, "gold", "upgradeInfo"), got, *Update, t)
 
-			a.Equal(string(got), string(want))
+			a.Equal(got, want)
 		})
 	}
 }

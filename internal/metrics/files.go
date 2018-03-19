@@ -215,11 +215,11 @@ func getAndValidateJSONFromFile(p string, errmsg string) *json.RawMessage {
 	b, err := getFromFile(p)
 	if err != nil {
 		log.Infof("no %s data found: "+utils.ErrFormat, errmsg, err)
-		b = []byte("{}")
+		return nil
 	}
 	if !json.Valid(b) {
 		log.Infof("%s data found, but not valid json.", errmsg)
-		b = []byte("{}")
+		return nil
 	}
 	c := json.RawMessage(b)
 	return &c
