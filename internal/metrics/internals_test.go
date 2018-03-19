@@ -405,6 +405,40 @@ func TestGetScreens(t *testing.T) {
 	}
 }
 
+func TestGetPartitions(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		name string
+
+		want []string
+	}{
+		{"one partition", []string{"159.4"}},
+		{"multiple partitions", []string{"159.4", "309.7"}},
+		{"no partitions", nil},
+		{"filters loop devices", []string{"159.4"}},
+		{"empty", nil},
+		{"malformed partition line", nil},
+		{"garbage", nil},
+		{"fail", nil},
+	}
+	for _, tc := range testCases {
+		tc := tc // capture range variable for parallel execution
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			a := helper.Asserter{T: t}
+
+			cmd, cancel := newMockShortCmd(t, "df", tc.name)
+			defer cancel()
+
+			m := newTestMetrics(t, WithSpaceInfoCommand(cmd))
+			info := m.getPartitions()
+
+			a.Equal(info, tc.want)
+		})
+	}
+}
+
 func newTestMetrics(t *testing.T, fixtures ...func(m *Metrics) error) Metrics {
 	t.Helper()
 	m, err := New(fixtures...)

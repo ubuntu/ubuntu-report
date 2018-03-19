@@ -77,7 +77,12 @@ func (m Metrics) getPartitions() []string {
 			log.Infof("partition size should be of form 'block device      size', got: %s", size)
 			continue
 		}
-		sizes = append(sizes, s[1])
+		v, err := convKBToGB(s[1])
+		if err != nil {
+			log.Infof("partition size should be an integer: "+utils.ErrFormat, err)
+			continue
+		}
+		sizes = append(sizes, v)
 	}
 
 	return sizes

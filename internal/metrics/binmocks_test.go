@@ -107,5 +107,34 @@ DP-1 disconnected (normal left inverted right x axis y axis)`
 			fmt.Println(regularOutput) // still print content
 			os.Exit(1)
 		}
+
+	case "df":
+		regularOutput := `Sys. de fichiers blocs de 1K   Utilisé Disponible Uti% Monté sur
+udev                 3992524         0    3992524   0% /dev
+tmpfs                 804812      2104     802708   1% /run
+/dev/sda5          159431364 142492784    8816880  95% /
+tmpfs                4024048    152728    3871320   4% /dev/shm
+tmpfs                   5120         4       5116   1% /run/lock`
+		switch args[0] {
+		case "one partition":
+			fmt.Println(regularOutput)
+		case "multiple partitions":
+			fmt.Println(regularOutput)
+			fmt.Println(`/dev/sdc2          309681364 102492784    2816880   5% /something`)
+		case "no partitions":
+			fmt.Println("")
+		case "filters loop devices":
+			fmt.Println(regularOutput)
+			fmt.Println(`/dev/loop0            132480    132480          0 100% /snap/gnome-3-26-1604/27
+/dev/loop2             83584     83584          0 100% /snap/core/4110`)
+		case "empty":
+		case "malformed partition line":
+			fmt.Println(strings.Replace(regularOutput, "/dev", "/other", -1))
+		case "garbage":
+			fmt.Println(garbageOutput)
+		case "fail":
+			fmt.Println(regularOutput) // still print content
+			os.Exit(1)
+		}
 	}
 }

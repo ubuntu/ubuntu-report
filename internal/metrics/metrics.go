@@ -3,10 +3,12 @@ package metrics
 import (
 	"bufio"
 	"encoding/json"
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -129,4 +131,13 @@ func (m Metrics) Collect() ([]byte, error) {
 
 	d, err := json.Marshal(r)
 	return d, errors.Wrapf(err, "can't be converted to a valid json")
+}
+
+func convKBToGB(s string) (string, error) {
+	v, err := strconv.Atoi(s)
+	if err != nil {
+		return "", errors.Wrapf(err, "couldn't convert %s to an integer", s)
+	}
+	// convert in GB (SI)
+	return fmt.Sprintf("%.1f", (float64(v) / (1000 * 1000))), nil
 }
