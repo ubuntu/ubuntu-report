@@ -42,6 +42,7 @@ func TestMetricsHelperProcess(*testing.T) {
 	case "lspci":
 		if args[0] != "-n" {
 			fmt.Fprintf(os.Stderr, "Unexpected lspci arguments: %v\n", args)
+			os.Exit(1)
 		}
 		regularOutput := `00:00.0 0600: 8086:0104 (rev 09)
 00:02.0 0300: 8086:0126 (rev 09)
