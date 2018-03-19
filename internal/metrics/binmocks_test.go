@@ -49,12 +49,12 @@ func TestMetricsHelperProcess(*testing.T) {
 00:16.3 0700: 8086:1c3d (rev 04)
 00:19.0 0200: 8086:1502 (rev 04)`
 		switch args[1] {
-		case "onegpu":
+		case "one gpu":
 			fmt.Println(regularOutput)
-		case "multiplegpus":
+		case "multiple gpus":
 			fmt.Println(regularOutput)
 			fmt.Println("00:02.0 0300: 8086:0127 (rev 09)")
-		case "nogpu":
+		case "no gpu":
 			fmt.Println(`00:00.0 0600: 8086:0104 (rev 09)
 00:16.0 0780: 8086:1c3a (rev 04)
 00:16.3 0700: 8086:1c3d (rev 04)

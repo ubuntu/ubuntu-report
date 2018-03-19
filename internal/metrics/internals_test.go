@@ -345,9 +345,9 @@ func TestGetGPU(t *testing.T) {
 
 		want []gpuInfo
 	}{
-		{"onegpu", []gpuInfo{{"8086", "0126"}}},
-		{"multiplegpus", []gpuInfo{{"8086", "0126"}, {"8086", "0127"}}},
-		{"nogpu", nil},
+		{"one gpu", []gpuInfo{{"8086", "0126"}}},
+		{"multiple gpus", []gpuInfo{{"8086", "0126"}, {"8086", "0127"}}},
+		{"no gpu", nil},
 		{"empty", nil},
 		{"malformed gpu line", nil},
 		{"garbage", nil},
