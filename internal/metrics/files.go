@@ -170,11 +170,11 @@ func (m Metrics) getLivePatch() bool {
 	return true
 }
 
-func (m Metrics) installerInfo() *json.RawMessage {
+func (m Metrics) installerInfo() json.RawMessage {
 	return getAndValidateJSONFromFile(filepath.Join(m.root, installerLogsPath), "install")
 }
 
-func (m Metrics) upgradeInfo() *json.RawMessage {
+func (m Metrics) upgradeInfo() json.RawMessage {
 	return getAndValidateJSONFromFile(filepath.Join(m.root, upgradeLogsPath), "upgrade")
 }
 
@@ -211,7 +211,7 @@ func getFromFileTrimmed(p string) (string, error) {
 	return strings.TrimSpace(string(b)), nil
 }
 
-func getAndValidateJSONFromFile(p string, errmsg string) *json.RawMessage {
+func getAndValidateJSONFromFile(p string, errmsg string) json.RawMessage {
 	b, err := getFromFile(p)
 	if err != nil {
 		log.Infof("no %s data found: "+utils.ErrFormat, errmsg, err)
@@ -221,6 +221,5 @@ func getAndValidateJSONFromFile(p string, errmsg string) *json.RawMessage {
 		log.Infof("%s data found, but not valid json.", errmsg)
 		return nil
 	}
-	c := json.RawMessage(b)
-	return &c
+	return json.RawMessage(b)
 }

@@ -28,8 +28,8 @@ type metrics struct {
 	} `json:",omitempty"`
 	Timezone string `json:",omitempty"`
 
-	Install *json.RawMessage `json:",omitempty"`
-	Upgrade *json.RawMessage `json:",omitempty"`
+	Install json.RawMessage `json:",omitempty"`
+	Upgrade json.RawMessage `json:",omitempty"`
 }
 
 type gpuInfo struct {
