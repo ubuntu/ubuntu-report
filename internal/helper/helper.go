@@ -27,6 +27,17 @@ func (m Asserter) Equal(got, want interface{}) {
 	same := false
 	switch t := reflect.TypeOf(got); t.Kind() {
 	case reflect.Slice:
+		// We treat slice of bytes differently, order is important
+		a, gotIsBytes := got.([]byte)
+		b, wantIsBytes := want.([]byte)
+		if gotIsBytes && wantIsBytes {
+			// convert them to string for easier comparaison once
+			// they don'tmatch
+			if same = reflect.DeepEqual(a, b); !same {
+				m.Errorf("got: %s (converted from []byte), wants %s (converted from []byte)", string(a), string(b))
+			}
+			return
+		}
 		same = unsortedEqualsSliceArray(got, want)
 	case reflect.Array:
 		same = unsortedEqualsSliceArray(got, want)
