@@ -34,7 +34,7 @@ func New(options ...func(*Metrics) error) (Metrics, error) {
 	m := Metrics{
 		root:          "/",
 		screenInfoCmd: setCommand("xrandr"),
-		spaceInfoCmd:  setCommand("df", "-h"),
+		spaceInfoCmd:  setCommand("df"),
 		gpuInfoCmd:    setCommand("lspci", "-n"),
 		getenv:        os.Getenv,
 	}
