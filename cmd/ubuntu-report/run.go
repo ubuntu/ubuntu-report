@@ -56,7 +56,7 @@ func metricsReport(m metrics.Metrics, r reportType, alwaysReport bool, baseURL s
 	sendMetrics := true
 	if r == reportInteractive {
 		fmt.Println("This is the result of hardware and optional installer/upgrader that we collected:")
-		fmt.Println(data)
+		fmt.Println(string(data))
 
 		validAnswer := false
 		scanner := bufio.NewScanner(os.Stdin)
