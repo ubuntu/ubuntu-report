@@ -101,6 +101,13 @@ func generateRootCmd() *cobra.Command {
 	}
 	rootCmd.AddCommand(send)
 
+	interactiveCmd := &cobra.Command{
+		Use:   "interactive",
+		Short: "Interactive mode, similar to running this tool without any subcommands",
+		Run:   rootCmd.Run,
+	}
+	rootCmd.AddCommand(interactiveCmd)
+
 	return rootCmd
 }
 
