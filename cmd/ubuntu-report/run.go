@@ -61,7 +61,7 @@ func metricsReport(m metrics.Metrics, r reportType, alwaysReport bool, baseURL s
 		validAnswer := false
 		scanner := bufio.NewScanner(os.Stdin)
 		for validAnswer != true {
-			fmt.Printf("Do you agree to report this? [y/N] ")
+			fmt.Printf("Do you agree to report this? [y (send metrics)/N (send opt out message)] ")
 			if !scanner.Scan() {
 				log.Info("programm interrupted")
 				return nil
