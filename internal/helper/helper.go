@@ -134,7 +134,7 @@ func ShortProcess(t *testing.T, helper string, s ...string) (*exec.Cmd, context.
 	cs := []string{"-test.run=" + helper, "--"}
 	cs = append(cs, s...)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 
 	cmd := exec.CommandContext(ctx, os.Args[0], cs...)
 	cmd.Env = []string{"GO_WANT_HELPER_PROCESS=1"}
