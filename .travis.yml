@@ -1,0 +1,19 @@
+language: go
+sudo: false
+go:
+  - 1.10.x
+  - master
+
+# disable running go get as we should have all deps vendored
+install: true
+
+before_script:
+  - go vet ./...
+  - FMT=`go fmt ./...` && [ -z "$FMT" ]
+
+script:
+  - go test -coverprofile=coverage.txt -covermode=atomic ./...
+  - go test -race ./...
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
