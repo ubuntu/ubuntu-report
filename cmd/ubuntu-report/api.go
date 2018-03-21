@@ -39,5 +39,5 @@ func Report(r reportType, alwaysReport bool, baseURL string) error {
 	if err != nil {
 		return errors.Wrapf(err, "couldn't create a metric collector")
 	}
-	return metricsReport(m, r, alwaysReport, baseURL)
+	return metricsReport(m, r, alwaysReport, baseURL, "")
 }

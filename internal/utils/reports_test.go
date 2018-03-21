@@ -18,21 +18,24 @@ func TestReportPath(t *testing.T) {
 	}
 
 	testCases := []struct {
-		name          string
-		home          string
-		xdg_cache_dir string
-		distro        string
-		version       string
+		name            string
+		home            string
+		xdg_cache_dir   string
+		distro          string
+		version         string
+		explicitacheDir string
 
 		want    string
 		wantErr bool
 	}{
-		{"regular", "/some/dir", "", "distroname", "versionnumber", "/some/dir/.cache/ubuntu-report/distroname.versionnumber", false},
-		{"relative xdg path", "/some/dir", "xdg_cache_path", "distroname", "versionnumber", "/some/dir/xdg_cache_path/ubuntu-report/distroname.versionnumber", false},
-		{"absolute xdg path", "/some/dir", "/xdg_cache_path", "distroname", "versionnumber", "/xdg_cache_path/ubuntu-report/distroname.versionnumber", false},
-		{"no home dir", "", "", "distroname", "versionnumber", u.HomeDir + "/.cache/ubuntu-report/distroname.versionnumber", false},
-		{"no distro name", "/some/dir", "", "", "versionnumber", "/some/dir/.cache/ubuntu-report/.versionnumber", false},
-		{"no version name", "/some/dir", "", "distroname", "", "/some/dir/.cache/ubuntu-report/distroname.", false},
+		{"regular", "/some/dir", "", "distroname", "versionnumber", "", "/some/dir/.cache/ubuntu-report/distroname.versionnumber", false},
+		{"relative xdg path", "/some/dir", "xdg_cache_path", "distroname", "versionnumber", "", "/some/dir/xdg_cache_path/ubuntu-report/distroname.versionnumber", false},
+		{"absolute xdg path", "/some/dir", "/xdg_cache_path", "distroname", "versionnumber", "", "/xdg_cache_path/ubuntu-report/distroname.versionnumber", false},
+		{"no home dir", "", "", "distroname", "versionnumber", "", u.HomeDir + "/.cache/ubuntu-report/distroname.versionnumber", false},
+		{"no distro name", "/some/dir", "", "", "versionnumber", "", "/some/dir/.cache/ubuntu-report/.versionnumber", false},
+		{"no version name", "/some/dir", "", "distroname", "", "", "/some/dir/.cache/ubuntu-report/distroname.", false},
+		{"explicit cache dir", "", "", "distroname", "versionnumber", "/explicit/cachedir", "/explicit/cachedir/ubuntu-report/distroname.versionnumber", false},
+		{"explicit cache dir takes predecedence", "/some/dir", "/xdg_cache_path", "distroname", "versionnumber", "/explicit/cachedir", "/explicit/cachedir/ubuntu-report/distroname.versionnumber", false},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -40,7 +43,7 @@ func TestReportPath(t *testing.T) {
 			defer changeEnv(t, "XDG_CACHE_HOME", tc.xdg_cache_dir)()
 			a := helper.Asserter{T: t}
 
-			got, err := utils.ReportPath(tc.distro, tc.version)
+			got, err := utils.ReportPath(tc.distro, tc.version, tc.explicitacheDir)
 
 			a.CheckWantedErr(err, tc.wantErr)
 			a.Equal(got, tc.want)

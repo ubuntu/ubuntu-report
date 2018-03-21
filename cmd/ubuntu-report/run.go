@@ -27,13 +27,13 @@ func metricsCollect(m metrics.Metrics) ([]byte, error) {
 	return json.MarshalIndent(&h, "", "  ")
 }
 
-func metricsReport(m metrics.Metrics, r reportType, alwaysReport bool, baseURL string) error {
+func metricsReport(m metrics.Metrics, r reportType, alwaysReport bool, baseURL string, reportBasePath string) error {
 	distro, version, err := m.GetIDS()
 	if err != nil {
 		return errors.Wrapf(err, "couldn't get mandatory information")
 	}
 
-	reportP, err := utils.ReportPath(distro, version)
+	reportP, err := utils.ReportPath(distro, version, reportBasePath)
 	if err != nil {
 		return errors.Wrapf(err, "couldn't get where to save reported metrics on disk")
 	}

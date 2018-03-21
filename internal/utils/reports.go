@@ -20,12 +20,14 @@ var (
 )
 
 // ReportPath of last saved report
-func ReportPath(distro, version string) (string, error) {
-	d, err := cacheDir()
-	if err != nil {
-		return "", err
+func ReportPath(distro, version string, cacheP string) (string, error) {
+	if cacheP == "" {
+		var err error
+		if cacheP, err = cacheDir(); err != nil {
+			return "", err
+		}
 	}
-	return filepath.Join(d, reportDir, distro+"."+version), nil
+	return filepath.Join(cacheP, reportDir, distro+"."+version), nil
 }
 
 func cacheDir() (string, error) {
