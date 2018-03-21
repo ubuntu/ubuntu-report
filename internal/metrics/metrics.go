@@ -26,7 +26,7 @@ type Metrics struct {
 	screenInfoCmd *exec.Cmd
 	spaceInfoCmd  *exec.Cmd
 	gpuInfoCmd    *exec.Cmd
-	getenv        func(string) string
+	getenv        GetenvFn
 }
 
 // New return a new metrics element with optional testing functions
