@@ -66,7 +66,7 @@ func TestNonInteractiveCollectAndSend(t *testing.T) {
 			err := sysmetrics.CollectAndSend(tc.r, tc.alwaysReport, ts.URL)
 
 			if err != nil {
-				t.Fatal("we didn't get an error in collect/sending where we didn't expect one", err)
+				t.Fatal("we didn't expect getting an error, got:", err)
 			}
 
 			a.Equal(serverHit, tc.shouldHitServer)
@@ -124,7 +124,7 @@ func TestCollectAndSendTwice(t *testing.T) {
 			// first call
 			err := sysmetrics.CollectAndSend(sysmetrics.ReportAuto, tc.alwaysReport, ts.URL)
 			if err != nil {
-				t.Fatal("we didn't get an error in collect/sending where we didn't expect one", err)
+				t.Fatal("we didn't expect getting an error, got:", err)
 			}
 			a.Equal(serverHit, true)
 			p := filepath.Join(out, findInDirectory(t, "", out))
