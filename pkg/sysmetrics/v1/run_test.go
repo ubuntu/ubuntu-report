@@ -76,29 +76,37 @@ func TestMetricsReport(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
-		name          string
-		root          string
-		caseGPU       string
-		caseScreen    string
-		casePartition string
-		env           map[string]string
-		r             ReportType
+		name            string
+		root            string
+		caseGPU         string
+		caseScreen      string
+		casePartition   string
+		env             map[string]string
+		r               ReportType
+		manualServerURL string
 
 		// note that only an internal json package error can make it returning an error
-		cacheReportP string
-		sHitHat      string
-		wantErr      bool
+		cacheReportP    string
+		shouldHitServer bool
+		sHitHat         string
+		wantErr         bool
 	}{
 		{"regular report auto",
 			"testdata/good", "one gpu", "one screen", "one partition",
 			map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12"},
-			ReportAuto,
-			"ubuntu-report/ubuntu.18.04", "/ubuntu/desktop/18.04", false},
+			ReportAuto, "",
+			"ubuntu-report/ubuntu.18.04", true, "/ubuntu/desktop/18.04", false},
 		{"regular report OptOut",
 			"testdata/good", "one gpu", "one screen", "one partition",
 			map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12"},
-			ReportOptOut,
-			"ubuntu-report/ubuntu.18.04", "/ubuntu/desktop/18.04", false},
+			ReportOptOut, "",
+			"ubuntu-report/ubuntu.18.04", true, "/ubuntu/desktop/18.04", false},
+		{"No IDs (mandatory)",
+			"testdata/no-ids", "", "", "", nil, ReportAuto, "", "ubuntu-report", false, "", true},
+		{"Other URL",
+			"testdata/good", "", "", "", nil, ReportAuto, "localhost:4299", "ubuntu-report", false, "", true},
+		{"Invalid URL",
+			"testdata/good", "", "", "", nil, ReportAuto, "http://a b.com/", "ubuntu-report", false, "", true},
 	}
 	for _, tc := range testCases {
 		tc := tc // capture range variable for parallel execution
@@ -118,10 +126,27 @@ func TestMetricsReport(t *testing.T) {
 				serverHitAt = r.URL.String()
 			}))
 			defer ts.Close()
+			url := tc.manualServerURL
+			if url == "" {
+				url = ts.URL
+			}
 
-			err := metricsReport(m, tc.r, false, ts.URL, out)
+			err := metricsReport(m, tc.r, false, url, out)
 
 			a.CheckWantedErr(err, tc.wantErr)
+			// check we didn't do too much work on error
+			if err != nil {
+				if !tc.shouldHitServer {
+					a.Equal(serverHitAt, "")
+				}
+				if tc.shouldHitServer && serverHitAt == "" {
+					t.Error("we should have hit the local server and it wasn't")
+				}
+				if _, err := os.Stat(filepath.Join(out, tc.cacheReportP)); !os.IsNotExist(err) {
+					t.Errorf("we didn't expect finding a cache report path as we erroring out")
+				}
+				return
+			}
 			a.Equal(serverHitAt, tc.sHitHat)
 			gotF, err := os.Open(filepath.Join(out, tc.cacheReportP))
 			if err != nil {
