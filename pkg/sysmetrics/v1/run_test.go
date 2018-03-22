@@ -169,6 +169,82 @@ func TestMetricsReport(t *testing.T) {
 	}
 }
 
+func TestMultipleMetricsReport(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		name         string
+		alwaysReport bool
+
+		cacheReportP    string
+		shouldHitServer bool
+		sHitHat         string
+		wantErr         bool
+	}{
+		{"fail report twice", false, "ubuntu-report/ubuntu.18.04", false, "/ubuntu/desktop/18.04", true},
+		{"forcing report twice", true, "ubuntu-report/ubuntu.18.04", true, "/ubuntu/desktop/18.04", false},
+	}
+	for _, tc := range testCases {
+		tc := tc // capture range variable for parallel execution
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			a := helper.Asserter{T: t}
+
+			m, cancelGPU, cancelScreen, cancelPartition := newTestMetricsWithCommands(t, "testdata/good",
+				"one gpu", "one screen", "one partition",
+				map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12"})
+			defer cancelGPU()
+			defer cancelScreen()
+			defer cancelPartition()
+			out, tearDown := helper.TempDir(t)
+			defer tearDown()
+			serverHitAt := ""
+			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				serverHitAt = r.URL.String()
+			}))
+			defer ts.Close()
+
+			err := metricsReport(m, ReportAuto, tc.alwaysReport, ts.URL, out)
+			if err != nil {
+				t.Fatal("Didn't expect first call to fail")
+			}
+
+			// second call, reset server
+			serverHitAt = ""
+			m, cancelGPU, cancelScreen, cancelPartition = newTestMetricsWithCommands(t, "testdata/good",
+				"one gpu", "one screen", "one partition",
+				map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12"})
+			defer cancelGPU()
+			defer cancelScreen()
+			defer cancelPartition()
+			err = metricsReport(m, ReportAuto, tc.alwaysReport, ts.URL, out)
+
+			a.CheckWantedErr(err, tc.wantErr)
+			// check we didn't do too much work on error
+			if err != nil {
+				if !tc.shouldHitServer {
+					a.Equal(serverHitAt, "")
+				}
+				if tc.shouldHitServer && serverHitAt == "" {
+					t.Error("we should have hit the local server and it wasn't")
+				}
+				return
+			}
+			a.Equal(serverHitAt, tc.sHitHat)
+			gotF, err := os.Open(filepath.Join(out, tc.cacheReportP))
+			if err != nil {
+				t.Fatal("didn't generate a report file on disk", err)
+			}
+			got, err := ioutil.ReadAll(gotF)
+			if err != nil {
+				t.Fatal("couldn't read generated report file", err)
+			}
+			want := helper.LoadOrUpdateGolden(t, filepath.Join("testdata/good", "gold", fmt.Sprintf("cachereport-twice.ReportType%d", int(ReportAuto))), got, *Update)
+			a.Equal(got, want)
+		})
+	}
+}
+
 func newMockShortCmd(t *testing.T, s ...string) (*exec.Cmd, context.CancelFunc) {
 	t.Helper()
 	return helper.ShortProcess(t, "TestMetricsHelperProcess", s...)
