@@ -12,14 +12,30 @@ import (
 func TestGetURL(t *testing.T) {
 	t.Parallel()
 
-	got, err := sender.GetURL("https://myurl.com", "distroname", "versionnumber")
-	want := "https://myurl.com/distroname/desktop/versionnumber"
+	testCases := []struct {
+		name    string
+		baseURL string
 
-	if err != nil {
-		t.Fatal("got a parsing error:", err)
+		want    string
+		wantErr bool
+	}{
+		{"regular", "https://myurl.com", "https://myurl.com/distroname/desktop/versionnumber", false},
+		{"bad parsing", "http://a b.com/", "", true},
 	}
-	if got != want {
-		t.Errorf("got %s; want %s", got, want)
+	for _, tc := range testCases {
+		tc := tc // capture range variable for parallel execution
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			a := helper.Asserter{T: t}
+
+			got, err := sender.GetURL(tc.baseURL, "distroname", "versionnumber")
+
+			a.CheckWantedErr(err, tc.wantErr)
+			if err != nil {
+				return
+			}
+			a.Equal(got, tc.want)
+		})
 	}
 }
 
