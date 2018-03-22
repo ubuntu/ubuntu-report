@@ -24,7 +24,14 @@ import (
 
 var Update = flag.Bool("update", false, "update golden files")
 
-const ExpectedReportItem = `"Version":`
+const (
+	// ExpectedReportItem is the field we expect to always get in JSON
+	ExpectedReportItem = `"Version":`
+
+	// OptOutJSON is the data sent in case of Opt-Out choise
+	// export the private field for tests
+	OptOutJSON = optOutJSON
+)
 
 func TestMetricsCollect(t *testing.T) {
 	t.Parallel()
