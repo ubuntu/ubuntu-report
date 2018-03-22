@@ -215,29 +215,17 @@ func TestInteractiveCollectAndSend(t *testing.T) {
 			}))
 			defer ts.Close()
 
-			stdin, stdinW, err := os.Pipe()
-			if err != nil {
-				t.Fatal("couldn't create stdin pipe", err)
-			}
-			stdout, stdoutW, err := os.Pipe()
-			if err != nil {
-				t.Fatal("couldn't create stdout pipe", err)
-			}
-			oldStdout := os.Stdout
-			defer func() { os.Stdout = oldStdout }()
-			oldStdin := os.Stdin
-			defer func() { os.Stdin = oldStdin }()
-			os.Stdout = stdoutW
-			os.Stdin = stdin
+			stdout, tearDown := helper.CaptureStdout(t)
+			defer tearDown()
+			stdin, tearDown := helper.CaptureStdin(t)
+			defer tearDown()
 
+			var err error
 			done := make(chan struct{})
 			go func() {
-				defer stdoutW.Close()
-
 				// add a timeout
 				go func() {
 					err = sysmetrics.CollectAndSend(sysmetrics.ReportInteractive, false, ts.URL)
-					fmt.Println("DONE")
 					fmt.Println(err)
 					close(done)
 				}()
@@ -264,15 +252,15 @@ func TestInteractiveCollectAndSend(t *testing.T) {
 				}
 				a := tc.answers[answerIndex]
 				if a == "CTRL-C" {
-					stdinW.Close()
+					stdin.Close()
 					break
 				} else {
-					stdinW.Write([]byte(tc.answers[answerIndex] + "\n"))
+					stdin.Write([]byte(tc.answers[answerIndex] + "\n"))
 				}
 				answerIndex = answerIndex + 1
 				// all answers have be provided
 				if answerIndex >= len(tc.answers) {
-					stdinW.Close()
+					stdin.Close()
 					break
 				}
 			}

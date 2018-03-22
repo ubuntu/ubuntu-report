@@ -201,3 +201,30 @@ func TempDir(t *testing.T) (string, func()) {
 		}
 	}
 }
+
+// CaptureStdout returns an io.Reader to read what was printed, and teardown
+func CaptureStdout(t *testing.T) (io.Reader, func()) {
+	t.Helper()
+	stdout, stdoutW, err := os.Pipe()
+	if err != nil {
+		t.Fatal("couldn't create stdout pipe", err)
+	}
+	oldStdout := os.Stdout
+	os.Stdout = stdoutW
+	return stdout, func() {
+		stdout.Close()
+		os.Stdout = oldStdout
+	}
+}
+
+// CaptureStdin returns an i.Writer to write, as stdin, and teardown
+func CaptureStdin(t *testing.T) (io.WriteCloser, func()) {
+	t.Helper()
+	stdin, stdinW, err := os.Pipe()
+	if err != nil {
+		t.Fatal("couldn't create stdin pipe", err)
+	}
+	oldStdin := os.Stdin
+	os.Stdin = stdin
+	return stdinW, func() { os.Stdin = oldStdin }
+}
