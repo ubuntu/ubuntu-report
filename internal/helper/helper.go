@@ -188,3 +188,16 @@ func GetenvFromMap(env map[string]string) func(key string) string {
 	}
 }
 
+// TempDir creates and give defer to remove temporary dir safely for testing
+func TempDir(t *testing.T) (string, func()) {
+	t.Helper()
+	d, err := ioutil.TempDir("", "ubuntu-report-tests")
+	if err != nil {
+		t.Fatal("couldn't create temporary directory", err)
+	}
+	return d, func() {
+		if err = os.RemoveAll(d); err != nil {
+			t.Fatalf("couldn't clean temporary directory %s, %v", d, err)
+		}
+	}
+}
