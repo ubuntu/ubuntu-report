@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"os/exec"
-	"path"
+	"path/filepath"
 	"testing"
 
 	"github.com/ubuntu/ubuntu-report/internal/helper"
@@ -89,7 +89,7 @@ func TestCollect(t *testing.T) {
 				metrics.WithMapForEnv(tc.env))
 			got, err := m.Collect()
 
-			want := helper.LoadOrUpdateGolden(t, path.Join(tc.root, "gold", "collect"), got, *metrics.Update)
+			want := helper.LoadOrUpdateGolden(t, filepath.Join(tc.root, "gold", "collect"), got, *metrics.Update)
 			a.CheckWantedErr(err, tc.wantErr)
 			a.Equal(got, want)
 		})

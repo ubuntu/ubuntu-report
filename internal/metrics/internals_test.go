@@ -5,6 +5,7 @@ import (
 	"flag"
 	"os/exec"
 	"path"
+	"path/filepath"
 	"testing"
 
 	"github.com/ubuntu/ubuntu-report/internal/helper"
@@ -66,7 +67,7 @@ func TestUpgradeInfo(t *testing.T) {
 
 			m := newTestMetrics(t, WithRootAt(tc.root))
 			got := []byte(m.upgradeInfo())
-			want := helper.LoadOrUpdateGolden(t, path.Join(m.root, "gold", "upgradeInfo"), got, *Update)
+			want := helper.LoadOrUpdateGolden(t, filepath.Join(m.root, "gold", "upgradeInfo"), got, *Update)
 
 			a.Equal(got, want)
 		})
