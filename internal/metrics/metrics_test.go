@@ -12,6 +12,7 @@ import (
 )
 
 func TestGetIDS(t *testing.T) {
+	t.Parallel()
 
 	testCases := []struct {
 		name string
@@ -49,6 +50,8 @@ func TestGetIDS(t *testing.T) {
 }
 
 func TestCollect(t *testing.T) {
+	t.Parallel()
+
 	testCases := []struct {
 		name          string
 		root          string
@@ -97,6 +100,8 @@ func TestCollect(t *testing.T) {
 }
 
 func TestRunCollectTwice(t *testing.T) {
+	t.Parallel()
+
 	testCases := []struct {
 		name          string
 		root          string
