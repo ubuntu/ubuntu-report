@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -27,7 +28,7 @@ func metricsCollect(m metrics.Metrics) ([]byte, error) {
 	return json.MarshalIndent(&h, "", "  ")
 }
 
-func metricsReport(m metrics.Metrics, r ReportType, alwaysReport bool, baseURL string, reportBasePath string) error {
+func metricsReport(m metrics.Metrics, r ReportType, alwaysReport bool, baseURL string, reportBasePath string, in io.Reader, out io.Writer) error {
 	distro, version, err := m.GetIDS()
 	if err != nil {
 		return errors.Wrapf(err, "couldn't get mandatory information")
@@ -55,13 +56,13 @@ func metricsReport(m metrics.Metrics, r ReportType, alwaysReport bool, baseURL s
 
 	sendMetrics := true
 	if r == ReportInteractive {
-		fmt.Println("This is the result of hardware and optional installer/upgrader that we collected:")
-		fmt.Println(string(data))
+		fmt.Fprintln(out, "This is the result of hardware and optional installer/upgrader that we collected:")
+		fmt.Fprintln(out, string(data))
 
 		validAnswer := false
-		scanner := bufio.NewScanner(os.Stdin)
+		scanner := bufio.NewScanner(in)
 		for validAnswer != true {
-			fmt.Printf("Do you agree to report this? [y (send metrics)/N (send opt out message)] ")
+			fmt.Fprintf(out, "Do you agree to report this? [y (send metrics)/N (send opt out message)] ")
 			if !scanner.Scan() {
 				log.Info("programm interrupted")
 				return nil

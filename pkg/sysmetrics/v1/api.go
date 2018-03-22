@@ -1,6 +1,8 @@
 package sysmetrics
 
 import (
+	"os"
+
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/ubuntu/ubuntu-report/internal/metrics"
@@ -39,5 +41,5 @@ func CollectAndSend(r ReportType, alwaysReport bool, baseURL string) error {
 	if err != nil {
 		return errors.Wrapf(err, "couldn't create a metric collector")
 	}
-	return metricsReport(m, r, alwaysReport, baseURL, "")
+	return metricsReport(m, r, alwaysReport, baseURL, "", os.Stdin, os.Stdout)
 }

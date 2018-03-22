@@ -138,7 +138,7 @@ func TestMetricsReport(t *testing.T) {
 				url = ts.URL
 			}
 
-			err := metricsReport(m, tc.r, false, url, out)
+			err := metricsReport(m, tc.r, false, url, out, os.Stdout, os.Stdin)
 
 			a.CheckWantedErr(err, tc.wantErr)
 			// check we didn't do too much work on error
@@ -204,7 +204,7 @@ func TestMultipleMetricsReport(t *testing.T) {
 			}))
 			defer ts.Close()
 
-			err := metricsReport(m, ReportAuto, tc.alwaysReport, ts.URL, out)
+			err := metricsReport(m, ReportAuto, tc.alwaysReport, ts.URL, out, os.Stdout, os.Stdin)
 			if err != nil {
 				t.Fatal("Didn't expect first call to fail")
 			}
@@ -217,7 +217,7 @@ func TestMultipleMetricsReport(t *testing.T) {
 			defer cancelGPU()
 			defer cancelScreen()
 			defer cancelPartition()
-			err = metricsReport(m, ReportAuto, tc.alwaysReport, ts.URL, out)
+			err = metricsReport(m, ReportAuto, tc.alwaysReport, ts.URL, out, os.Stdout, os.Stdin)
 
 			a.CheckWantedErr(err, tc.wantErr)
 			// check we didn't do too much work on error
