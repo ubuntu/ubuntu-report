@@ -3,8 +3,9 @@ Report hardware and other collected metrics like installer or upgrade informatio
 
 Those information can't be used to identify a single machine and are presented before being sent to the server.
 
-Test: [![Build & Tests Status](https://travis-ci.org/ubuntu/ubuntu-report.svg?branch=master)](https://travis-ci.org/ubuntu/ubuntu-report)
-Coverage: [![codecov](https://codecov.io/gh/ubuntu/ubuntu-report/branch/master/graph/badge.svg)](https://codecov.io/gh/ubuntu/ubuntu-report)
+[![Build & Tests Status](https://travis-ci.org/ubuntu/ubuntu-report.svg?branch=master)](https://travis-ci.org/ubuntu/ubuntu-report)
+[![codecov](https://codecov.io/gh/ubuntu/ubuntu-report/branch/master/graph/badge.svg)](https://codecov.io/gh/ubuntu/ubuntu-report)
+[![GoDoc](https://godoc.org/github.com/ubuntu/ubuntu-report?status.svg)](https://godoc.org/github.com/ubuntu/ubuntu-report/pkg/sysmetrics/v1)
 
 ## About
 

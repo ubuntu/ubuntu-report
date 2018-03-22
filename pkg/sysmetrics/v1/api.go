@@ -6,11 +6,15 @@ import (
 	"github.com/ubuntu/ubuntu-report/internal/metrics"
 )
 
+// ReportType define the desired kind of interaction in CollectAndSend()
 type ReportType int
 
 const (
+	// ReportInteractive will show report content on stdout and read anwser on stdin
 	ReportInteractive ReportType = iota
+	// ReportAuto will send a report without printing report
 	ReportAuto
+	// ReportOptOut will send opt-out message without printing report
 	ReportOptOut
 )
 
@@ -26,12 +30,8 @@ func Collect() ([]byte, error) {
 }
 
 // CollectAndSend gather system info and send them
-// ReportType can be:
-// - ReportInteractive (will show report content on stdout and read anwser on stdin)
-// - ReportAuto (will report without printing report)
-// - ReportOptOut (will send opt-out message without printing report)
-// - baseURL is alternative url to send the report to, if not empty
-// alwaysReport forces a report even if a previous report was already done
+// alwaysReports bypass previous report already be sent for current version check
+// It can be send to an alternative url via baseURL to send the report to, if not empty
 func CollectAndSend(r ReportType, alwaysReport bool, baseURL string) error {
 	log.Debug("collect and report system information")
 
