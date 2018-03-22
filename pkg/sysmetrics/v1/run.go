@@ -77,7 +77,7 @@ func metricsReport(m metrics.Metrics, r ReportType, alwaysReport bool, baseURL s
 				sendMetrics = true
 				validAnswer = true
 			} else if text == "q" || text == "quit" || text == "" {
-				os.Exit(0)
+				return nil
 			}
 			if validAnswer != true {
 				log.Error("we didn't understand your answer")
