@@ -62,13 +62,13 @@ func metricsReport(m metrics.Metrics, r ReportType, alwaysReport bool, baseURL s
 		validAnswer := false
 		scanner := bufio.NewScanner(in)
 		for validAnswer != true {
-			fmt.Fprintf(out, "Do you agree to report this? [y (send metrics)/N (send opt out message)] ")
+			fmt.Fprintf(out, "Do you agree to report this? [y (send metrics)/n (send opt out message)/Q (quit)] ")
 			if !scanner.Scan() {
 				log.Info("programm interrupted")
 				return nil
 			}
 			text := strings.ToLower(strings.TrimSpace(scanner.Text()))
-			if text == "n" || text == "no" || text == "" {
+			if text == "n" || text == "no" {
 				log.Debug("sending report was denied")
 				sendMetrics = false
 				validAnswer = true
@@ -76,6 +76,8 @@ func metricsReport(m metrics.Metrics, r ReportType, alwaysReport bool, baseURL s
 				log.Debug("sending report was accepted")
 				sendMetrics = true
 				validAnswer = true
+			} else if text == "q" || text == "quit" || text == "" {
+				os.Exit(0)
 			}
 			if validAnswer != true {
 				log.Error("we didn't understand your answer")
