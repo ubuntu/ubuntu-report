@@ -320,7 +320,7 @@ func TestInteractiveMetricsReport(t *testing.T) {
 			gotJSONReport := false
 			answerIndex := 0
 			scanner := bufio.NewScanner(stdout)
-			scanner.Split(scanLinesOrQuestion)
+			scanner.Split(ScanLinesOrQuestion)
 			for scanner.Scan() {
 				txt := scanner.Text()
 				// first, we should have a known element
@@ -392,8 +392,8 @@ func newTestMetricsWithCommands(t *testing.T, root, caseGPU, caseScreen, casePar
 		cancelGPU, cancelScreen, cancelPartition
 }
 
-// copy of ScanLines, adding the expected question string as we don't return here
-func scanLinesOrQuestion(data []byte, atEOF bool) (advance int, token []byte, err error) {
+// ScanLinesOrQuestion is copy of ScanLines, adding the expected question string as we don't return here
+func ScanLinesOrQuestion(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	if atEOF && len(data) == 0 {
 		return 0, nil, nil
 	}
