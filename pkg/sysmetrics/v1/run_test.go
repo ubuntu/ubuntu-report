@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/ubuntu/ubuntu-report/internal/helper"
@@ -85,7 +86,6 @@ func TestMetricsReport(t *testing.T) {
 		r               ReportType
 		manualServerURL string
 
-		// note that only an internal json package error can make it returning an error
 		cacheReportP    string
 		shouldHitServer bool
 		sHitHat         string
@@ -107,6 +107,8 @@ func TestMetricsReport(t *testing.T) {
 			"testdata/good", "", "", "", nil, ReportAuto, "localhost:4299", "ubuntu-report", false, "", true},
 		{"Invalid URL",
 			"testdata/good", "", "", "", nil, ReportAuto, "http://a b.com/", "ubuntu-report", false, "", true},
+		{"Unwritable path",
+			"testdata/good", "", "", "", nil, ReportAuto, "", "/unwritable/cache/path", true, "/ubuntu/desktop/18.04", true},
 	}
 	for _, tc := range testCases {
 		tc := tc // capture range variable for parallel execution
@@ -119,8 +121,13 @@ func TestMetricsReport(t *testing.T) {
 			defer cancelGPU()
 			defer cancelScreen()
 			defer cancelPartition()
+			var out string
 			out, tearDown := helper.TempDir(t)
 			defer tearDown()
+			if strings.HasPrefix(tc.cacheReportP, "/") {
+				// absolute path, override temporary one
+				out = tc.cacheReportP
+			}
 			serverHitAt := ""
 			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				serverHitAt = r.URL.String()
