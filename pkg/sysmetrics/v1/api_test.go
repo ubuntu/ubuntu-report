@@ -87,7 +87,7 @@ func TestNonInteractiveCollectAndSend(t *testing.T) {
 	}
 }
 
-func TestNonInteractiveCollectAndSendReportTwice(t *testing.T) {
+func TestCollectAndSendTwice(t *testing.T) {
 	// we change current path and env variable: not parallelizable tests
 	helper.SkipIfShort(t)
 

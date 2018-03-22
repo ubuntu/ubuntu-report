@@ -127,7 +127,6 @@ func TestMetricsReport(t *testing.T) {
 			defer cancelGPU()
 			defer cancelScreen()
 			defer cancelPartition()
-			var out string
 			out, tearDown := helper.TempDir(t)
 			defer tearDown()
 			if strings.HasPrefix(tc.cacheReportP, "/") {
