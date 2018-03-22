@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/ubuntu/ubuntu-report/internal/utils"
+	sysmetrics "github.com/ubuntu/ubuntu-report/pkg/sysmetrics/v1"
 )
 
 func main() {
@@ -45,7 +46,7 @@ func generateRootCmd() *cobra.Command {
 			}
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			if err := Report(reportInteractive, flagForce, ""); err != nil {
+			if err := sysmetrics.CollectAndSend(sysmetrics.ReportInteractive, flagForce, ""); err != nil {
 				log.Errorf(utils.ErrFormat, err)
 				os.Exit(1)
 			}
@@ -59,7 +60,7 @@ func generateRootCmd() *cobra.Command {
 		Short: "Only collect and display metrics without sending",
 		Args:  cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			data, err := Collect()
+			data, err := sysmetrics.Collect()
 			if err != nil {
 				log.Errorf(utils.ErrFormat, err)
 				os.Exit(1)
@@ -83,17 +84,17 @@ func generateRootCmd() *cobra.Command {
 		ValidArgs: []string{"yes", "no"},
 
 		Run: func(cmd *cobra.Command, args []string) {
-			var r reportType
+			var r sysmetrics.ReportType
 			if args[0] == "yes" {
-				r = reportAuto
+				r = sysmetrics.ReportAuto
 			} else if args[0] == "no" {
-				r = reportOptOut
+				r = sysmetrics.ReportOptOut
 			} else {
 				log.Error("Invalid arg")
 				os.Exit(1)
 			}
 
-			if err := Report(r, flagForce, ""); err != nil {
+			if err := sysmetrics.CollectAndSend(r, flagForce, ""); err != nil {
 				log.Errorf(utils.ErrFormat, err)
 				os.Exit(1)
 			}

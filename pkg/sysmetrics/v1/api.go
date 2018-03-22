@@ -1,4 +1,4 @@
-package main
+package sysmetrics
 
 import (
 	"github.com/pkg/errors"
@@ -6,12 +6,12 @@ import (
 	"github.com/ubuntu/ubuntu-report/internal/metrics"
 )
 
-type reportType int
+type ReportType int
 
 const (
-	reportInteractive reportType = iota
-	reportAuto
-	reportOptOut
+	ReportInteractive ReportType = iota
+	ReportAuto
+	ReportOptOut
 )
 
 // Collect system info and return a pretty printed version of collected data
@@ -25,14 +25,14 @@ func Collect() ([]byte, error) {
 	return metricsCollect(m)
 }
 
-// Report system info after collect
-// reportType can be:
-// - reportInteractive (will show report content on stdout and read anwser on stdin)
-// - reportAuto (will report without printing report)
-// - reportOptOut (will send opt-out message without printing report)
+// CollectAndSend gather system info and send them
+// ReportType can be:
+// - ReportInteractive (will show report content on stdout and read anwser on stdin)
+// - ReportAuto (will report without printing report)
+// - ReportOptOut (will send opt-out message without printing report)
 // - baseURL is alternative url to send the report to, if not empty
 // alwaysReport forces a report even if a previous report was already done
-func Report(r reportType, alwaysReport bool, baseURL string) error {
+func CollectAndSend(r ReportType, alwaysReport bool, baseURL string) error {
 	log.Debug("collect and report system information")
 
 	m, err := metrics.New()

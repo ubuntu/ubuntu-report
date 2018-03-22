@@ -1,4 +1,4 @@
-package main
+package sysmetrics
 
 import (
 	"bufio"
@@ -27,7 +27,7 @@ func metricsCollect(m metrics.Metrics) ([]byte, error) {
 	return json.MarshalIndent(&h, "", "  ")
 }
 
-func metricsReport(m metrics.Metrics, r reportType, alwaysReport bool, baseURL string, reportBasePath string) error {
+func metricsReport(m metrics.Metrics, r ReportType, alwaysReport bool, baseURL string, reportBasePath string) error {
 	distro, version, err := m.GetIDS()
 	if err != nil {
 		return errors.Wrapf(err, "couldn't get mandatory information")
@@ -47,14 +47,14 @@ func metricsReport(m metrics.Metrics, r reportType, alwaysReport bool, baseURL s
 	}
 
 	var data []byte
-	if r != reportOptOut {
+	if r != ReportOptOut {
 		if data, err = metricsCollect(m); err != nil {
 			return errors.Wrapf(err, "couldn't collect system minimal info and format it")
 		}
 	}
 
 	sendMetrics := true
-	if r == reportInteractive {
+	if r == ReportInteractive {
 		fmt.Println("This is the result of hardware and optional installer/upgrader that we collected:")
 		fmt.Println(string(data))
 
@@ -80,7 +80,7 @@ func metricsReport(m metrics.Metrics, r reportType, alwaysReport bool, baseURL s
 				log.Error("we didn't understand your answer")
 			}
 		}
-	} else if r == reportAuto {
+	} else if r == ReportAuto {
 		log.Debug("auto report requested")
 		sendMetrics = true
 	} else {
