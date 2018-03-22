@@ -44,13 +44,11 @@ func TestMetricsCollect(t *testing.T) {
 			t.Parallel()
 			a := helper.Asserter{T: t}
 
-			cmdGPU, cancel := newMockShortCmd(t, "lspci", "-n", tc.caseGPU)
-			defer cancel()
-			cmdScreen, cancel := newMockShortCmd(t, "xrandr", tc.caseScreen)
-			defer cancel()
-			cmdPartition, cancel := newMockShortCmd(t, "df", tc.casePartition)
-			defer cancel()
-			m := metrics.NewTestMetrics(tc.root, cmdGPU, cmdScreen, cmdPartition, helper.GetenvFromMap(tc.env))
+			m, cancelGPU, cancelScreen, cancelPartition := newTestMetricsWithCommands(t, tc.root,
+				tc.caseGPU, tc.caseScreen, tc.casePartition, tc.env)
+			defer cancelGPU()
+			defer cancelScreen()
+			defer cancelPartition()
 			b1, err1 := metricsCollect(m)
 
 			want := helper.LoadOrUpdateGolden(t, filepath.Join(tc.root, "gold", "metricscollect"), b1, *Update)
@@ -58,13 +56,11 @@ func TestMetricsCollect(t *testing.T) {
 			a.Equal(b1, want)
 
 			// second run should return the same thing (idemnpotence)
-			cmdGPU, cancel = newMockShortCmd(t, "lspci", "-n", tc.caseGPU)
-			defer cancel()
-			cmdScreen, cancel = newMockShortCmd(t, "xrandr", tc.caseScreen)
-			defer cancel()
-			cmdPartition, cancel = newMockShortCmd(t, "df", tc.casePartition)
-			defer cancel()
-			m = metrics.NewTestMetrics(tc.root, cmdGPU, cmdScreen, cmdPartition, helper.GetenvFromMap(tc.env))
+			m, cancelGPU, cancelScreen, cancelPartition = newTestMetricsWithCommands(t, tc.root,
+				tc.caseGPU, tc.caseScreen, tc.casePartition, tc.env)
+			defer cancelGPU()
+			defer cancelScreen()
+			defer cancelPartition()
 			b2, err2 := metricsCollect(m)
 
 			a.CheckWantedErr(err2, tc.wantErr)
@@ -110,13 +106,11 @@ func TestMetricsReport(t *testing.T) {
 			t.Parallel()
 			a := helper.Asserter{T: t}
 
-			cmdGPU, cancel := newMockShortCmd(t, "lspci", "-n", tc.caseGPU)
-			defer cancel()
-			cmdScreen, cancel := newMockShortCmd(t, "xrandr", tc.caseScreen)
-			defer cancel()
-			cmdPartition, cancel := newMockShortCmd(t, "df", tc.casePartition)
-			defer cancel()
-			m := metrics.NewTestMetrics(tc.root, cmdGPU, cmdScreen, cmdPartition, helper.GetenvFromMap(tc.env))
+			m, cancelGPU, cancelScreen, cancelPartition := newTestMetricsWithCommands(t, tc.root,
+				tc.caseGPU, tc.caseScreen, tc.casePartition, tc.env)
+			defer cancelGPU()
+			defer cancelScreen()
+			defer cancelPartition()
 			out, tearDown := helper.TempDir(t)
 			defer tearDown()
 			serverHitAt := ""
@@ -146,4 +140,14 @@ func TestMetricsReport(t *testing.T) {
 func newMockShortCmd(t *testing.T, s ...string) (*exec.Cmd, context.CancelFunc) {
 	t.Helper()
 	return helper.ShortProcess(t, "TestMetricsHelperProcess", s...)
+}
+
+func newTestMetricsWithCommands(t *testing.T, root, caseGPU, caseScreen, casePartition string, env map[string]string) (m metrics.Metrics,
+	cancelGPU, cancelSreen, cancelPartition context.CancelFunc) {
+	t.Helper()
+	cmdGPU, cancelGPU := newMockShortCmd(t, "lspci", "-n", caseGPU)
+	cmdScreen, cancelScreen := newMockShortCmd(t, "xrandr", caseScreen)
+	cmdPartition, cancelPartition := newMockShortCmd(t, "df", casePartition)
+	return metrics.NewTestMetrics(root, cmdGPU, cmdScreen, cmdPartition, helper.GetenvFromMap(env)),
+		cancelGPU, cancelScreen, cancelPartition
 }
