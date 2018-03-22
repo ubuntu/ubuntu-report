@@ -151,7 +151,7 @@ func TestMetricsReport(t *testing.T) {
 					a.Equal(serverHitAt, "")
 				}
 				if tc.shouldHitServer && serverHitAt == "" {
-					t.Error("we should have hit the local server and it wasn't")
+					t.Error("we should have hit the local server and it didn't")
 				}
 				if _, err := os.Stat(filepath.Join(out, tc.cacheReportP)); !os.IsNotExist(err) {
 					t.Errorf("we didn't expect finding a cache report path as we erroring out")
@@ -230,7 +230,7 @@ func TestMultipleMetricsReport(t *testing.T) {
 					a.Equal(serverHitAt, "")
 				}
 				if tc.shouldHitServer && serverHitAt == "" {
-					t.Error("we should have hit the local server and it wasn't")
+					t.Error("we should have hit the local server and we didn't")
 				}
 				return
 			}
