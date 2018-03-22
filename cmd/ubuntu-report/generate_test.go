@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"flag"
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -12,6 +13,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/cobra/doc"
+	"github.com/ubuntu/ubuntu-report/internal/helper"
 )
 
 /*
@@ -25,9 +27,13 @@ var generate = flag.Bool("generate", false, "generate manpages and completion fi
 
 func TestGenerateManpage(t *testing.T) {
 	if !*generate {
-		t.Skip("skipping man page generation, --generate isn't set")
+		helper.SkipIfShort(t)
+		t.Log("mocking man page generation, --generate isn't set")
+		_, tearDown := chTempDir(t)
+		defer tearDown()
+	} else {
+		t.Parallel()
 	}
-	t.Parallel()
 
 	if err := os.Mkdir(out, 0755); err != nil && os.IsNotExist(err) {
 		t.Fatalf("couldn't create %s directory: %v", out, err)
@@ -43,9 +49,13 @@ func TestGenerateManpage(t *testing.T) {
 
 func TestGenerateCompletion(t *testing.T) {
 	if !*generate {
-		t.Skip("skipping bash and zsh completion generation, --generate isn't set")
+		helper.SkipIfShort(t)
+		t.Log("mocking bash and zsh completion generation, --generate isn't set")
+		_, tearDown := chTempDir(t)
+		defer tearDown()
+	} else {
+		t.Parallel()
 	}
-	t.Parallel()
 
 	rootCmd := generateRootCmd()
 	if err := os.Mkdir(out, 0755); err != nil && os.IsNotExist(err) {
@@ -60,12 +70,21 @@ func TestGenerateCompletion(t *testing.T) {
 }
 
 func TestGenerateREADME(t *testing.T) {
-	if !*generate {
-		t.Skip("skipping README generation, --generate isn't set")
-	}
-	t.Parallel()
-
 	sp := filepath.Join("..", "..", "README.md")
+	if !*generate {
+		helper.SkipIfShort(t)
+		t.Log("mock README generation, --generate isn't set")
+		sp = filepath.Join(curDir(t), sp)
+		d, tearDown := chTempDir(t)
+		defer tearDown()
+
+		newsp := filepath.Join(d, "README.md")
+		helper.CopyFile(t, sp, newsp)
+		sp = newsp
+	} else {
+		t.Parallel()
+	}
+
 	dp := sp + ".new"
 	src, err := os.Open(sp)
 	if err != nil {
@@ -149,5 +168,36 @@ func TestGenerateREADME(t *testing.T) {
 func mustWrite(t *testing.T, f *os.File, s string) {
 	if _, err := f.WriteString(s + "\n"); err != nil {
 		t.Fatalf("couldn't write '%s' to %s: %v", s, f.Name(), err)
+	}
+}
+
+func curDir(t *testing.T) string {
+	t.Helper()
+
+	c, err := os.Getwd()
+	if err != nil {
+		t.Fatal("couldn't get current directory", err)
+	}
+	return c
+}
+
+func chTempDir(t *testing.T) (string, func()) {
+	t.Helper()
+	d, err := ioutil.TempDir("", "ubuntu-report-tests")
+	if err != nil {
+		t.Fatal("couldn't create temporary directory", err)
+	}
+	c := curDir(t)
+	if err = os.Chdir(d); err != nil {
+		t.Fatalf("couldn't change directory to %s: %v", d, err)
+	}
+
+	return d, func() {
+		if err = os.Chdir(c); err != nil {
+			t.Fatalf("couldn't restore to initial directory %s, %v", c, err)
+		}
+		if err = os.RemoveAll(d); err != nil {
+			t.Fatalf("couldn't clean temporary directory %s, %v", d, err)
+		}
 	}
 }

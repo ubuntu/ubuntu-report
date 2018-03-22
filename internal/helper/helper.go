@@ -2,6 +2,7 @@ package helper
 
 import (
 	"context"
+	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -140,4 +141,37 @@ func ShortProcess(t *testing.T, helper string, s ...string) (*exec.Cmd, context.
 	cmd.Env = []string{"GO_WANT_HELPER_PROCESS=1"}
 
 	return cmd, cancel
+}
+
+// CopyFile for testing from src to dst
+func CopyFile(t *testing.T, src, dst string) {
+	t.Helper()
+
+	s, err := os.Open(src)
+	if err != nil {
+		t.Fatalf("couldn't open %s: %v", src, err)
+	}
+	defer s.Close()
+
+	d, err := os.Create(dst)
+	if err != nil {
+		t.Fatalf("couldn't create %s: %v", dst, err)
+	}
+	defer func() {
+		if err := d.Close(); err != nil {
+			t.Fatalf("couldn't close properly %s: %v", dst, err)
+		}
+	}()
+
+	if _, err := io.Copy(d, s); err != nil {
+		t.Fatalf("couldn't copy %s content to %s: %v", src, dst, err)
+	}
+}
+
+// SkipIfShort will skip current test if -short isn't passed
+func SkipIfShort(t *testing.T) {
+	t.Helper()
+	if testing.Short() {
+		t.Skip("short tests only, skipping")
+	}
 }
