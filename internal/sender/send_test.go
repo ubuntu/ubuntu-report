@@ -66,6 +66,15 @@ func TestSend(t *testing.T) {
 	}
 }
 
+func TestSendNoServer(t *testing.T) {
+	t.Parallel()
+	a := helper.Asserter{T: t}
+
+	err := sender.Send("https://localhost:4299", []byte("some content"))
+
+	a.CheckWantedErr(err, true)
+}
+
 type statusHandler int
 
 func (h *statusHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
