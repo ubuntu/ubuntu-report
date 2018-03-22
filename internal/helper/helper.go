@@ -175,3 +175,16 @@ func SkipIfShort(t *testing.T) {
 		t.Skip("short tests only, skipping")
 	}
 }
+
+// GetenvFromMap generates a getenv function mock from a map[string]string
+// no value returns empty string
+func GetenvFromMap(env map[string]string) func(key string) string {
+	return func(key string) string {
+		value, ok := env[key]
+		if !ok {
+			value = ""
+		}
+		return value
+	}
+}
+

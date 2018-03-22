@@ -4,6 +4,7 @@ import (
 	"os/exec"
 
 	log "github.com/sirupsen/logrus"
+	"github.com/ubuntu/ubuntu-report/internal/helper"
 )
 
 // WithRootAt tweaks the root directory of the file system
@@ -46,13 +47,7 @@ func WithSpaceInfoCommand(cmd *exec.Cmd) func(*Metrics) error {
 func WithMapForEnv(env map[string]string) func(*Metrics) error {
 	log.Debugf("Setting new environment to '%v'", env)
 	return func(m *Metrics) error {
-		m.getenv = func(key string) string {
-			value, ok := env[key]
-			if !ok {
-				value = ""
-			}
-			return value
-		}
+		m.getenv = helper.GetenvFromMap(env)
 		return nil
 	}
 }
