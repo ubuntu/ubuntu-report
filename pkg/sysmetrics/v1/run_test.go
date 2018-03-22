@@ -24,6 +24,8 @@ import (
 
 var Update = flag.Bool("update", false, "update golden files")
 
+const ExpectedReportItem = `"Version":`
+
 func TestMetricsCollect(t *testing.T) {
 	t.Parallel()
 
@@ -323,7 +325,7 @@ func TestInteractiveMetricsReport(t *testing.T) {
 			for scanner.Scan() {
 				txt := scanner.Text()
 				// first, we should have a known element
-				if strings.Contains(txt, `"Version":`) {
+				if strings.Contains(txt, ExpectedReportItem) {
 					gotJSONReport = true
 				}
 				if !strings.Contains(txt, "Do you agree to report this?") {
