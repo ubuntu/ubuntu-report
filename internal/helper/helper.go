@@ -2,6 +2,7 @@ package helper
 
 import (
 	"context"
+	"errors"
 	"io"
 	"io/ioutil"
 	"os"
@@ -227,4 +228,34 @@ func CaptureStdin(t *testing.T) (io.WriteCloser, func()) {
 	oldStdin := os.Stdin
 	os.Stdin = stdin
 	return stdinW, func() { os.Stdin = oldStdin }
+}
+
+// RunFunctionWithTimeout run in a go routing the fn functionL
+// There is a timeout as a maximum limit for the function, to run
+// The returned channel of errors is closed once the command ends
+// or if timeout is reached
+func RunFunctionWithTimeout(t *testing.T, fn func() error) chan error {
+	errs := make(chan error)
+	go func() {
+		defer close(errs)
+
+		// add a timeout
+		cmd := func() chan error {
+			cmderr := make(chan error)
+			go func() {
+				defer close(cmderr)
+				err := fn()
+				cmderr <- err
+			}()
+			return cmderr
+		}
+
+		select {
+		case err := <-cmd():
+			errs <- err
+		case <-time.After(5 * time.Second):
+			errs <- errors.New("function under test timed out")
+		}
+	}()
+	return errs
 }

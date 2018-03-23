@@ -16,7 +16,6 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/ubuntu/ubuntu-report/internal/helper"
 	"github.com/ubuntu/ubuntu-report/internal/metrics"
@@ -303,26 +302,10 @@ func TestInteractiveMetricsReport(t *testing.T) {
 			}))
 			defer ts.Close()
 
-			var err error
 			stdin, stdinW := io.Pipe()
 			stdout, stdoutW := io.Pipe()
 
-			done := make(chan struct{})
-			go func() {
-				defer stdoutW.Close()
-
-				// add a timeout
-				go func() {
-					err = metricsReport(m, ReportInteractive, false, ts.URL, out, stdin, stdoutW)
-					close(done)
-				}()
-				select {
-				case <-done:
-				case <-time.After(5 * time.Second):
-					t.Error("metricsReport timed out")
-					close(done)
-				}
-			}()
+			cmdErrs := helper.RunFunctionWithTimeout(t, func() error { return metricsReport(m, ReportInteractive, false, ts.URL, out, stdin, stdoutW) })
 
 			gotJSONReport := false
 			answerIndex := 0
@@ -352,9 +335,7 @@ func TestInteractiveMetricsReport(t *testing.T) {
 				}
 			}
 
-			<-done
-
-			if err != nil {
+			if err := <-cmdErrs; err != nil {
 				t.Fatal("didn't expect to get an error, got:", err)
 			}
 			a.Equal(gotJSONReport, true)

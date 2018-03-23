@@ -10,7 +10,6 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/ubuntu/ubuntu-report/internal/helper"
 	"github.com/ubuntu/ubuntu-report/pkg/sysmetrics/v1"
@@ -220,22 +219,7 @@ func TestInteractiveCollectAndSend(t *testing.T) {
 			stdin, tearDown := helper.CaptureStdin(t)
 			defer tearDown()
 
-			var err error
-			done := make(chan struct{})
-			go func() {
-				// add a timeout
-				go func() {
-					err = sysmetrics.CollectAndSend(sysmetrics.ReportInteractive, false, ts.URL)
-					fmt.Println(err)
-					close(done)
-				}()
-				select {
-				case <-done:
-				case <-time.After(5 * time.Second):
-					t.Error("metricsReport timed out")
-					close(done)
-				}
-			}()
+			cmdErrs := helper.RunFunctionWithTimeout(t, func() error { return sysmetrics.CollectAndSend(sysmetrics.ReportInteractive, false, ts.URL) })
 
 			gotJSONReport := false
 			answerIndex := 0
@@ -265,9 +249,7 @@ func TestInteractiveCollectAndSend(t *testing.T) {
 				}
 			}
 
-			<-done
-
-			if err != nil {
+			if err := <-cmdErrs; err != nil {
 				t.Fatal("didn't expect to get an error, got:", err)
 			}
 			a.Equal(gotJSONReport, true)
