@@ -13,9 +13,6 @@ import (
 )
 
 func main() {
-	log.SetFormatter(&log.TextFormatter{DisableTimestamp: true})
-	log.SetLevel(log.ErrorLevel)
-
 	rootCmd := generateRootCmd()
 
 	if err := rootCmd.Execute(); err != nil {
@@ -25,6 +22,9 @@ func main() {
 }
 
 func generateRootCmd() *cobra.Command {
+	log.SetFormatter(&log.TextFormatter{DisableTimestamp: true})
+	log.SetLevel(log.ErrorLevel)
+
 	var flagForce bool
 	var flagVerbosity int
 
