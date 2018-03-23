@@ -5,7 +5,11 @@ Those information can't be used to identify a single machine and are presented b
 
 [![Build & Tests Status](https://travis-ci.org/ubuntu/ubuntu-report.svg?branch=master)](https://travis-ci.org/ubuntu/ubuntu-report)
 [![codecov](https://codecov.io/gh/ubuntu/ubuntu-report/branch/master/graph/badge.svg)](https://codecov.io/gh/ubuntu/ubuntu-report)
-[![GoDoc](https://godoc.org/github.com/ubuntu/ubuntu-report?status.svg)](https://godoc.org/github.com/ubuntu/ubuntu-report/pkg/sysmetrics)
+
+APIS:
+ * Go: [![Go API](https://godoc.org/github.com/ubuntu/ubuntu-report?status.svg)](https://godoc.org/github.com/ubuntu/ubuntu-report/pkg/sysmetrics)
+ * C: [![C API](https://godoc.org/github.com/ubuntu/ubuntu-report?status.svg)](https://godoc.org/github.com/ubuntu/ubuntu-report/pkg/sysmetrics/C)
+
 
 ## About
 
@@ -14,7 +18,7 @@ invoke by a GUI, but it provides also a command line tool.
 
 The ubuntu welcome UI has a dedicated panel for this report collection and upload.
 
-The command line tool as well as the C API have different mode:
+The command line tool as well as the Go and C API have different mode:
 * Interactive mode (prompt displaying the data being sent and ask if sending or opting out)
 * Only show the report
 * Report automatically the collected data without prompting
@@ -104,7 +108,21 @@ ubuntu-report show [flags]
   -v, --verbose count[=-1]   issue INFO (-v) and DEBUG (-vv) output
 ```
 
-## Example of data being sent if agreement if performed
+## APIS
+
+### Go API
+
+The Go API is used by the command line, but can be embedded as well by 3rd parties. Doc reference is available at
+[![this link](https://godoc.org/github.com/ubuntu/ubuntu-report?status.svg)](https://godoc.org/github.com/ubuntu/ubuntu-report/pkg/sysmetrics).
+
+### C API
+
+The C API is provided for embedding the library in C code. Doc reference is available at
+[![this link](https://godoc.org/github.com/ubuntu/ubuntu-report?status.svg)](https://godoc.org/github.com/ubuntu/ubuntu-report/pkg/sysmetrics/C).
+
+## Send data to server
+
+### Example of data being sent if agreement if performed
 
 The data are pretty printed here for easier read.
 
@@ -176,7 +194,7 @@ The data are pretty printed here for easier read.
 }
 ```
 
-## Data being sent if agreement if denied
+### Data being sent if agreement if denied
 
 The data are pretty printed here for easier read.
 
