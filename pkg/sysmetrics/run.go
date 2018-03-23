@@ -44,8 +44,7 @@ func metricsReport(m metrics.Metrics, r ReportType, alwaysReport bool, baseURL s
 	if _, err := os.Stat(reportP); !os.IsNotExist(err) {
 		log.Infof("previous report found in %s", reportP)
 		if !alwaysReport {
-			return errors.Errorf("metrics from this machine have already been reported and can be found in: %s, "+
-				"please use the --force flag if you really want to report them again.", reportP)
+			return errors.Errorf("metrics from this machine have already been reported and can be found in: %s", reportP)
 		}
 		log.Debug("ignore previous report requested")
 	}

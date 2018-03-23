@@ -3,10 +3,10 @@
 // Building as a shared library
 //
 // The following command (in the pkg/sysmetrics/C directory) will provide a .h and .so file:
-//   go build -o libsysmetrics1.so -buildmode=c-shared libsysmetrics.go
+//   go build -o libsysmetrics.so.1 -buildmode=c-shared -ldflags '-extldflags -Wl,-soname,libsysmetrics.so.1' libsysmetrics.go
 //
 // Then, you can simply build your example program with:
-//   gcc main.c ./libsysmetrics1.so
+//   gcc main.c ./libsysmetrics.so.1
 //
 // Collect system info
 //
