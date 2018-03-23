@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"io"
 	"io/ioutil"
-	"os"
 	"strings"
 	"testing"
 
@@ -22,8 +21,8 @@ const (
 func TestShow(t *testing.T) {
 	helper.SkipIfShort(t)
 	a := helper.Asserter{T: t}
-	stdout, tearDown := helper.CaptureStdout(t)
-	defer tearDown()
+	stdout, restoreStdout := helper.CaptureStdout(t)
+	defer restoreStdout()
 
 	cmd := generateRootCmd()
 	cmd.SetArgs([]string{"show"})
@@ -32,7 +31,7 @@ func TestShow(t *testing.T) {
 	cmdErrs := helper.RunFunctionWithTimeout(t, func() error {
 		var err error
 		c, err = cmd.ExecuteC()
-		os.Stdout.Close() // close stdout to release ReadAll()
+		restoreStdout() // close stdout to release ReadAll()
 		return err
 	})
 
@@ -64,8 +63,8 @@ func TestVerbosity(t *testing.T) {
 		tc := tc // capture range variable for parallel execution
 		t.Run("verbosity level "+tc.verbosity, func(t *testing.T) {
 			a := helper.Asserter{T: t}
-			out, tearDown := helper.CaptureLogs(t)
-			defer tearDown()
+			out, restoreLogs := helper.CaptureLogs(t)
+			defer restoreLogs()
 
 			cmd := generateRootCmd()
 			args := []string{"show"}
@@ -77,7 +76,7 @@ func TestVerbosity(t *testing.T) {
 			cmdErrs := helper.RunFunctionWithTimeout(t, func() error {
 				var err error
 				_, err = cmd.ExecuteC()
-				tearDown() // send EOF to log to release io.Copy()
+				restoreLogs() // send EOF to log to release io.Copy()
 				return err
 
 			})

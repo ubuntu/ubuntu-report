@@ -214,9 +214,15 @@ func CaptureStdout(t *testing.T) (io.Reader, func()) {
 	}
 	oldStdout := os.Stdout
 	os.Stdout = stdoutW
+	closed := false
 	return stdout, func() {
-		stdout.Close()
+		// only teardown once
+		if closed {
+			return
+		}
 		os.Stdout = oldStdout
+		stdoutW.Close()
+		closed = true
 	}
 }
 
