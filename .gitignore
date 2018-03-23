@@ -1,6 +1,7 @@
 # Generated binaries and corresponding assets
 cmd/ubuntu-report/ubuntu-report
 */*/build
+libsysmetrics.so.*
 
 # Binaries for programs and plugins
 *.so

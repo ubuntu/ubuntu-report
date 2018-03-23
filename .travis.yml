@@ -14,6 +14,7 @@ before_script:
 script:
   - go test -coverprofile=coverage.txt -covermode=atomic ./...
   - go test -race ./...
+  - go build -o libsysmetrics.so.1 -buildmode=c-shared -ldflags '-extldflags -Wl,-soname,libsysmetrics.so.1' pkg/sysmetrics/C/libsysmetrics.go
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
