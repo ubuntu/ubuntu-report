@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"reflect"
+	"strings"
 	"testing"
 	"time"
 
@@ -285,4 +286,33 @@ func RunFunctionWithTimeout(t *testing.T, fn func() error) chan error {
 		}
 	}()
 	return errs
+}
+
+// ChangeEnv change a key in process environ
+// Return a teardown
+func ChangeEnv(key, value string) func() {
+	old := os.Getenv(key)
+	os.Setenv(key, value)
+
+	return func() {
+		os.Setenv(key, old)
+	}
+}
+
+// FindInDirectory return first match of prefix in d
+func FindInDirectory(t *testing.T, prefix, d string) string {
+	t.Helper()
+
+	files, err := ioutil.ReadDir(d)
+	if err != nil {
+		t.Fatalf("couldn't scan %s: %v", d, err)
+	}
+
+	for _, f := range files {
+		if strings.HasPrefix(f.Name(), prefix) {
+			return f.Name()
+		}
+	}
+	t.Fatalf("didn't find %s in %s. Only got: %v", prefix, d, files)
+	return ""
 }

@@ -51,7 +51,7 @@ func TestNonInteractiveCollectAndSend(t *testing.T) {
 
 			out, tearDown := helper.TempDir(t)
 			defer tearDown()
-			defer changeEnv("XDG_CACHE_HOME", out)()
+			defer helper.ChangeEnv("XDG_CACHE_HOME", out)()
 			out = filepath.Join(out, "ubuntu-report")
 			// we don't really care where we hit for this API integration test, internal ones test it
 			// and we don't really control /etc/os-release version and id.
@@ -69,7 +69,7 @@ func TestNonInteractiveCollectAndSend(t *testing.T) {
 			}
 
 			a.Equal(serverHit, tc.shouldHitServer)
-			p := filepath.Join(out, findInDirectory(t, "", out))
+			p := filepath.Join(out, helper.FindInDirectory(t, "", out))
 			data, err := ioutil.ReadFile(p)
 			if err != nil {
 				t.Fatalf("couldn't open report file %s", out)
@@ -109,7 +109,7 @@ func TestCollectAndSendTwice(t *testing.T) {
 
 			out, tearDown := helper.TempDir(t)
 			defer tearDown()
-			defer changeEnv("XDG_CACHE_HOME", out)()
+			defer helper.ChangeEnv("XDG_CACHE_HOME", out)()
 			out = filepath.Join(out, "ubuntu-report")
 			// we don't really care where we hit for this API integration test, internal ones test it
 			// and we don't really control /etc/os-release version and id.
@@ -126,7 +126,7 @@ func TestCollectAndSendTwice(t *testing.T) {
 				t.Fatal("we didn't expect getting an error, got:", err)
 			}
 			a.Equal(serverHit, true)
-			p := filepath.Join(out, findInDirectory(t, "", out))
+			p := filepath.Join(out, helper.FindInDirectory(t, "", out))
 			data, err := ioutil.ReadFile(p)
 			if err != nil {
 				t.Fatalf("couldn't open report file %s", out)
@@ -202,7 +202,7 @@ func TestInteractiveCollectAndSend(t *testing.T) {
 
 			out, tearDown := helper.TempDir(t)
 			defer tearDown()
-			defer changeEnv("XDG_CACHE_HOME", out)()
+			defer helper.ChangeEnv("XDG_CACHE_HOME", out)()
 			out = filepath.Join(out, "ubuntu-report")
 			// we don't really care where we hit for this API integration test, internal ones test it
 			// and we don't really control /etc/os-release version and id.
@@ -261,7 +261,7 @@ func TestInteractiveCollectAndSend(t *testing.T) {
 				}
 				return
 			}
-			p := filepath.Join(out, findInDirectory(t, "", out))
+			p := filepath.Join(out, helper.FindInDirectory(t, "", out))
 			data, err := ioutil.ReadFile(p)
 			if err != nil {
 				t.Fatalf("couldn't open report file %s", out)
@@ -276,31 +276,4 @@ func TestInteractiveCollectAndSend(t *testing.T) {
 			}
 		})
 	}
-}
-
-func changeEnv(key, value string) func() {
-	old := os.Getenv(key)
-	os.Setenv(key, value)
-
-	return func() {
-		os.Setenv(key, old)
-	}
-}
-
-// findInDirectory return first match of prefix in d
-func findInDirectory(t *testing.T, prefix, d string) string {
-	t.Helper()
-
-	files, err := ioutil.ReadDir(d)
-	if err != nil {
-		t.Fatalf("couldn't scan %s: %v", d, err)
-	}
-
-	for _, f := range files {
-		if strings.HasPrefix(f.Name(), prefix) {
-			return f.Name()
-		}
-	}
-	t.Fatalf("didn't find %s in %s. Only got: %v", prefix, d, files)
-	return ""
 }
