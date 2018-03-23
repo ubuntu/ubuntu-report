@@ -50,7 +50,7 @@ func (m Metrics) getScreens() []screenInfo {
 			log.Infof("screen info should be of form 'resolution     freq*+', got: %s", screeninfo)
 			continue
 		}
-		screens = append(screens, screenInfo{Resolution: i[0], Frequence: i[1]})
+		screens = append(screens, screenInfo{Resolution: i[0], Frequency: i[1]})
 	}
 
 	return screens

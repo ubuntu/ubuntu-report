@@ -29,7 +29,7 @@
   "Screens": [
     {
       "Resolution": "1366x768",
-      "Frequence": "60.02"
+      "Frequency": "60.02"
     }
   ],
   "Autologin": false,

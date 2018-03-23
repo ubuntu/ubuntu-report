@@ -155,11 +155,11 @@ The data are pretty printed here for easier read.
   "Screens": [
     {
       "Resolution": "1366x768",
-      "Frequence": "60.02"
+      "Frequency": "60.02"
     },
     {
       "Resolution": "1920x1080",
-      "Frequence": "60.00"
+      "Frequency": "60.00"
     }
   ],
   "Autologin": false,

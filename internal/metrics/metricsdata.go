@@ -39,7 +39,7 @@ type gpuInfo struct {
 
 type screenInfo struct {
 	Resolution string
-	Frequence  string
+	Frequency  string
 }
 
 type cpuInfo struct {

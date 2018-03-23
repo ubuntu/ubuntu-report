@@ -11,7 +11,7 @@
 // Collect system info
 //
 // res will be the pretty printed version of collected data.
-// err will be != NULL in case any errored occured.
+// err will be != NULL in case any error occurred.
 //
 //   char* Collect(char** res);
 //
