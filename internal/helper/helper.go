@@ -10,6 +10,8 @@ import (
 	"reflect"
 	"testing"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 )
 
 /*
@@ -228,6 +230,25 @@ func CaptureStdin(t *testing.T) (io.WriteCloser, func()) {
 	oldStdin := os.Stdin
 	os.Stdin = stdin
 	return stdinW, func() { os.Stdin = oldStdin }
+}
+
+// CaptureLogs returns an io.Reader to read what was logged, and teardown
+func CaptureLogs(t *testing.T) (io.Reader, func()) {
+	t.Helper()
+
+	pr, pw := io.Pipe()
+	log.SetOutput(pw)
+	old := log.StandardLogger().Out
+	closed := false
+	return pr, func() {
+		// only teardown once
+		if closed {
+			return
+		}
+		log.SetOutput(old)
+		pw.Close()
+		closed = true
+	}
 }
 
 // RunFunctionWithTimeout run in a go routing the fn functionL
