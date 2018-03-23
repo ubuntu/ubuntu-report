@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/ubuntu/ubuntu-report/internal/utils"
-	sysmetrics "github.com/ubuntu/ubuntu-report/pkg/sysmetrics/v1"
+	"github.com/ubuntu/ubuntu-report/pkg/sysmetrics"
 )
 
 func main() {

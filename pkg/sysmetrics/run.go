@@ -17,7 +17,7 @@ import (
 	"github.com/ubuntu/ubuntu-report/internal/utils"
 )
 
-// optOutJSON is the data sent in case of Opt-Out coice
+// optOutJSON is the data sent in case of Opt-Out choice
 const optOutJSON = `{"OptOut": true}`
 
 func metricsCollect(m metrics.Metrics) ([]byte, error) {

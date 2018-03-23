@@ -27,7 +27,7 @@ const (
 	// ExpectedReportItem is the field we expect to always get in JSON
 	ExpectedReportItem = `"Version":`
 
-	// OptOutJSON is the data sent in case of Opt-Out choise
+	// OptOutJSON is the data sent in case of Opt-Out choice
 	// export the private field for tests
 	OptOutJSON = optOutJSON
 )

@@ -12,7 +12,7 @@ import (
 	"testing"
 
 	"github.com/ubuntu/ubuntu-report/internal/helper"
-	"github.com/ubuntu/ubuntu-report/pkg/sysmetrics/v1"
+	"github.com/ubuntu/ubuntu-report/pkg/sysmetrics"
 )
 
 func TestCollect(t *testing.T) {
