@@ -49,6 +49,7 @@ ubuntu-report [flags]
 ```
   -f, --force                collect and send new report even if already reported
   -h, --help                 help for ubuntu-report
+  -u, --url string           server url to send report to. Leave empty for default. (default "https://metrics.ubuntu.com")
   -v, --verbose count[=-1]   issue INFO (-v) and DEBUG (-vv) output
 ```
 

@@ -11,8 +11,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// URL server to send metrics to
-const URL = "https://metrics.ubuntu.com"
+// BaseURL server to send metrics to
+const BaseURL = "https://metrics.ubuntu.com"
 
 // Send to url the json data
 func Send(url string, data []byte) error {

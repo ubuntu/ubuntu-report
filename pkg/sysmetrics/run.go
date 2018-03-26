@@ -99,7 +99,7 @@ func metricsReport(m metrics.Metrics, r ReportType, alwaysReport bool, baseURL s
 	}
 
 	if baseURL == "" {
-		baseURL = sender.URL
+		baseURL = sender.BaseURL
 	}
 	u, err := sender.GetURL(baseURL, distro, version)
 	if err != nil {

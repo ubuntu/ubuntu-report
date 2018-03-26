@@ -8,6 +8,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
+	"github.com/ubuntu/ubuntu-report/internal/sender"
 	"github.com/ubuntu/ubuntu-report/internal/utils"
 	"github.com/ubuntu/ubuntu-report/pkg/sysmetrics"
 )
@@ -27,6 +28,7 @@ func generateRootCmd() *cobra.Command {
 
 	var flagForce bool
 	var flagVerbosity int
+	var flagServerURL string
 
 	var rootCmd = &cobra.Command{
 		Use:   "ubuntu-report",
@@ -46,7 +48,7 @@ func generateRootCmd() *cobra.Command {
 			}
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			if err := sysmetrics.CollectAndSend(sysmetrics.ReportInteractive, flagForce, ""); err != nil {
+			if err := sysmetrics.CollectAndSend(sysmetrics.ReportInteractive, flagForce, flagServerURL); err != nil {
 				log.Errorf(utils.ErrFormat, err)
 				os.Exit(1)
 			}
@@ -54,6 +56,8 @@ func generateRootCmd() *cobra.Command {
 	}
 	rootCmd.PersistentFlags().CountVarP(&flagVerbosity, "verbose", "v", "issue INFO (-v) and DEBUG (-vv) output")
 	rootCmd.PersistentFlags().BoolVarP(&flagForce, "force", "f", false, "collect and send new report even if already reported")
+
+	rootCmd.Flags().StringVarP(&flagServerURL, "url", "u", sender.BaseURL, "server url to send report to. Leave empty for default.")
 
 	show := &cobra.Command{
 		Use:   "show",
@@ -94,7 +98,7 @@ func generateRootCmd() *cobra.Command {
 				os.Exit(1)
 			}
 
-			if err := sysmetrics.CollectAndSend(r, flagForce, ""); err != nil {
+			if err := sysmetrics.CollectAndSend(r, flagForce, flagServerURL); err != nil {
 				log.Errorf(utils.ErrFormat, err)
 				os.Exit(1)
 			}
@@ -107,6 +111,7 @@ func generateRootCmd() *cobra.Command {
 		Short: "Interactive mode, alias to running this tool without any subcommands.",
 		Run:   rootCmd.Run,
 	}
+	interactiveCmd.Flags().StringVarP(&flagServerURL, "url", "u", sender.BaseURL, "server url to send report to. Leave empty for default.")
 	rootCmd.AddCommand(interactiveCmd)
 
 	return rootCmd
