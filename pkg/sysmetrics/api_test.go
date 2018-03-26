@@ -2,7 +2,6 @@ package sysmetrics_test
 
 import (
 	"bufio"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -209,7 +208,6 @@ func TestInteractiveCollectAndSend(t *testing.T) {
 			// Same for report file
 			serverHit := false
 			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				fmt.Println("HIT")
 				serverHit = true
 			}))
 			defer ts.Close()

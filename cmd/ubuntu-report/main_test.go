@@ -82,7 +82,6 @@ func TestVerbosity(t *testing.T) {
 				_, err = cmd.ExecuteC()
 				restoreLogs() // send EOF to log to release io.Copy()
 				return err
-
 			})
 
 			var got bytes.Buffer
