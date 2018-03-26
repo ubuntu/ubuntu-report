@@ -80,6 +80,10 @@ func TestCollectAndSendExample(t *testing.T) {
 		t.Fatal("we didn't expect an error and got one", err)
 	}
 
+	// There isn't a data race as only the external binary can hit test server,
+	// but Go can't know it. To prevent that, shutdown the test server explicitely
+	ts.Close()
+
 	a.Equal(serverHit, true)
 	xdgP := filepath.Join(out, "ubuntu-report")
 	p = filepath.Join(xdgP, helper.FindInDirectory(t, "", xdgP))
