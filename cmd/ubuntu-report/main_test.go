@@ -5,6 +5,9 @@ import (
 	"bytes"
 	"io"
 	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -113,6 +116,73 @@ func TestVerbosity(t *testing.T) {
 			case "-vv":
 				if !strings.Contains(got.String(), "level=debug") {
 					t.Errorf("Expected some debug log to be printed, but got: %s", got.String())
+				}
+			}
+		})
+	}
+}
+
+func TestSend(t *testing.T) {
+	helper.SkipIfShort(t)
+
+	testCases := []struct {
+		name   string
+		answer string
+
+		shouldHitServer bool
+		wantErr         bool
+	}{
+		{"regular report auto", "yes", true, false},
+		{"regular report opt-out", "no", true, false},
+	}
+	for _, tc := range testCases {
+		tc := tc // capture range variable for parallel execution
+		t.Run(tc.name, func(t *testing.T) {
+			a := helper.Asserter{T: t}
+
+			out, tearDown := helper.TempDir(t)
+			defer tearDown()
+			defer helper.ChangeEnv("XDG_CACHE_HOME", out)()
+			out = filepath.Join(out, "ubuntu-report")
+			// we don't really care where we hit for this API integration test, internal ones test it
+			// and we don't really control /etc/os-release version and id.
+			// Same for report file
+			serverHit := false
+			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				serverHit = true
+			}))
+			defer ts.Close()
+
+			cmd := generateRootCmd()
+			args := []string{"send", tc.answer, "--url", ts.URL}
+			cmd.SetArgs(args)
+
+			cmdErrs := helper.RunFunctionWithTimeout(t, func() error {
+				var err error
+				_, err = cmd.ExecuteC()
+				return err
+			})
+
+			if err := <-cmdErrs; err != nil {
+				t.Fatal("got an error when expecting none:", err)
+			}
+
+			a.Equal(serverHit, tc.shouldHitServer)
+			p := filepath.Join(out, helper.FindInDirectory(t, "", out))
+			data, err := ioutil.ReadFile(p)
+			if err != nil {
+				t.Fatalf("couldn't open report file %s", out)
+			}
+			d := string(data)
+
+			switch tc.answer {
+			case "yes":
+				if !strings.Contains(d, expectedReportItem) {
+					t.Errorf("we expected to find %s in report file, got: %s", expectedReportItem, d)
+				}
+			case "no":
+				if !strings.Contains(d, optOutJSON) {
+					t.Errorf("we expected to find %s in report file, got: %s", optOutJSON, d)
 				}
 			}
 		})

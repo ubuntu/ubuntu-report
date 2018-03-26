@@ -104,6 +104,7 @@ func generateRootCmd() *cobra.Command {
 			}
 		},
 	}
+	send.Flags().StringVarP(&flagServerURL, "url", "u", sender.BaseURL, "server url to send report to. Leave empty for default.")
 	rootCmd.AddCommand(send)
 
 	interactiveCmd := &cobra.Command{
