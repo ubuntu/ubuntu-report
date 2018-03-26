@@ -73,7 +73,8 @@ ubuntu-report send yes|no [flags]
 #### Options
 
 ```
-  -h, --help   help for send
+  -h, --help         help for send
+  -u, --url string   server url to send report to. Leave empty for default. (default "https://metrics.ubuntu.com")
 ```
 
 #### Options inherited from parent commands
@@ -188,7 +189,7 @@ The data are pretty printed here for easier read.
       "27": "start_install",
       "37": "timezone",
       "49": "usersetup",
-      "57": "done_setup",
+      "57": "user_done",
       "829": "done"
     }
   }

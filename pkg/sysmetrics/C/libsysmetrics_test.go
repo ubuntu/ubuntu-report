@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"context"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -106,7 +105,6 @@ func buildExample(t *testing.T, dest, example, lib string) string {
 
 	d := filepath.Join(dest, "example")
 	cmd := exec.Command("gcc", "-o", d, example, lib)
-	fmt.Println(example)
 	if err := cmd.Run(); err != nil {
 		t.Fatal("couldn't build example binary:", err)
 	}
