@@ -14,7 +14,10 @@ before_script:
 script:
   - go test -coverprofile=coverage.txt -covermode=atomic ./...
   - go test -race ./...
-  - go build -o libsysmetrics.so.1 -buildmode=c-shared -ldflags '-extldflags -Wl,-soname,libsysmetrics.so.1' pkg/sysmetrics/C/libsysmetrics.go
+  - echo "Build assets"
+  - cd cmd/ubuntu-report && go build -o ../../build/ubuntu-report
+  - cd pkg/sysmetrics/C/ && go build -o ../../../build/libsysmetrics.so.1 -buildmode=c-shared -ldflags '-extldflags -Wl,-soname,libsysmetrics.so.1' libsysmetrics.go<
+  - cd cmd/ubuntu-report && go test generate_test.go main.go --generate --path ../../build/
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
