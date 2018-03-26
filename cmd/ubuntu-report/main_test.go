@@ -237,6 +237,11 @@ func TestInteractive(t *testing.T) {
 			}))
 			defer ts.Close()
 
+			stdout, restoreStdout := helper.CaptureStdout(t)
+			defer restoreStdout()
+			stdin, tearDown := helper.CaptureStdin(t)
+			defer tearDown()
+
 			cmd := generateRootCmd()
 			args := []string{}
 			if tc.cmd != "" {
@@ -248,13 +253,9 @@ func TestInteractive(t *testing.T) {
 			cmdErrs := helper.RunFunctionWithTimeout(t, func() error {
 				var err error
 				_, err = cmd.ExecuteC()
+				restoreStdout()
 				return err
 			})
-
-			stdout, tearDown := helper.CaptureStdout(t)
-			defer tearDown()
-			stdin, tearDown := helper.CaptureStdin(t)
-			defer tearDown()
 
 			gotJSONReport := false
 			answerIndex := 0
