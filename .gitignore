@@ -1,13 +1,14 @@
-# Generated binaries and corresponding assets
+# Binaries for programs and plugins
 cmd/ubuntu-report/ubuntu-report
-*/*/build
+*.so
 libsysmetrics.so.*
 
-# Binaries for programs and plugins
-*.so
+# Generated binaries and corresponding assets
+build/
 
 # Test binary, build with `go test -c`
 *.test
 
 # Output of the go coverage tool
 *.out
+coverage.txt
