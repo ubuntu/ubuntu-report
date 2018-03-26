@@ -1,19 +1,12 @@
-// C bindings to sysmetrics package
-//
-// Building as a shared library
-//
-// The following command (in the pkg/sysmetrics/C directory) will provide a .h and .so file:
-//   go build -o libsysmetrics.so.1 -buildmode=c-shared -ldflags '-extldflags -Wl,-soname,libsysmetrics.so.1' libsysmetrics.go
-//
-// Then, you can simply build your example program with:
-//   gcc main.c ./libsysmetrics.so.1
+// Package sysmetrics C bindings: collect and report system and hardware metrics
+// from your system.
 //
 // Collect system info
 //
-// res will be the pretty printed version of collected data.
-// err will be != NULL in case any error occurred.
-//
+// Command signature:
 //   char* Collect(char** res);
+// "res" will be the pretty printed version of collected data. The return "err" err will be != NULL in case
+// any error occurred during data collection.
 //
 // Example:
 //   #include <stdio.h>
@@ -36,9 +29,7 @@
 //
 // CollectAndSend gather system info and send them
 //
-// alwaysReports bypass previous report already be sent for current version check.
-// It can be send to an alternative url via baseURL to send the report to, if not empty.
-//
+// Command signature:
 //   char* CollectAndSend(ReportType r, bool alwaysreport, char* url);
 //
 // ReportType is the following enum:
@@ -50,6 +41,9 @@
 //      // ReportOptOut will send opt-out message without printing report
 //      ReportOptOut = 2,
 //    } ReportType;
+// You should generally prefer in bindings the Auto or OptOut report. Interactive is based on stdout and stdin.
+// "alwaysReports" bypass detection if a report has already been be sent for current version check.
+// It can be sent to an alternative url via "baseURL" to send the report to. Empty string will send to default server.
 //
 // Example (in autoreport mode, without reporting twice the same data and using default server URL):
 //   #include <stdbool.h>
@@ -70,4 +64,13 @@
 //       }
 //       free(err);
 //   }
+//
+// Building as a shared library
+//
+// The following command (in the pkg/sysmetrics/C directory) will provide a .h and .so file:
+//   go build -o libsysmetrics.so.1 -buildmode=c-shared -ldflags '-extldflags -Wl,-soname,libsysmetrics.so.1' libsysmetrics.go
+//
+// Then, you can simply build your example program with:
+//   gcc main.c ./libsysmetrics.so.1
+//
 package main

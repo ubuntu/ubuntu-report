@@ -1,3 +1,5 @@
+// Package sysmetrics Golang bindings: collect and report system and hardware metrics
+// from your system.
 package sysmetrics
 
 import (
