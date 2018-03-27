@@ -1,6 +1,9 @@
 #!/usr/bin/make -f
 #export DH_VERBOSE = 1
 
+# generate shared lib, shell completion, man pages and shared lib
+export DH_GOLANG_GO_GENERATE := 1
+
 builddir = $(CURDIR)/obj-$(DEB_HOST_GNU_TYPE)
 artefactsdir = $(builddir)/build
 
@@ -9,9 +12,8 @@ artefactsdir = $(builddir)/build
 
 override_dh_auto_build:
 	dh_auto_build
-	# build markdown, man pages and shared lib
-	cd $(builddir)/src/github.com/ubuntu/ubuntu-report/cmd/ubuntu-report && go test generate_test.go main.go --generate --path $(artefactsdir)
-	cd $(builddir)/src/github.com/ubuntu/ubuntu-report/pkg/sysmetrics/C && go build -o $(artefactsdir)/libsysmetrics.so.1 -buildmode=c-shared -ldflags "-extldflags -Wl,-soname,libsysmetrics.so.1" libsysmetrics.go && mv $(artefactsdir)/libsysmetrics.so.h $(artefactsdir)/libsysmetrics.h
+	# move shell completion, man pages and shared lib
+	mv $(builddir)/src/github.com/ubuntu/ubuntu-report/build $(artefactsdir)
 	mv $(artefactsdir)/bash-completion $(artefactsdir)/ubuntu-report
 	mv $(artefactsdir)/zsh-completion $(artefactsdir)/_ubuntu-report
 	rm $(builddir)/bin/C
