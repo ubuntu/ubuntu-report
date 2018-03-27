@@ -70,6 +70,9 @@ func TestGenerateCompletion(t *testing.T) {
 
 func TestGenerateREADME(t *testing.T) {
 	sp := filepath.Join("..", "..", "README.md")
+	if _, err := os.Stat(sp); err != nil && os.IsNotExist(err) {
+		t.Skip("no README.md file: doesn't run from source repository, nothing to update")
+	}
 	if !*generate {
 		helper.SkipIfShort(t)
 		t.Log("mock README generation, --generate isn't set")
