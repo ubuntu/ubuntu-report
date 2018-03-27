@@ -17,6 +17,9 @@ import (
 	"github.com/ubuntu/ubuntu-report/pkg/sysmetrics"
 )
 
+// generate shared library and header
+//go:generate sh -c "go build -o ../../../build/libsysmetrics.so.1 -buildmode=c-shared -ldflags \"-extldflags -Wl,-soname,libsysmetrics.so.1\" libsysmetrics.go && mv ../../../build/libsysmetrics.so.h ../../../build/libsysmetrics.h"
+
 // Collect system info and return a pretty printed version of collected data
 //export Collect
 func Collect(res **C.char) *C.char {

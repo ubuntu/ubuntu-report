@@ -16,8 +16,7 @@ script:
   - go test -race ./...
   - echo "Build assets"
   - pushd cmd/ubuntu-report && go build -o ../../build/ubuntu-report && popd
-  - pushd pkg/sysmetrics/C/ && go build -o ../../../build/libsysmetrics.so.1 -buildmode=c-shared -ldflags '-extldflags -Wl,-soname,libsysmetrics.so.1' libsysmetrics.go && popd
-  - pushd cmd/ubuntu-report && go test generate_test.go main.go --generate --path ../../build/ && popd
+  - go generate ./...
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)

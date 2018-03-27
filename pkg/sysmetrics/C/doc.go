@@ -69,7 +69,8 @@
 //
 // The following command (in the pkg/sysmetrics/C directory) will provide a .h and .so file:
 //   go build -o libsysmetrics.so.1 -buildmode=c-shared -ldflags '-extldflags -Wl,-soname,libsysmetrics.so.1' libsysmetrics.go
-// You will probably want to rename libsysmetrics.so.h to libsysmetrics.h
+// You will probably want to rename libsysmetrics.so.h to libsysmetrics.h. Note that go generate will proceed
+// this for you.
 //
 // Then, you can simply build your example program with:
 //   gcc main.c ./libsysmetrics.so.1

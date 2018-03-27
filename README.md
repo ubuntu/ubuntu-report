@@ -122,6 +122,12 @@ The Go API is used by the command line, but can be embedded as well by 3rd parti
 The C API is provided for embedding the library in C code. Doc reference is available at
 [![this link](https://godoc.org/github.com/ubuntu/ubuntu-report?status.svg)](https://godoc.org/github.com/ubuntu/ubuntu-report/pkg/sysmetrics/C).
 
+You can generate the shared library and headers by running `go generate`.
+
+## Command line options
+
+You can regenerate previous README section, shell completion support and man pages by simply running `go generate`.
+
 ## Send data to server
 
 ### Example of data being sent if agreement if performed
