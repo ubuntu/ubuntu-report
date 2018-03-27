@@ -1,0 +1,3 @@
+usr/bin
+obj-*/build/ubuntu-report usr/share/bash-completion/completions/
+obj-*/build/_ubuntu-report usr/share/zsh/vendor-completions/

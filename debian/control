@@ -1,0 +1,64 @@
+Source: ubuntu-report
+Section: utils
+Priority: optional
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+Build-Depends: debhelper (>= 11),
+               dh-golang (>= 1.17~),
+               golang-go (>= 2:1.10~),
+Standards-Version: 4.1.2
+XS-Go-Import-Path: github.com/ubuntu/ubuntu-report
+Homepage: https://github.com/ubuntu/ubuntu-report
+Vcs-Git: https://github.com/ubuntu/ubuntu-report.git
+
+Package: ubuntu-report
+Architecture: any
+Built-Using: ${misc:Built-Using},
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+Description: Report hardware and other collected metrics
+ The tool will show you what is going to be reported and ask for your
+ acknowledgement before uploading it. Those information can't be used to
+ identify a single machine and are presented before being sent to the server.
+ .
+ This package contain the command line tool.
+
+Package: libsysmetrics1
+Section: libs
+Architecture: any
+Multi-Arch: same
+Built-Using: ${misc:Built-Using},
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+Description: Report hardware and other collected metrics - shared lib
+ The tool will show you what is going to be reported and ask for your
+ acknowledgement before uploading it. Those information can't be used to
+ identify a single machine and are presented before being sent to the server.
+ .
+ This package contains shared libraries to use sysmetrics collection
+ and report functionality.
+
+Package: libsysmetrics-dev
+Section: devel
+Architecture: any
+Multi-Arch: same
+Depends: ${misc:Depends},
+         libsysmetrics1 (= ${binary:Version}),
+Description: Report hardware and other collected metrics - shared lib
+ The tool will show you what is going to be reported and ask for your
+ acknowledgement before uploading it. Those information can't be used to
+ identify a single machine and are presented before being sent to the server.
+ .
+ This package contains development files for applications using
+ the sysmetrics collection and report functionality.
+
+Package: golang-github-ubuntu-ubuntu-report-dev
+Architecture: all
+Depends: ${misc:Depends},
+         golang-go,
+Description: Report hardware and other collected metrics - source
+ The tool will show you what is going to be reported and ask for your
+ acknowledgement before uploading it. Those information can't be used to
+ identify a single machine and are presented before being sent to the server.
+ .
+ This package provides Golang sources and API to use sysmetrics collection
+ and report functionality.

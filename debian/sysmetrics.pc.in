@@ -1,0 +1,10 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${prefix}/lib/DEB_HOST_GNU_TYPE
+includedir=${prefix}/include
+
+Name: libsysmetrics
+Description: report hardware and other collected metrics
+Version: 1.0.0
+Cflags: -I${includedir}
+Libs: -L${libdir} -lsysmetrics
