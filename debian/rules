@@ -1,6 +1,9 @@
 #!/usr/bin/make -f
 #export DH_VERBOSE = 1
 
+# strict symbols checking
+export DPKG_GENSYMBOLS_CHECK_LEVEL=4
+
 # generate shared lib, shell completion, man pages and shared lib
 export DH_GOLANG_GO_GENERATE := 1
 
