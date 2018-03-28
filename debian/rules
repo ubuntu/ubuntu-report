@@ -11,6 +11,8 @@ artefactsdir = $(builddir)/build
 	dh $@ --buildsystem=golang --with=golang
 
 override_dh_auto_build:
+	# we don't depend on the vendor directory in ubuntu by policy
+	rm -rf obj-*/src/github.com/ubuntu/ubuntu-report/vendor
 	dh_auto_build
 	# move shell completion, man pages and shared lib
 	mv $(builddir)/src/github.com/ubuntu/ubuntu-report/build $(artefactsdir)

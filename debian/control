@@ -5,6 +5,16 @@ Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
 Build-Depends: debhelper (>= 11),
                dh-golang (>= 1.17~),
                golang-go (>= 2:1.10~),
+               golang-github-cpuguy83-go-md2man-dev,
+               golang-github-inconshreveable-mousetrap-dev,
+               golang-github-pkg-errors-dev,
+               golang-github-russross-blackfriday-dev,
+               golang-github-sirupsen-logrus-dev,
+               golang-github-spf13-cobra-dev,
+               golang-github-spf13-pflag-dev,
+               golang-golang-x-crypto-dev,
+               golang-golang-x-sys-dev,
+               golang-gopkg-yaml.v2-dev,
 Standards-Version: 4.1.2
 XS-Go-Import-Path: github.com/ubuntu/ubuntu-report
 Homepage: https://github.com/ubuntu/ubuntu-report
@@ -54,7 +64,17 @@ Description: Report hardware and other collected metrics - shared lib
 Package: golang-github-ubuntu-ubuntu-report-dev
 Architecture: all
 Depends: ${misc:Depends},
-         golang-go,
+         golang-go (>= 2:1.10~),
+         golang-github-cpuguy83-go-md2man-dev,
+         golang-github-inconshreveable-mousetrap-dev,
+         golang-github-pkg-errors-dev,
+         golang-github-russross-blackfriday-dev,
+         golang-github-sirupsen-logrus-dev,
+         golang-github-spf13-cobra-dev,
+         golang-github-spf13-pflag-dev,
+         golang-golang-x-crypto-dev,
+         golang-golang-x-sys-dev,
+         golang-gopkg-yaml.v2-dev,
 Description: Report hardware and other collected metrics - source
  The tool will show you what is going to be reported and ask for your
  acknowledgement before uploading it. Those information can't be used to
