@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+export GOPATH=/tmp:/usr/share/gocode
+
+rm -rf /tmp/src/github.com/ubuntu/
+mkdir -p /tmp/src/github.com/ubuntu/
+cp -a . /tmp/src/github.com/ubuntu/ubuntu-report
+
+rm -rf /tmp/src/github.com/ubuntu/ubuntu-report/vendor
+
