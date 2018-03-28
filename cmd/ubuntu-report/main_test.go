@@ -102,7 +102,7 @@ func TestVerbosity(t *testing.T) {
 					l := scanner.Text()
 					if strings.Contains(l, "level=info") {
 						allowedLog := false
-						for _, msg := range []string{"/telemetry", "GPU info", "Disk info", "Screen info", "autologin information"} {
+						for _, msg := range []string{"/telemetry", "GPU info", "Disk info", "Screen info", "CPU info", "autologin information", "/sys/class/dmi/id/"} {
 							if strings.Contains(l, msg) {
 								allowedLog = true
 							}
@@ -110,7 +110,7 @@ func TestVerbosity(t *testing.T) {
 						if allowedLog {
 							continue
 						}
-						t.Errorf("Expected no log output with -v apart from missing telemetry, GPU, Screen and autologin information, but got: %s", l)
+						t.Errorf("Expected no log output with -v apart from missing telemetry, GPU, Disk, Screen, chassis and autologin information, but got: %s", l)
 					}
 				}
 			case "-vv":
