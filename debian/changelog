@@ -1,5 +1,5 @@
-ubuntu-report (18.04) UNRELEASED; urgency=medium
+ubuntu-report (1.0.0) bionic; urgency=medium
 
-  * Initial release
+  * Initial release (LP: #1755456)
 
- -- Didier Roche <didrocks@ubuntu.com>  Tue, 27 Mar 2018 10:44:59 +0200
+ -- Didier Roche <didrocks@ubuntu.com>  Wed, 28 Mar 2018 12:23:32 +0200
