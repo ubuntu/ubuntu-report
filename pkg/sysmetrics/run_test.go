@@ -85,7 +85,7 @@ func TestMetricsCollect(t *testing.T) {
 	}
 }
 
-func TestMetricsReport(t *testing.T) {
+func TestMetricsCollectAndSend(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
@@ -149,7 +149,7 @@ func TestMetricsReport(t *testing.T) {
 				url = ts.URL
 			}
 
-			err := metricsReport(m, tc.r, false, url, out, os.Stdout, os.Stdin)
+			err := metricsCollectAndSend(m, tc.r, false, url, out, os.Stdout, os.Stdin)
 
 			a.CheckWantedErr(err, tc.wantErr)
 			// check we didn't do too much work on error
@@ -180,7 +180,7 @@ func TestMetricsReport(t *testing.T) {
 	}
 }
 
-func TestMultipleMetricsReport(t *testing.T) {
+func TestMultipleMetricsCollectAndSend(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
@@ -215,7 +215,7 @@ func TestMultipleMetricsReport(t *testing.T) {
 			}))
 			defer ts.Close()
 
-			err := metricsReport(m, ReportAuto, tc.alwaysReport, ts.URL, out, os.Stdout, os.Stdin)
+			err := metricsCollectAndSend(m, ReportAuto, tc.alwaysReport, ts.URL, out, os.Stdout, os.Stdin)
 			if err != nil {
 				t.Fatal("Didn't expect first call to fail")
 			}
@@ -228,7 +228,7 @@ func TestMultipleMetricsReport(t *testing.T) {
 			defer cancelGPU()
 			defer cancelScreen()
 			defer cancelPartition()
-			err = metricsReport(m, ReportAuto, tc.alwaysReport, ts.URL, out, os.Stdout, os.Stdin)
+			err = metricsCollectAndSend(m, ReportAuto, tc.alwaysReport, ts.URL, out, os.Stdout, os.Stdin)
 
 			a.CheckWantedErr(err, tc.wantErr)
 			// check we didn't do too much work on error
@@ -256,7 +256,7 @@ func TestMultipleMetricsReport(t *testing.T) {
 	}
 }
 
-func TestInteractiveMetricsReport(t *testing.T) {
+func TestInteractiveMetricsCollectAndSend(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
@@ -305,7 +305,7 @@ func TestInteractiveMetricsReport(t *testing.T) {
 			stdin, stdinW := io.Pipe()
 			stdout, stdoutW := io.Pipe()
 
-			cmdErrs := helper.RunFunctionWithTimeout(t, func() error { return metricsReport(m, ReportInteractive, false, ts.URL, out, stdin, stdoutW) })
+			cmdErrs := helper.RunFunctionWithTimeout(t, func() error { return metricsCollectAndSend(m, ReportInteractive, false, ts.URL, out, stdin, stdoutW) })
 
 			gotJSONReport := false
 			answerIndex := 0

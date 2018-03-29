@@ -43,5 +43,5 @@ func CollectAndSend(r ReportType, alwaysReport bool, baseURL string) error {
 	if err != nil {
 		return errors.Wrapf(err, "couldn't create a metric collector")
 	}
-	return metricsReport(m, r, alwaysReport, baseURL, "", os.Stdin, os.Stdout)
+	return metricsCollectAndSend(m, r, alwaysReport, baseURL, "", os.Stdin, os.Stdout)
 }

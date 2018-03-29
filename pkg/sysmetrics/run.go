@@ -31,7 +31,7 @@ func metricsCollect(m metrics.Metrics) ([]byte, error) {
 	return json.MarshalIndent(&h, "", "  ")
 }
 
-func metricsReport(m metrics.Metrics, r ReportType, alwaysReport bool, baseURL string, reportBasePath string, in io.Reader, out io.Writer) error {
+func metricsCollectAndSend(m metrics.Metrics, r ReportType, alwaysReport bool, baseURL string, reportBasePath string, in io.Reader, out io.Writer) error {
 	distro, version, err := m.GetIDS()
 	if err != nil {
 		return errors.Wrapf(err, "couldn't get mandatory information")
