@@ -38,7 +38,7 @@ Report metrics from your system, install and upgrades
 
 
 This tool will collect and report metrics from current hardware, partition and session information.
-This information can't be used to identify a single machine and are presented before being sent to the server.
+This information can't be used to identify a single machine and is presented before being sent to the server.
 
 ```
 ubuntu-report [flags]

@@ -36,10 +36,10 @@ func generateRootCmd() *cobra.Command {
 	var rootCmd = &cobra.Command{
 		Use:   "ubuntu-report",
 		Short: "Report metrics from your system, install and upgrades",
-		Long: `This tool will collect and report metrics from current hardware,` +
+		Long: `This tool will collect and report metrics from current hardware, ` +
 			`partition and session information.` + "\n" +
-			`Those information can't be used to identify a single machine and` +
-			`are presented before being sent to the server.`,
+			`This information can't be used to identify a single machine and ` +
+			`is presented before being sent to the server.`,
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			if flagVerbosity == 1 {
 				log.SetLevel(log.InfoLevel)
@@ -79,7 +79,7 @@ func generateRootCmd() *cobra.Command {
 
 	send := &cobra.Command{
 		Use:   "send yes|no",
-		Short: "Send or opt-out directly from metrics report without interactions",
+		Short: "Send or opt-out directly from metric reports without interactions",
 
 		// we want exactly one arg by in ValidArgs list
 		Args: func(cmd *cobra.Command, args []string) error {
