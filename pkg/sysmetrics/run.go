@@ -37,16 +37,9 @@ func metricsCollectAndSend(m metrics.Metrics, r ReportType, alwaysReport bool, b
 		return errors.Wrapf(err, "couldn't get mandatory information")
 	}
 
-	reportP, err := utils.ReportPath(distro, version, reportBasePath)
+	reportP, err := checkPreviousReport(distro, version, reportBasePath, alwaysReport)
 	if err != nil {
-		return errors.Wrapf(err, "couldn't get where to save reported metrics on disk")
-	}
-	if _, err := os.Stat(reportP); !os.IsNotExist(err) {
-		log.Infof("previous report found in %s", reportP)
-		if !alwaysReport {
-			return errors.Errorf("metrics from this machine have already been reported and can be found in: %s", reportP)
-		}
-		log.Debug("ignore previous report requested")
+		return err
 	}
 
 	var data []byte
@@ -125,4 +118,19 @@ func saveMetrics(p string, data []byte) error {
 	}
 
 	return nil
+}
+
+func checkPreviousReport(distro, version, reportBasePath string, alwaysReport bool) (string, error) {
+	p, err := utils.ReportPath(distro, version, reportBasePath)
+	if err != nil {
+		return "", errors.Wrapf(err, "couldn't get where to save reported metrics on disk")
+	}
+	if _, err := os.Stat(p); !os.IsNotExist(err) {
+		log.Infof("previous report found in %s", p)
+		if !alwaysReport {
+			return "", errors.Errorf("metrics from this machine have already been reported and can be found in: %s", p)
+		}
+		log.Debug("ignore previous report requested")
+	}
+	return p, nil
 }
