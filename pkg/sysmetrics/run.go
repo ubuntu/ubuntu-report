@@ -31,7 +31,7 @@ func metricsCollect(m metrics.Metrics) ([]byte, error) {
 	return json.MarshalIndent(&h, "", "  ")
 }
 
-func metricsCollectAndSend(m metrics.Metrics, r ReportType, alwaysReport bool, baseURL string, reportBasePath string, in io.Reader, out io.Writer) error {
+func metricsSend(m metrics.Metrics, data []byte, acknowledgement, alwaysReport bool, baseURL string, reportBasePath string, in io.Reader, out io.Writer) error {
 	distro, version, err := m.GetIDS()
 	if err != nil {
 		return errors.Wrapf(err, "couldn't get mandatory information")
@@ -39,6 +39,35 @@ func metricsCollectAndSend(m metrics.Metrics, r ReportType, alwaysReport bool, b
 
 	reportP, err := checkPreviousReport(distro, version, reportBasePath, alwaysReport)
 	if err != nil {
+		return err
+	}
+
+	// erase potential collected data
+	if !acknowledgement {
+		data = []byte(optOutJSON)
+	}
+
+	if baseURL == "" {
+		baseURL = sender.BaseURL
+	}
+	u, err := sender.GetURL(baseURL, distro, version)
+	if err != nil {
+		return errors.Wrapf(err, "report destination url is invalid")
+	}
+	if err := sender.Send(u, data); err != nil {
+		return errors.Wrapf(err, "data were not delivered successfully to metrics server")
+	}
+
+	return saveMetrics(reportP, data)
+}
+
+func metricsCollectAndSend(m metrics.Metrics, r ReportType, alwaysReport bool, baseURL string, reportBasePath string, in io.Reader, out io.Writer) error {
+	distro, version, err := m.GetIDS()
+	if err != nil {
+		return errors.Wrapf(err, "couldn't get mandatory information")
+	}
+
+	if _, err := checkPreviousReport(distro, version, reportBasePath, alwaysReport); err != nil {
 		return err
 	}
 
@@ -86,23 +115,7 @@ func metricsCollectAndSend(m metrics.Metrics, r ReportType, alwaysReport bool, b
 		sendMetrics = false
 	}
 
-	// erase potential collected data
-	if !sendMetrics {
-		data = []byte(optOutJSON)
-	}
-
-	if baseURL == "" {
-		baseURL = sender.BaseURL
-	}
-	u, err := sender.GetURL(baseURL, distro, version)
-	if err != nil {
-		return errors.Wrapf(err, "report destination url is invalid")
-	}
-	if err := sender.Send(u, data); err != nil {
-		return errors.Wrapf(err, "data were not delivered successfully to metrics server")
-	}
-
-	return saveMetrics(reportP, data)
+	return metricsSend(m, data, sendMetrics, alwaysReport, baseURL, reportBasePath, in, out)
 }
 
 func saveMetrics(p string, data []byte) error {

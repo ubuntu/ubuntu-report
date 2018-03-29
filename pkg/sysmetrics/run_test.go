@@ -85,6 +85,161 @@ func TestMetricsCollect(t *testing.T) {
 	}
 }
 
+func TestMetricsSend(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		name            string
+		root            string
+		data            []byte
+		ack             bool
+		manualServerURL string
+
+		cacheReportP    string
+		shouldHitServer bool
+		sHitHat         string
+		wantErr         bool
+	}{
+		{"send data",
+			"testdata/good", []byte(`{ "some-data": true }`), true, "",
+			"ubuntu-report/ubuntu.18.04", true, "/ubuntu/desktop/18.04", false},
+		{"nack send data",
+			"testdata/good", []byte(`{ "some-data": true }`), false, "",
+			"ubuntu-report/ubuntu.18.04", true, "/ubuntu/desktop/18.04", false},
+		{"no IDs (mandatory)",
+			"testdata/no-ids", []byte(`{ "some-data": true }`), true, "",
+			"ubuntu-report", false, "", true},
+		{"other URL",
+			"testdata/good", []byte(`{ "some-data": true }`), true, "localhost:4299",
+			"ubuntu-report", false, "", true},
+		{"invalid URL",
+			"testdata/good", []byte(`{ "some-data": true }`), true, "http://a b.com/",
+			"ubuntu-report", false, "", true},
+		{"unwritable path",
+			"testdata/good", []byte(`{ "some-data": true }`), true, "",
+			"/unwritable/cache/path", true, "/ubuntu/desktop/18.04", true},
+	}
+	for _, tc := range testCases {
+		tc := tc // capture range variable for parallel execution
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			a := helper.Asserter{T: t}
+
+			m := metrics.NewTestMetrics(tc.root, nil, nil, nil, os.Getenv)
+			out, tearDown := helper.TempDir(t)
+			defer tearDown()
+			if strings.HasPrefix(tc.cacheReportP, "/") {
+				// absolute path, override temporary one
+				out = tc.cacheReportP
+			}
+			serverHitAt := ""
+			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				serverHitAt = r.URL.String()
+			}))
+			defer ts.Close()
+			url := tc.manualServerURL
+			if url == "" {
+				url = ts.URL
+			}
+
+			err := metricsSend(m, tc.data, tc.ack, false, url, out, os.Stdout, os.Stdin)
+
+			a.CheckWantedErr(err, tc.wantErr)
+			// check we didn't do too much work on error
+			if err != nil {
+				if !tc.shouldHitServer {
+					a.Equal(serverHitAt, "")
+				}
+				if tc.shouldHitServer && serverHitAt == "" {
+					t.Error("we should have hit the local server and it didn't")
+				}
+				if _, err := os.Stat(filepath.Join(out, tc.cacheReportP)); !os.IsNotExist(err) {
+					t.Errorf("we didn't expect finding a cache report path as we erroring out")
+				}
+				return
+			}
+			a.Equal(serverHitAt, tc.sHitHat)
+			gotF, err := os.Open(filepath.Join(out, tc.cacheReportP))
+			if err != nil {
+				t.Fatal("didn't generate a report file on disk", err)
+			}
+			got, err := ioutil.ReadAll(gotF)
+			if err != nil {
+				t.Fatal("couldn't read generated report file", err)
+			}
+
+			want := helper.LoadOrUpdateGolden(t, filepath.Join(tc.root, "gold", fmt.Sprintf("metricssend.%s.%t", strings.Replace(tc.name, " ", "_", -1), tc.ack)), got, *Update)
+			a.Equal(got, want)
+		})
+	}
+}
+
+func TestMultipleMetricsSend(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		name         string
+		alwaysReport bool
+
+		cacheReportP    string
+		shouldHitServer bool
+		sHitHat         string
+		wantErr         bool
+	}{
+		{"fail report twice", false, "ubuntu-report/ubuntu.18.04", false, "/ubuntu/desktop/18.04", true},
+		{"forcing report twice", true, "ubuntu-report/ubuntu.18.04", true, "/ubuntu/desktop/18.04", false},
+	}
+	for _, tc := range testCases {
+		tc := tc // capture range variable for parallel execution
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			a := helper.Asserter{T: t}
+
+			m := metrics.NewTestMetrics("testdata/good", nil, nil, nil, os.Getenv)
+			out, tearDown := helper.TempDir(t)
+			defer tearDown()
+			serverHitAt := ""
+			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				serverHitAt = r.URL.String()
+			}))
+			defer ts.Close()
+
+			err := metricsSend(m, []byte(`{ "some-data": true }`), true, tc.alwaysReport, ts.URL, out, os.Stdout, os.Stdin)
+			if err != nil {
+				t.Fatal("Didn't expect first call to fail")
+			}
+
+			// second call, reset server
+			serverHitAt = ""
+			m = metrics.NewTestMetrics("testdata/good", nil, nil, nil, os.Getenv)
+			err = metricsSend(m, []byte(`{ "some-data": true }`), true, tc.alwaysReport, ts.URL, out, os.Stdout, os.Stdin)
+
+			a.CheckWantedErr(err, tc.wantErr)
+			// check we didn't do too much work on error
+			if err != nil {
+				if !tc.shouldHitServer {
+					a.Equal(serverHitAt, "")
+				}
+				if tc.shouldHitServer && serverHitAt == "" {
+					t.Error("we should have hit the local server and we didn't")
+				}
+				return
+			}
+			a.Equal(serverHitAt, tc.sHitHat)
+			gotF, err := os.Open(filepath.Join(out, tc.cacheReportP))
+			if err != nil {
+				t.Fatal("didn't generate a report file on disk", err)
+			}
+			got, err := ioutil.ReadAll(gotF)
+			if err != nil {
+				t.Fatal("couldn't read generated report file", err)
+			}
+			want := helper.LoadOrUpdateGolden(t, filepath.Join("testdata/good", "gold", fmt.Sprintf("metricssend_twice.%s", strings.Replace(tc.name, " ", "_", -1))), got, *Update)
+			a.Equal(got, want)
+		})
+	}
+}
+
 func TestMetricsCollectAndSend(t *testing.T) {
 	t.Parallel()
 
