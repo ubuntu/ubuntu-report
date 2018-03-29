@@ -1,7 +1,7 @@
 # Ubuntu Report
-Report hardware and other collected metrics like installer or upgrade informations.
+Report hardware and other collected metrics like installer or upgrade information.
 
-Those information can't be used to identify a single machine and are presented before being sent to the server.
+This information can't be used to identify a single machine and is presented before being sent to the server.
 
 [![Build & Tests Status](https://travis-ci.org/ubuntu/ubuntu-report.svg?branch=master)](https://travis-ci.org/ubuntu/ubuntu-report)
 [![codecov](https://codecov.io/gh/ubuntu/ubuntu-report/branch/master/graph/badge.svg)](https://codecov.io/gh/ubuntu/ubuntu-report)
@@ -13,16 +13,16 @@ APIS:
 
 ## About
 
-The tool will show you what is going to be reported and ask for you acknowledgement before uploading it. It will be mainly
-invoke by a GUI, but it provides also a command line tool.
+The tool will show you what is going to be reported and ask for your acknowledgement before uploading it. It will be mainly
+invoked by a GUI, but it provides also a command line tool.
 
-The ubuntu welcome UI has a dedicated panel for this report collection and upload.
+The Ubuntu welcome UI has a dedicated panel for this report collection and upload.
 
-The command line tool as well as the Go and C API have different mode:
+The command line tool as well as the Go and C API have different modes:
 * Interactive mode (prompt displaying the data being sent and ask if sending or opting out)
 * Only show the report
 * Report automatically the collected data without prompting
-* Report that we are opting out of data collection
+* Report that you have opted out of data collection
 
 By default, you can only report your data collection once per distribution version.
 
@@ -37,8 +37,8 @@ Report metrics from your system, install and upgrades
 #### Synopsis
 
 
-This tool will collect and report metrics from current hardware,partition and session information.
-Those information can't be used to identify a single machine andare presented before being sent to the server.
+This tool will collect and report metrics from current hardware, partition and session information.
+This information can't be used to identify a single machine and are presented before being sent to the server.
 
 ```
 ubuntu-report [flags]
@@ -59,12 +59,12 @@ Interactive mode, alias to running this tool without any subcommands.
 
 ### ubuntu-report send
 
-Send or opt-out directly from metrics report without interactions
+Send or opt-out directly from metric reports without interactions
 
 #### Synopsis
 
 
-Send or opt-out directly from metrics report without interactions
+Send or opt-out directly from metric reports without interactions
 
 ```
 ubuntu-report send yes|no [flags]
@@ -132,7 +132,7 @@ You can regenerate previous README section, shell completion support and man pag
 
 ### Example of data being sent if agreement if performed
 
-The data are pretty printed here for easier read.
+The data is pretty printed here to be more readable.
 
 ```json
 {
@@ -204,7 +204,7 @@ The data are pretty printed here for easier read.
 
 ### Data being sent if agreement if denied
 
-The data are pretty printed here for easier read.
+The data is pretty printed here to be more readable.
 
 ```json
 {
