@@ -67,7 +67,7 @@ func TestCollectAndSendExample(t *testing.T) {
 	defer tearDown()
 
 	lib := buildLib(t, out)
-	p := extractExampleFromDoc(t, out, "CollectAndSend", `""`, `"`+ts.URL+`"`)
+	p := extractExampleFromDoc(t, out, "Collect and send system info to server", `""`, `"`+ts.URL+`"`)
 	binary := buildExample(t, out, p, lib)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)

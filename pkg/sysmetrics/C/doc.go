@@ -4,7 +4,7 @@
 // Collect system info
 //
 // Command signature:
-//   char* Collect(char** res);
+//   char* sysmetrics_collect(char** res);
 // "res" will be the pretty printed version of collected data. The return "err" err will be != NULL in case
 // any error occurred during data collection.
 //
@@ -16,7 +16,7 @@
 //   int main() {
 //       char *res, *err;
 //
-//       err = Collect(&res);
+//       err = sysmetrics_collect(&res);
 //
 //       if (err != NULL) {
 //           printf("ERR: %s\n", err);
@@ -27,21 +27,21 @@
 //       free(err);
 //   }
 //
-// CollectAndSend gather system info and send them
+// Collect and send system info to server
 //
 // Command signature:
-//   char* CollectAndSend(ReportType r, bool alwaysreport, char* url);
+//   char* sysmetrics_collect_and_send(sysmetrics_report_type r, bool alwaysreport, char* url);
 //
-// ReportType is the following enum:
+// sysmetrics_report_type is the following enum:
 //    typedef enum {
-//      // ReportInteractive will show report content on stdout and read anwser on stdin
-//      ReportInteractive = 0,
-//      // ReportAuto will send a report without printing report
-//      ReportAuto = 1,
-//      // ReportOptOut will send opt-out message without printing report
-//      ReportOptOut = 2,
-//    } ReportType;
-// You should generally prefer in bindings the Auto or OptOut report. Interactive is based on stdout and stdin.
+//      // sysmetrics_report_interactive will show report content on stdout and read anwser on stdin
+//      sysmetrics_report_interactive = 0,
+//      // sysmetrics_report_auto will send a report without printing report
+//      sysmetrics_report_auto = 1,
+//      // sysmetrics_report_optout will send opt-out message without printing report
+//      sysmetrics_report_optout = 2,
+//    } sysmetrics_report_type;
+// You should generally prefer in bindings the auto or optout report. Interactive is based on stdout and stdin.
 // "alwaysReports" bypass detection if a report has already been be sent for current version check.
 // It can be sent to an alternative url via "baseURL" to send the report to. Empty string will send to default server.
 //
@@ -52,10 +52,10 @@
 //   #include "libsysmetrics.h"
 //
 //   int main() {
-//       ReportType r = ReportAuto;
+//       sysmetrics_report_type r = sysmetrics_report_auto;
 //       char *err;
 //
-//       err = CollectAndSend(r, false, "");
+//       err = sysmetrics_collect_and_send(r, false, "");
 //
 //       if (err != NULL) {
 //           printf("ERR: %s\n", err);

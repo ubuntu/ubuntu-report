@@ -3,14 +3,14 @@ package main
 // #include <stdbool.h>
 // #include <stdio.h>
 // #include <stdlib.h>
-// extern char* Collect(char** p0);
+// extern char* sysmetrics_collect(char** p0);
 // typedef enum {
-//     ReportInteractive = 0,
-//     ReportAuto = 1,
-//     ReportOptOut = 2,
-// } ReportType;
+//     sysmetrics_report_interactive = 0,
+//     sysmetrics_report_auto = 1,
+//     sysmetrics_report_optout = 2,
+// } sysmetrics_report_type;
 // typedef unsigned char GoUint8;
-// extern char* CollectAndSend(ReportType p0, GoUint8 p1, char* p2);
+// extern char* sysmetrics_collect_and_send(sysmetrics_report_type p0, GoUint8 p1, char* p2);
 import "C"
 
 import (
@@ -47,7 +47,7 @@ func testCollect(t *testing.T) {
 	var res *C.char
 	defer C.free(unsafe.Pointer(res))
 
-	err := C.Collect(&res)
+	err := C.sysmetrics_collect(&res)
 	defer C.free(unsafe.Pointer(err))
 
 	if err != nil {
@@ -94,7 +94,7 @@ func testNonInteractiveCollectAndSend(t *testing.T) {
 			url := C.CString(ts.URL)
 			defer C.free(unsafe.Pointer(url))
 
-			err := C.CollectAndSend(C.ReportType(tc.r), C.uchar(0), url)
+			err := C.sysmetrics_collect_and_send(C.sysmetrics_report_type(tc.r), C.uchar(0), url)
 			defer C.free(unsafe.Pointer(err))
 
 			if err != nil {
@@ -177,7 +177,7 @@ func testInteractiveCollectAndSend(t *testing.T) {
 				url := C.CString(ts.URL)
 				defer C.free(unsafe.Pointer(url))
 
-				errstr := C.CollectAndSend(C.ReportType(sysmetrics.ReportInteractive), C.uchar(0), url)
+				errstr := C.sysmetrics_collect_and_send(C.sysmetrics_report_type(sysmetrics.ReportInteractive), C.uchar(0), url)
 				defer C.free(unsafe.Pointer(errstr))
 				var err error
 				if errstr != nil {
