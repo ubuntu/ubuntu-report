@@ -1,5 +1,6 @@
 libsysmetrics.so.1 libsysmetrics1 #MINVER#
- _cgo_90cee26748d5_Cfunc__Cmalloc@Base 1.0.0
+ _cgo_404991d3d543_Cfunc__Cmalloc@Base 1.0.1
+ _cgo_90cee26748d5_Cfunc__Cmalloc@Base 1.0.1
  _cgo_90cee26748d5_Cfunc_free@Base 1.0.0
  _cgo_90cee26748d5_Cfunc_mygetgrgid_r@Base 1.0.0
  _cgo_90cee26748d5_Cfunc_mygetgrnam_r@Base 1.0.0
@@ -8,7 +9,7 @@ libsysmetrics.so.1 libsysmetrics1 #MINVER#
  _cgo_90cee26748d5_Cfunc_mygetpwuid_r@Base 1.0.0
  _cgo_90cee26748d5_Cfunc_realloc@Base 1.0.0
  _cgo_90cee26748d5_Cfunc_sysconf@Base 1.0.0
- _cgo_cc17aa3f59ed_Cfunc__Cmalloc@Base 1.0.1
+ _cgo_f447be26940c_Cfunc__Cmalloc@Base 1.0.1
  _cgo_f7895c2c5a3a_C2func_getaddrinfo@Base 1.0.0
  _cgo_f7895c2c5a3a_C2func_getnameinfo@Base 1.0.0
  _cgo_f7895c2c5a3a_Cfunc_freeaddrinfo@Base 1.0.0
@@ -24,8 +25,9 @@ libsysmetrics.so.1 libsysmetrics1 #MINVER#
  _cgo_try_pthread_create@Base 1.0.0
  _cgo_wait_runtime_init_done@Base 1.0.0
  _cgo_yield@Base 1.0.0
- _cgoexp_cc17aa3f59ed_sysmetrics_collect@Base 1.0.1
- _cgoexp_cc17aa3f59ed_sysmetrics_collect_and_send@Base 1.0.1
+ _cgoexp_404991d3d543_sysmetrics_collect@Base 1.0.1
+ _cgoexp_404991d3d543_sysmetrics_collect_and_send@Base 1.0.1
+ _cgoexp_404991d3d543_sysmetrics_send@Base 1.0.1
  (arch=arm64)crosscall1@Base 1.0.0
  crosscall2@Base 1.0.0
  (arch=amd64)crosscall_amd64@Base 1.0.0
@@ -36,6 +38,7 @@ libsysmetrics.so.1 libsysmetrics1 #MINVER#
  (arch=armhf arm64)setg_gcc@Base 1.0.0
  sysmetrics_collect@Base 1.0.1
  sysmetrics_collect_and_send@Base 1.0.1
+ sysmetrics_send@Base 1.0.1
  x_cgo_callers@Base 1.0.0
  x_cgo_init@Base 1.0.0
  x_cgo_inittls@Base 1.0.0
