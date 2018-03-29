@@ -1,3 +1,11 @@
+ubuntu-report (1.0.1) UNRELEASED; urgency=medium
+
+  * namespace C API release:
+    before tagging officially 1.*, use feedback on the C API to
+    adjust it.
+
+ -- Didier Roche <didrocks@ubuntu.com>  Thu, 29 Mar 2018 11:26:34 +0200
+
 ubuntu-report (1.0.0) bionic; urgency=medium
 
   * Initial release (LP: #1755456)
