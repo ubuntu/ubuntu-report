@@ -32,6 +32,18 @@ func sysmetrics_collect(res **C.char) *C.char {
 	return nil
 }
 
+// sysmetrics_send reports user's system metrics data to server depending on user acknowledgement
+// alwaysReports bypass previous report already be sent for current version check
+// It can be send to an alternative url via baseURL to send the report to, if not empty
+//export sysmetrics_send
+func sysmetrics_send(data *C.char, ack, alwaysReport bool, baseURL *C.char) *C.char {
+	err := sysmetrics.Send([]byte(C.GoString(data)), ack, alwaysReport, C.GoString(baseURL))
+	if err != nil {
+		return C.CString(err.Error())
+	}
+	return nil
+}
+
 // sysmetrics_collect_and_send gather system info and send them
 // alwaysReports bypass previous report already be sent for current version check
 // It can be send to an alternative url via baseURL to send the report to, if not empty

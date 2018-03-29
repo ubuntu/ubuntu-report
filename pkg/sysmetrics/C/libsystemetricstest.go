@@ -10,6 +10,7 @@ package main
 //     sysmetrics_report_optout = 2,
 // } sysmetrics_report_type;
 // typedef unsigned char GoUint8;
+// extern char* sysmetrics_send(char* p0, GoUint8 p1, GoUint8 p2, char* p3);
 // extern char* sysmetrics_collect_and_send(sysmetrics_report_type p0, GoUint8 p1, char* p2);
 import "C"
 
@@ -56,6 +57,73 @@ func testCollect(t *testing.T) {
 	data := C.GoString(res)
 	if !strings.Contains(data, expectedReportItem) {
 		t.Errorf("we expected at least %s in output, got: '%s", expectedReportItem, data)
+	}
+}
+
+func testSend(t *testing.T) {
+	// we change current path and env variable: not parallelizable tests
+	helper.SkipIfShort(t)
+
+	testCases := []struct {
+		name            string
+		acknowledgement bool
+
+		shouldHitServer bool
+		wantErr         bool
+	}{
+		{"regular send", true, true, false},
+		{"regular send opt-out", false, true, false},
+	}
+	for _, tc := range testCases {
+		tc := tc // capture range variable for parallel execution
+		t.Run(tc.name, func(t *testing.T) {
+			a := helper.Asserter{T: t}
+
+			out, tearDown := helper.TempDir(t)
+			defer tearDown()
+			defer helper.ChangeEnv("XDG_CACHE_HOME", out)()
+			out = filepath.Join(out, "ubuntu-report")
+			// we don't really care where we hit for this API integration test, internal ones test it
+			// and we don't really control /etc/os-release version and id.
+			// Same for report file
+			serverHit := false
+			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				serverHit = true
+			}))
+			defer ts.Close()
+
+			cData := C.CString(fmt.Sprintf(`{ %s: "18.04" }`, expectedReportItem))
+			url := C.CString(ts.URL)
+			defer C.free(unsafe.Pointer(url))
+			ack := 0
+			if tc.acknowledgement {
+				ack = 1
+			}
+
+			err := C.sysmetrics_send(cData, C.uchar(ack), C.uchar(0), url)
+			defer C.free(unsafe.Pointer(err))
+
+			if err != nil {
+				t.Fatal("we didn't expect getting an error, got:", err)
+			}
+
+			a.Equal(serverHit, tc.shouldHitServer)
+			p := filepath.Join(out, helper.FindInDirectory(t, "", out))
+			data, errread := ioutil.ReadFile(p)
+			if errread != nil {
+				t.Fatalf("couldn't open report file %s", out)
+			}
+			d := string(data)
+			if tc.acknowledgement {
+				if !strings.Contains(d, expectedReportItem) {
+					t.Errorf("we expected to find %s in report file, got: %s", expectedReportItem, d)
+				}
+			} else {
+				if !strings.Contains(d, optOutJSON) {
+					t.Errorf("we expected to find %s in report file, got: %s", optOutJSON, d)
+				}
+			}
+		})
 	}
 }
 
