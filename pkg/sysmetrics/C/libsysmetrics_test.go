@@ -158,7 +158,7 @@ func buildExample(t *testing.T, dest, example, lib string) string {
 	t.Helper()
 
 	d := filepath.Join(dest, "example")
-	cmd := exec.Command("gcc", "-o", d, example, lib)
+	cmd := exec.Command("gcc", "-I", dest, "-o", d, example, lib)
 	var out bytes.Buffer
 	cmd.Stderr = &out
 	if err := cmd.Run(); err != nil {
