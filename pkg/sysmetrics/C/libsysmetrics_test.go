@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"context"
 	"io/ioutil"
 	"net/http"
@@ -158,8 +159,10 @@ func buildExample(t *testing.T, dest, example, lib string) string {
 
 	d := filepath.Join(dest, "example")
 	cmd := exec.Command("gcc", "-o", d, example, lib)
+	var out bytes.Buffer
+	cmd.Stderr = &out
 	if err := cmd.Run(); err != nil {
-		t.Fatal("couldn't build example binary:", err)
+		t.Fatal("couldn't build example binary:", err, "\n", out.String())
 	}
 	return d
 }
