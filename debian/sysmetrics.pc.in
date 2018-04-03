@@ -6,5 +6,5 @@ includedir=${prefix}/include
 Name: libsysmetrics
 Description: report hardware and other collected metrics
 Version: 1.0.0
-Cflags: -I${includedir}
+Cflags: -I${includedir}/sysmetrics
 Libs: -L${libdir} -lsysmetrics
