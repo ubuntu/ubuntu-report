@@ -27,16 +27,16 @@
 //       free(err);
 //   }
 //
-// Send a previously collected report to server
+// Send provided metrics data to server
 //
 // Command signature:
-//   char* sysmetrics_send(char* data, bool acknowledgement, bool alwaysReport, char* baseUrl);
+//   char* sysmetrics_send_report(char* data, bool alwaysReport, char* baseUrl);
 //
-// Send provided metrics data to server depending on user acknowledgement.
 // The report will not be sent if a report has already been sent for this version unless "alwaysReport" is true.
 // If "baseURL" is not an empty string, this overrides the server the report is sent to.
+// The return "err" will be != NULL in case any error occurred during POST.
 //
-// Example (sending provided metrics data, with user's acknowledgement):
+// Example (sending provided metrics data):
 //   #include <stdbool.h>
 //   #include <stdio.h>
 //   #include <stdlib.h>
@@ -45,7 +45,7 @@
 //   int main() {
 //       char *err;
 //
-//       err = sysmetrics_send("{ \"Version\": \"18.04\" }", true, false, "");
+//       err = sysmetrics_send_report("{ \"Version\": \"18.04\" }", false, "");
 //
 //       if (err != NULL) {
 //           printf("ERR: %s\n", err);
@@ -70,7 +70,7 @@
 //      sysmetrics_report_optout = 2,
 //    } sysmetrics_report_type;
 // You should generally prefer in bindings the auto or optout report. Interactive is based on stdout and stdin.
-// "alwaysReport" bypass detection if a report has already been be sent for current version check.
+// The report will not be sent if a report has already been sent for this version unless "alwaysReport" is true.
 // It can be sent to an alternative url via "baseURL" to send the report to. Empty string will send to default server.
 //
 // Example (in autoreport mode, without reporting twice the same data and using default server URL):

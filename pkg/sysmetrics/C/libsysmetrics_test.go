@@ -22,7 +22,7 @@ import (
 // These wrappers are here for gotest to find.
 // Similar technic than in https://golang.org/misc/cgo/test/cgo_test.go
 func TestCollect(t *testing.T)                      { testCollect(t) }
-func TestSend(t *testing.T)                         { testSend(t) }
+func TestSendReport(t *testing.T)                   { testSendReport(t) }
 func TestNonInteractiveCollectAndSend(t *testing.T) { testNonInteractiveCollectAndSend(t) }
 func TestInteractiveCollectAndSend(t *testing.T)    { testInteractiveCollectAndSend(t) }
 
@@ -52,7 +52,7 @@ func TestCollectExample(t *testing.T) {
 	}
 }
 
-func TestSendExample(t *testing.T) {
+func TestSendReportExample(t *testing.T) {
 	helper.SkipIfShort(t)
 	t.Parallel()
 	ensureGCC(t)
@@ -69,7 +69,7 @@ func TestSendExample(t *testing.T) {
 	defer tearDown()
 
 	lib := buildLib(t, out)
-	p := extractExampleFromDoc(t, out, "Send", `""`, `"`+ts.URL+`"`)
+	p := extractExampleFromDoc(t, out, "Send provided metrics data to server", `""`, `"`+ts.URL+`"`)
 	binary := buildExample(t, out, p, lib)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)

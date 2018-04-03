@@ -32,12 +32,13 @@ func sysmetrics_collect(res **C.char) *C.char {
 	return nil
 }
 
-// sysmetrics_send reports user's system metrics data to server depending on user acknowledgement
-// alwaysReports bypass previous report already be sent for current version check
-// It can be send to an alternative url via baseURL to send the report to, if not empty
-//export sysmetrics_send
-func sysmetrics_send(data *C.char, ack, alwaysReport bool, baseURL *C.char) *C.char {
-	err := sysmetrics.Send([]byte(C.GoString(data)), ack, alwaysReport, C.GoString(baseURL))
+// sysmetrics_send_report sends provided metrics data to server.
+// The report will not be sent if a report has already been sent for this version unless "alwaysReport" is true.
+// If "baseURL" is not an empty string, this overrides the server the report is sent to.
+// The return "err" will be != NULL in case any error occurred during POST.
+//export sysmetrics_send_report
+func sysmetrics_send_report(data *C.char, alwaysReport bool, baseURL *C.char) *C.char {
+	err := sysmetrics.SendReport([]byte(C.GoString(data)), alwaysReport, C.GoString(baseURL))
 	if err != nil {
 		return C.CString(err.Error())
 	}
@@ -45,8 +46,9 @@ func sysmetrics_send(data *C.char, ack, alwaysReport bool, baseURL *C.char) *C.c
 }
 
 // sysmetrics_collect_and_send gather system info and send them
-// alwaysReports bypass previous report already be sent for current version check
+// The report will not be sent if a report has already been sent for this version unless "alwaysReport" is true.
 // It can be send to an alternative url via baseURL to send the report to, if not empty
+// The return "err" will be != NULL in case any error occurred during POST.
 //export sysmetrics_collect_and_send
 func sysmetrics_collect_and_send(r C.sysmetrics_report_type, alwaysReport bool, baseURL *C.char) *C.char {
 	err := sysmetrics.CollectAndSend(sysmetrics.ReportType(r), alwaysReport, C.GoString(baseURL))

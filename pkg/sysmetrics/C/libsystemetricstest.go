@@ -10,7 +10,7 @@ package main
 //     sysmetrics_report_optout = 2,
 // } sysmetrics_report_type;
 // typedef unsigned char GoUint8;
-// extern char* sysmetrics_send(char* p0, GoUint8 p1, GoUint8 p2, char* p3);
+// extern char* sysmetrics_send_report(char* p0, GoUint8 p1, char* p2);
 // extern char* sysmetrics_collect_and_send(sysmetrics_report_type p0, GoUint8 p1, char* p2);
 import "C"
 
@@ -60,19 +60,17 @@ func testCollect(t *testing.T) {
 	}
 }
 
-func testSend(t *testing.T) {
+func testSendReport(t *testing.T) {
 	// we change current path and env variable: not parallelizable tests
 	helper.SkipIfShort(t)
 
 	testCases := []struct {
-		name            string
-		acknowledgement bool
+		name string
 
 		shouldHitServer bool
 		wantErr         bool
 	}{
-		{"regular send", true, true, false},
-		{"regular send opt-out", false, true, false},
+		{"regular send", true, false},
 	}
 	for _, tc := range testCases {
 		tc := tc // capture range variable for parallel execution
@@ -95,12 +93,8 @@ func testSend(t *testing.T) {
 			cData := C.CString(fmt.Sprintf(`{ %s: "18.04" }`, expectedReportItem))
 			url := C.CString(ts.URL)
 			defer C.free(unsafe.Pointer(url))
-			ack := 0
-			if tc.acknowledgement {
-				ack = 1
-			}
 
-			err := C.sysmetrics_send(cData, C.uchar(ack), C.uchar(0), url)
+			err := C.sysmetrics_send_report(cData, C.uchar(0), url)
 			defer C.free(unsafe.Pointer(err))
 
 			if err != nil {
@@ -114,14 +108,8 @@ func testSend(t *testing.T) {
 				t.Fatalf("couldn't open report file %s", out)
 			}
 			d := string(data)
-			if tc.acknowledgement {
-				if !strings.Contains(d, expectedReportItem) {
-					t.Errorf("we expected to find %s in report file, got: %s", expectedReportItem, d)
-				}
-			} else {
-				if !strings.Contains(d, optOutJSON) {
-					t.Errorf("we expected to find %s in report file, got: %s", optOutJSON, d)
-				}
+			if !strings.Contains(d, expectedReportItem) {
+				t.Errorf("we expected to find %s in report file, got: %s", expectedReportItem, d)
 			}
 		})
 	}
