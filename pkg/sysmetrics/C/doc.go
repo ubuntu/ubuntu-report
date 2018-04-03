@@ -5,13 +5,13 @@
 //
 // Command signature:
 //   char* sysmetrics_collect(char** res);
-// "res" will be the pretty printed version of collected data. The return "err" err will be != NULL in case
+// "res" will be the pretty printed version of collected data. The return "err" will be != NULL in case
 // any error occurred during data collection.
 //
 // Example:
 //   #include <stdio.h>
 //   #include <stdlib.h>
-//   #include "libsysmetrics.h"
+//   #include <libsysmetrics.h>
 //
 //   int main() {
 //       char *res, *err;
@@ -30,17 +30,17 @@
 // Send a previously collected report to server
 //
 // Command signature:
-//   char* sysmetrics_send(char* data, bool acknowledgement, bool alwaysreport, char* p3);
+//   char* sysmetrics_send(char* data, bool acknowledgement, bool alwaysReport, char* baseUrl);
 //
-// Send provided metrics data (from data char*) to server depending on user acknowledgement
-// alwaysReports bypass previous report already be sent for current version check
-// It can be send to an alternative url via baseURL to send the report to, if not empty
+// Send provided metrics data to server depending on user acknowledgement.
+// The report will not be sent if a report has already been sent for this version unless "alwaysReport" is true.
+// If "baseURL" is not an empty string, this overrides the server the report is sent to.
 //
-// Example (sending provided metrics data, with user's ackowledgement):
+// Example (sending provided metrics data, with user's acknowledgement):
 //   #include <stdbool.h>
 //   #include <stdio.h>
 //   #include <stdlib.h>
-//   #include "libsysmetrics.h"
+//   #include <libsysmetrics.h>
 //
 //   int main() {
 //       char *err;
@@ -58,7 +58,7 @@
 // Collect and send system info to server
 //
 // Command signature:
-//   char* sysmetrics_collect_and_send(sysmetrics_report_type r, bool alwaysreport, char* url);
+//   char* sysmetrics_collect_and_send(sysmetrics_report_type r, bool alwaysReport, char* url);
 //
 // sysmetrics_report_type is the following enum:
 //    typedef enum {
@@ -70,14 +70,14 @@
 //      sysmetrics_report_optout = 2,
 //    } sysmetrics_report_type;
 // You should generally prefer in bindings the auto or optout report. Interactive is based on stdout and stdin.
-// "alwaysReports" bypass detection if a report has already been be sent for current version check.
+// "alwaysReport" bypass detection if a report has already been be sent for current version check.
 // It can be sent to an alternative url via "baseURL" to send the report to. Empty string will send to default server.
 //
 // Example (in autoreport mode, without reporting twice the same data and using default server URL):
 //   #include <stdbool.h>
 //   #include <stdio.h>
 //   #include <stdlib.h>
-//   #include "libsysmetrics.h"
+//   #include <libsysmetrics.h>
 //
 //   int main() {
 //       sysmetrics_report_type r = sysmetrics_report_auto;
