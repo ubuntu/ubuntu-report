@@ -1,10 +1,18 @@
-ubuntu-report (1.0.2) UNRELEASED; urgency=medium
+ubuntu-report (1.0.3) bionic; urgency=medium
+
+  * Some C API refinement (splitting send to send_report and send_decline)
+    as suggested by the consumer side.
+  * Move header to subdirectory and point .pc file to include it.
+
+ -- Didier Roche <didrocks@ubuntu.com>  Tue, 03 Apr 2018 09:51:07 +0200
+
+ubuntu-report (1.0.2) bionic; urgency=medium
 
   * Remove symbols file:
     - internal generated symbol contains a hash depending on source file
       content, and differ betweens archs.
 
- -- Didier Roche <didrocks@ubuntu.com>  Thu, 29 Mar 2018 12:18:36 +0200
+ -- Didier Roche <didrocks@ubuntu.com>  Thu, 29 Mar 2018 12:20:46 +0200
 
 ubuntu-report (1.0.1) bionic; urgency=medium
 
