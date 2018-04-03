@@ -45,6 +45,19 @@ func sysmetrics_send_report(data *C.char, alwaysReport bool, baseURL *C.char) *C
 	return nil
 }
 
+// sysmetrics_send_decline sends denial message to server.
+// The denial message will not be sent if a report has already been sent for this version unless "alwaysReport" is true.
+// If "baseURL" is not an empty string, this overrides the server the report is sent to.
+// The return "err" will be != NULL in case any error occurred during POST.
+//export sysmetrics_send_decline
+func sysmetrics_send_decline(alwaysReport bool, baseURL *C.char) *C.char {
+	err := sysmetrics.SendDecline(alwaysReport, C.GoString(baseURL))
+	if err != nil {
+		return C.CString(err.Error())
+	}
+	return nil
+}
+
 // sysmetrics_collect_and_send gather system info and send them
 // The report will not be sent if a report has already been sent for this version unless "alwaysReport" is true.
 // It can be send to an alternative url via baseURL to send the report to, if not empty

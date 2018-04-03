@@ -55,6 +55,34 @@
 //       free(err);
 //   }
 //
+// Send denial message to server
+//
+// Command signature:
+//   char* sysmetrics_send_decline(bool alwaysReport, char* baseUrl);
+//
+// The denial message will not be sent if a report has already been sent for this version unless "alwaysReport" is true.
+// If "baseURL" is not an empty string, this overrides the server the report is sent to.
+// The return "err" will be != NULL in case any error occurred during POST.
+//
+// Example:
+//   #include <stdbool.h>
+//   #include <stdio.h>
+//   #include <stdlib.h>
+//   #include <libsysmetrics.h>
+//
+//   int main() {
+//       char *err;
+//
+//       err = sysmetrics_send_decline(false, "");
+//
+//       if (err != NULL) {
+//           printf("ERR: %s\n", err);
+//       } else {
+//           printf("Decline sent to default server");
+//       }
+//       free(err);
+//   }
+//
 // Collect and send system info to server
 //
 // Command signature:

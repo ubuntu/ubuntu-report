@@ -23,6 +23,7 @@ import (
 // Similar technic than in https://golang.org/misc/cgo/test/cgo_test.go
 func TestCollect(t *testing.T)                      { testCollect(t) }
 func TestSendReport(t *testing.T)                   { testSendReport(t) }
+func TestSendDecline(t *testing.T)                  { testSendDecline(t) }
 func TestNonInteractiveCollectAndSend(t *testing.T) { testNonInteractiveCollectAndSend(t) }
 func TestInteractiveCollectAndSend(t *testing.T)    { testInteractiveCollectAndSend(t) }
 
@@ -97,6 +98,54 @@ func TestSendReportExample(t *testing.T) {
 
 	if !strings.Contains(d, expectedReportItem) {
 		t.Errorf("we expected to find %s in report file, got: %s", expectedReportItem, d)
+	}
+}
+
+func TestSendDeclineExample(t *testing.T) {
+	helper.SkipIfShort(t)
+	t.Parallel()
+	ensureGCC(t)
+
+	a := helper.Asserter{T: t}
+
+	serverHit := false
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		serverHit = true
+	}))
+	defer ts.Close()
+
+	out, tearDown := helper.TempDir(t)
+	defer tearDown()
+
+	lib := buildLib(t, out)
+	p := extractExampleFromDoc(t, out, "Send denial message to server", `""`, `"`+ts.URL+`"`)
+	binary := buildExample(t, out, p, lib)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	cmd := exec.CommandContext(ctx, binary)
+	cmd.Env = append(cmd.Env, "LD_LIBRARY_PATH="+out, "XDG_CACHE_HOME="+out)
+	err := cmd.Run()
+
+	if err != nil {
+		t.Fatal("we didn't expect an error and got one", err)
+	}
+
+	// There isn't a data race as only the external binary can hit test server,
+	// but Go can't know it. To prevent that, shutdown the test server explicitely
+	ts.Close()
+
+	a.Equal(serverHit, true)
+	xdgP := filepath.Join(out, "ubuntu-report")
+	p = filepath.Join(xdgP, helper.FindInDirectory(t, "", xdgP))
+	data, err := ioutil.ReadFile(p)
+	if err != nil {
+		t.Fatalf("couldn't open report file %s", p)
+	}
+	d := string(data)
+
+	if !strings.Contains(d, optOutJSON) {
+		t.Errorf("we expected to find %s in report file, got: %s", optOutJSON, d)
 	}
 }
 

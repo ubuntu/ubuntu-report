@@ -11,6 +11,7 @@ package main
 // } sysmetrics_report_type;
 // typedef unsigned char GoUint8;
 // extern char* sysmetrics_send_report(char* p0, GoUint8 p1, char* p2);
+// extern char* sysmetrics_send_decline(GoUint8 p0, char* p1);
 // extern char* sysmetrics_collect_and_send(sysmetrics_report_type p0, GoUint8 p1, char* p2);
 import "C"
 
@@ -110,6 +111,60 @@ func testSendReport(t *testing.T) {
 			d := string(data)
 			if !strings.Contains(d, expectedReportItem) {
 				t.Errorf("we expected to find %s in report file, got: %s", expectedReportItem, d)
+			}
+		})
+	}
+}
+
+func testSendDecline(t *testing.T) {
+	// we change current path and env variable: not parallelizable tests
+	helper.SkipIfShort(t)
+
+	testCases := []struct {
+		name string
+
+		shouldHitServer bool
+		wantErr         bool
+	}{
+		{"regular send opt-out", true, false},
+	}
+	for _, tc := range testCases {
+		tc := tc // capture range variable for parallel execution
+		t.Run(tc.name, func(t *testing.T) {
+			a := helper.Asserter{T: t}
+
+			out, tearDown := helper.TempDir(t)
+			defer tearDown()
+			defer helper.ChangeEnv("XDG_CACHE_HOME", out)()
+			out = filepath.Join(out, "ubuntu-report")
+			// we don't really care where we hit for this API integration test, internal ones test it
+			// and we don't really control /etc/os-release version and id.
+			// Same for report file
+			serverHit := false
+			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				serverHit = true
+			}))
+			defer ts.Close()
+
+			url := C.CString(ts.URL)
+			defer C.free(unsafe.Pointer(url))
+
+			err := C.sysmetrics_send_decline(C.uchar(0), url)
+			defer C.free(unsafe.Pointer(err))
+
+			if err != nil {
+				t.Fatal("we didn't expect getting an error, got:", err)
+			}
+
+			a.Equal(serverHit, tc.shouldHitServer)
+			p := filepath.Join(out, helper.FindInDirectory(t, "", out))
+			data, errread := ioutil.ReadFile(p)
+			if errread != nil {
+				t.Fatalf("couldn't open report file %s", out)
+			}
+			d := string(data)
+			if !strings.Contains(d, optOutJSON) {
+				t.Errorf("we expected to find %s in report file, got: %s", optOutJSON, d)
 			}
 		})
 	}
