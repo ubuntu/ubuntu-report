@@ -29,20 +29,18 @@ func TestCollect(t *testing.T) {
 	}
 }
 
-func TestSend(t *testing.T) {
+func TestSendReport(t *testing.T) {
 	// we change current path and env variable: not parallelizable tests
 	helper.SkipIfShort(t)
 
 	testCases := []struct {
-		name            string
-		acknowledgement bool
-		alwaysReport    bool
+		name         string
+		alwaysReport bool
 
 		shouldHitServer bool
 		wantErr         bool
 	}{
-		{"regular send", true, false, true, false},
-		{"regular send opt-out", false, false, true, false},
+		{"regular send", false, true, false},
 	}
 	for _, tc := range testCases {
 		tc := tc // capture range variable for parallel execution
@@ -62,8 +60,8 @@ func TestSend(t *testing.T) {
 			}))
 			defer ts.Close()
 
-			err := sysmetrics.Send([]byte(fmt.Sprintf(`{ %s: "18.04" }`, sysmetrics.ExpectedReportItem)),
-				tc.acknowledgement, tc.alwaysReport, ts.URL)
+			err := sysmetrics.SendReport([]byte(fmt.Sprintf(`{ %s: "18.04" }`, sysmetrics.ExpectedReportItem)),
+				tc.alwaysReport, ts.URL)
 
 			if err != nil {
 				t.Fatal("we didn't expect getting an error, got:", err)
@@ -76,20 +74,64 @@ func TestSend(t *testing.T) {
 				t.Fatalf("couldn't open report file %s", out)
 			}
 			d := string(data)
-			if tc.acknowledgement {
-				if !strings.Contains(d, sysmetrics.ExpectedReportItem) {
-					t.Errorf("we expected to find %s in report file, got: %s", sysmetrics.ExpectedReportItem, d)
-				}
-			} else {
-				if !strings.Contains(d, sysmetrics.OptOutJSON) {
-					t.Errorf("we expected to find %s in report file, got: %s", sysmetrics.OptOutJSON, d)
-				}
+			if !strings.Contains(d, sysmetrics.ExpectedReportItem) {
+				t.Errorf("we expected to find %s in report file, got: %s", sysmetrics.ExpectedReportItem, d)
+			}
+		})
+	}
+}
+func TestSendDecline(t *testing.T) {
+	// we change current path and env variable: not parallelizable tests
+	helper.SkipIfShort(t)
+
+	testCases := []struct {
+		name         string
+		alwaysReport bool
+
+		shouldHitServer bool
+		wantErr         bool
+	}{
+		{"regular send opt-out", false, true, false},
+	}
+	for _, tc := range testCases {
+		tc := tc // capture range variable for parallel execution
+		t.Run(tc.name, func(t *testing.T) {
+			a := helper.Asserter{T: t}
+
+			out, tearDown := helper.TempDir(t)
+			defer tearDown()
+			defer helper.ChangeEnv("XDG_CACHE_HOME", out)()
+			out = filepath.Join(out, "ubuntu-report")
+			// we don't really care where we hit for this API integration test, internal ones test it
+			// and we don't really control /etc/os-release version and id.
+			// Same for report file
+			serverHit := false
+			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				serverHit = true
+			}))
+			defer ts.Close()
+
+			err := sysmetrics.SendDecline(tc.alwaysReport, ts.URL)
+
+			if err != nil {
+				t.Fatal("we didn't expect getting an error, got:", err)
+			}
+
+			a.Equal(serverHit, tc.shouldHitServer)
+			p := filepath.Join(out, helper.FindInDirectory(t, "", out))
+			data, err := ioutil.ReadFile(p)
+			if err != nil {
+				t.Fatalf("couldn't open report file %s", out)
+			}
+			d := string(data)
+			if !strings.Contains(d, sysmetrics.OptOutJSON) {
+				t.Errorf("we expected to find %s in report file, got: %s", sysmetrics.OptOutJSON, d)
 			}
 		})
 	}
 }
 
-func TestSendTwice(t *testing.T) {
+func TestSendReportTwice(t *testing.T) {
 	// we change current path and env variable: not parallelizable tests
 	helper.SkipIfShort(t)
 
@@ -121,8 +163,8 @@ func TestSendTwice(t *testing.T) {
 			defer ts.Close()
 
 			// first call
-			err := sysmetrics.Send([]byte(fmt.Sprintf(`{ %s: "18.04" }`, sysmetrics.ExpectedReportItem)),
-				true, tc.alwaysReport, ts.URL)
+			err := sysmetrics.SendReport([]byte(fmt.Sprintf(`{ %s: "18.04" }`, sysmetrics.ExpectedReportItem)),
+				tc.alwaysReport, ts.URL)
 			if err != nil {
 				t.Fatal("we didn't expect getting an error, got:", err)
 			}
@@ -144,8 +186,8 @@ func TestSendTwice(t *testing.T) {
 
 			// second call, reset server
 			serverHit = false
-			err = sysmetrics.Send([]byte(fmt.Sprintf(`{ %s: "18.04" }`, sysmetrics.ExpectedReportItem)),
-				true, tc.alwaysReport, ts.URL)
+			err = sysmetrics.SendReport([]byte(fmt.Sprintf(`{ %s: "18.04" }`, sysmetrics.ExpectedReportItem)),
+				tc.alwaysReport, ts.URL)
 			a.CheckWantedErr(err, tc.wantErr)
 
 			a.Equal(serverHit, tc.alwaysReport)
@@ -159,6 +201,85 @@ func TestSendTwice(t *testing.T) {
 			case true:
 				if !strings.Contains(d, sysmetrics.ExpectedReportItem) {
 					t.Errorf("we expected to find %s in second report file, got: %s", sysmetrics.ExpectedReportItem, d)
+				}
+			case false:
+				if d != "" {
+					t.Errorf("we expected to have an untouched report file on second report, got: %s", d)
+				}
+			}
+
+		})
+	}
+}
+
+func TestSendDceclineTwice(t *testing.T) {
+	// we change current path and env variable: not parallelizable tests
+	helper.SkipIfShort(t)
+
+	testCases := []struct {
+		name         string
+		alwaysReport bool
+
+		wantErr bool
+	}{
+		{"fail decline twice", false, true},
+		{"forcing decline twice", true, false},
+	}
+	for _, tc := range testCases {
+		tc := tc // capture range variable for parallel execution
+		t.Run(tc.name, func(t *testing.T) {
+			a := helper.Asserter{T: t}
+
+			out, tearDown := helper.TempDir(t)
+			defer tearDown()
+			defer helper.ChangeEnv("XDG_CACHE_HOME", out)()
+			out = filepath.Join(out, "ubuntu-report")
+			// we don't really care where we hit for this API integration test, internal ones test it
+			// and we don't really control /etc/os-release version and id.
+			// Same for report file
+			serverHit := false
+			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				serverHit = true
+			}))
+			defer ts.Close()
+
+			// first call
+			err := sysmetrics.SendDecline(tc.alwaysReport, ts.URL)
+			if err != nil {
+				t.Fatal("we didn't expect getting an error, got:", err)
+			}
+			a.Equal(serverHit, true)
+			p := filepath.Join(out, helper.FindInDirectory(t, "", out))
+			data, err := ioutil.ReadFile(p)
+			if err != nil {
+				t.Fatalf("couldn't open report file %s", out)
+			}
+			d := string(data)
+			if !strings.Contains(d, sysmetrics.OptOutJSON) {
+				t.Errorf("we expected to find %s in report file, got: %s", sysmetrics.OptOutJSON, d)
+			}
+
+			// scratch data file
+			if err != ioutil.WriteFile(p, []byte(""), 0644) {
+				t.Fatalf("couldn't reset %s: %v", p, err)
+			}
+
+			// second call, reset server
+			serverHit = false
+			err = sysmetrics.SendDecline(tc.alwaysReport, ts.URL)
+			a.CheckWantedErr(err, tc.wantErr)
+
+			a.Equal(serverHit, tc.alwaysReport)
+			// reread the same file
+			data, err = ioutil.ReadFile(p)
+			if err != nil {
+				t.Fatalf("couldn't open report file %s", out)
+			}
+			d = string(data)
+			switch tc.alwaysReport {
+			case true:
+				if !strings.Contains(d, sysmetrics.OptOutJSON) {
+					t.Errorf("we expected to find %s in second report file, got: %s", sysmetrics.OptOutJSON, d)
 				}
 			case false:
 				if d != "" {

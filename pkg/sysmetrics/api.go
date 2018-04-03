@@ -33,22 +33,35 @@ func Collect() ([]byte, error) {
 	return metricsCollect(m)
 }
 
-// Send reports user's system metrics data to server depending on user acknowledgement
-// alwaysReports bypass previous report already be sent for current version check
-// It can be send to an alternative url via baseURL to send the report to, if not empty
-func Send(data []byte, ack, alwaysReport bool, baseURL string) error {
-	log.Debug("collect and report system information")
+// SendReport POST to the baseURL server data coming from a previous collect.
+// The report will not be sent if a report has already been sent for this version unless "alwaysReport" is true.
+// If "baseURL" is not an empty string, this overrides the server the report is sent to.
+func SendReport(data []byte, alwaysReport bool, baseURL string) error {
+	log.Debug("report system information")
 
 	m, err := metrics.New()
 	if err != nil {
 		return errors.Wrapf(err, "couldn't create a metric collector")
 	}
-	return metricsSend(m, data, ack, alwaysReport, baseURL, "", os.Stdin, os.Stdout)
+	return metricsSend(m, data, true, alwaysReport, baseURL, "", os.Stdin, os.Stdout)
+}
+
+// SendDecline POST to the baseURL server data denial report message.
+// The denial message will not be sent if a report has already been sent for this version unless "alwaysReport" is true.
+// If "baseURL" is not an empty string, this overrides the server the report is sent to.
+func SendDecline(alwaysReport bool, baseURL string) error {
+	log.Debug("report system information")
+
+	m, err := metrics.New()
+	if err != nil {
+		return errors.Wrapf(err, "couldn't create a metric collector")
+	}
+	return metricsSend(m, nil, false, alwaysReport, baseURL, "", os.Stdin, os.Stdout)
 }
 
 // CollectAndSend gather system info and send them
-// alwaysReports bypass previous report already be sent for current version check
-// It can be send to an alternative url via baseURL to send the report to, if not empty
+// The report will not be sent if a report has already been sent for this version unless "alwaysReport" is true.
+// If "baseURL" is not an empty string, this overrides the server the report is sent to.
 func CollectAndSend(r ReportType, alwaysReport bool, baseURL string) error {
 	log.Debug("collect and report system information")
 
