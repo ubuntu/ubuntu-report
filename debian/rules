@@ -7,7 +7,7 @@ export DPKG_GENSYMBOLS_CHECK_LEVEL=4
 # generate shared lib, shell completion, man pages and shared lib
 export DH_GOLANG_GO_GENERATE := 1
 
-builddir = $(CURDIR)/obj-$(DEB_HOST_GNU_TYPE)
+builddir = $(CURDIR)/obj-$(DEB_HOST_MULTIARCH)
 artefactsdir = $(builddir)/build
 
 %:
@@ -24,11 +24,11 @@ override_dh_auto_build:
 	rm $(builddir)/bin/C
 	
 override_dh_auto_install:
-	mkdir -p debian/tmp/usr/lib/$(DEB_HOST_GNU_TYPE)/pkgconfig/ debian/tmp/usr/include/sysmetrics
-	cp -a $(artefactsdir)/libsysmetrics.so.1 debian/tmp/usr/lib/$(DEB_HOST_GNU_TYPE)/
-	ln -s libsysmetrics.so.1 debian/tmp/usr/lib/$(DEB_HOST_GNU_TYPE)/libsysmetrics.so
+	mkdir -p debian/tmp/usr/lib/$(DEB_HOST_MULTIARCH)/pkgconfig/ debian/tmp/usr/include/sysmetrics
+	cp -a $(artefactsdir)/libsysmetrics.so.1 debian/tmp/usr/lib/$(DEB_HOST_MULTIARCH)/
+	ln -s libsysmetrics.so.1 debian/tmp/usr/lib/$(DEB_HOST_MULTIARCH)/libsysmetrics.so
 	cp -a $(artefactsdir)/libsysmetrics.h debian/tmp/usr/include/sysmetrics
-	sed -e s/DEB_HOST_GNU_TYPE/$(DEB_HOST_GNU_TYPE)/ debian/sysmetrics.pc.in > debian/tmp/usr/lib/$(DEB_HOST_GNU_TYPE)/pkgconfig/sysmetrics.pc
+	sed -e s/DEB_HOST_MULTIARCH/$(DEB_HOST_MULTIARCH)/ debian/sysmetrics.pc.in > debian/tmp/usr/lib/$(DEB_HOST_MULTIARCH)/pkgconfig/sysmetrics.pc
 	dh_auto_install
 
 override_dh_missing:
