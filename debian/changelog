@@ -1,3 +1,9 @@
+ubuntu-report (1.0.5) bionic; urgency=medium
+
+  * dh_golang is using DEB_HOST_GNU_TYPE for build dir
+
+ -- Didier Roche <didrocks@ubuntu.com>  Wed, 04 Apr 2018 13:17:32 +0200
+
 ubuntu-report (1.0.4) bionic; urgency=medium
 
   * use DEB_HOST_MULTIARCH instead of DEB_HOST_GNU_TYPE for installing
