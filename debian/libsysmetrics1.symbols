@@ -1,0 +1,14 @@
+libsysmetrics.so.1 libsysmetrics1 #MINVER#
+ sysmetrics_collect@Base 1.0.4
+ sysmetrics_collect_and_send@Base 1.0.1
+ sysmetrics_send_decline@Base 1.0.5
+ sysmetrics_send_report@Base 1.0.5
+ (arch=arm64)crosscall1@Base 1.0.0
+ crosscall2@Base 1.0.0
+ (arch=amd64)crosscall_amd64@Base 1.0.0
+ (arch=i386)crosscall_386@Base 1.0.0
+ (arch=armhf)crosscall_arm1@Base 1.0.0
+ (arch=ppc64el)crosscall_ppc64@Base 1.0.0
+ fatalf@Base 1.0.0
+ (arch=armhf arm64)setg_gcc@Base 1.0.0
+ (regex|optional)"_cgo.*" 1.0.0
