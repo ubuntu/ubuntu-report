@@ -1,3 +1,12 @@
+ubuntu-report (1.0.6) bionic; urgency=medium
+
+  * Fix typo in package description
+  * Remove vendor directory from source tarball. Adjust d/copyright and
+    d/rules.
+  * Add symbols files, filtering private symbols.
+
+ -- Didier Roche <didrocks@ubuntu.com>  Tue, 10 Apr 2018 09:23:33 +0200
+
 ubuntu-report (1.0.5) bionic; urgency=medium
 
   * dh_golang is using DEB_HOST_GNU_TYPE for build dir
