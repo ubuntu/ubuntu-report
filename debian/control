@@ -30,7 +30,7 @@ Description: Report hardware and other collected metrics
  acknowledgement before uploading it. This information can't be used to
  identify a single machine and is presented before being sent to the server.
  .
- This package contain the command line tool.
+ This package contains the command line tool.
 
 Package: libsysmetrics1
 Section: libs
