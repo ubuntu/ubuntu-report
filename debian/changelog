@@ -1,3 +1,9 @@
+ubuntu-report (1.0.7) bionic; urgency=medium
+
+  * Add crosscall_s390x@Base in symbols file for s390x
+
+ -- Didier Roche <didrocks@ubuntu.com>  Tue, 10 Apr 2018 16:07:47 +0200
+
 ubuntu-report (1.0.6) bionic; urgency=medium
 
   * Fix typo in package description
