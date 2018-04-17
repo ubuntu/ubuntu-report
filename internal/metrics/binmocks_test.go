@@ -93,6 +93,21 @@ DP-1 disconnected (normal left inverted right x axis y axis)`
    1920x1080     60.00  
    1600x1200     60.00*+
    1680x1050     59.95  `)
+		case "chosen resolution not prefered":
+			fmt.Println(`VGA-1 connected 1920x1080+0+0 (normal left inverted right x axis y axis) 510mm x 287mm
+   1920x1080     60.00* 
+   1600x1200     60.00 +
+   1680x1050     59.95  `)
+		case "multiple frequencies for resolution":
+			fmt.Println(`VGA-1 connected 1920x1080+0+0 (normal left inverted right x axis y axis) 510mm x 287mm
+   1920x1080     60.00*+  59.94    50.00    60.05    60.00    50.04`)
+		case "multiple frequencies select other resolution":
+			fmt.Println(`VGA-1 connected 1920x1080+0+0 (normal left inverted right x axis y axis) 510mm x 287mm
+   1920x1080     60.00 +  59.94    50.00*   60.05    60.00    50.04`)
+		case "multiple frequencies select other resolution on non preferred":
+			fmt.Println(`VGA-1 connected 1920x1080+0+0 (normal left inverted right x axis y axis) 510mm x 287mm
+   1920x1080     60.00    59.94    50.00*   60.05    60.00    50.04
+   1600x1200     60.00 +`)
 		case "no chosen resolution":
 			fmt.Println(`VGA-1 connected 1920x1080+0+0 (normal left inverted right x axis y axis) 510mm x 287mm
    1920x1080     60.00  

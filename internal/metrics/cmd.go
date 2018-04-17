@@ -38,7 +38,7 @@ func (m Metrics) getScreens() []screenInfo {
 
 	r := runCmd(m.screenInfoCmd)
 
-	results, err := filterAll(r, `^ +(.*)\*\+$`)
+	results, err := filterAll(r, `^ +(.*)\*`)
 	if err != nil {
 		log.Infof("couldn't get Screen info: "+utils.ErrFormat, err)
 		return nil
@@ -46,11 +46,11 @@ func (m Metrics) getScreens() []screenInfo {
 
 	for _, screeninfo := range results {
 		i := strings.Fields(screeninfo)
-		if len(i) != 2 {
-			log.Infof("screen info should be of form 'resolution     freq*+', got: %s", screeninfo)
+		if len(i) < 2 {
+			log.Infof("screen info should be of form 'resolution     [freqs]*', got: %s", screeninfo)
 			continue
 		}
-		screens = append(screens, screenInfo{Resolution: i[0], Frequency: i[1]})
+		screens = append(screens, screenInfo{Resolution: i[0], Frequency: i[len(i)-1]})
 	}
 
 	return screens
