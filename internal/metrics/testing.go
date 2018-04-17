@@ -9,13 +9,14 @@ type GetenvFn func(key string) string
 // This is only a mock for testing, not for real use
 func NewTestMetrics(root string,
 	cmdGPU *exec.Cmd, cmdScreen *exec.Cmd, cmdPartition *exec.Cmd,
-	getenv GetenvFn) Metrics {
+	cmdArch *exec.Cmd, getenv GetenvFn) Metrics {
 	// do not use helper as in _test.go package
 	return Metrics{
 		root:          root,
 		gpuInfoCmd:    cmdGPU,
 		screenInfoCmd: cmdScreen,
 		spaceInfoCmd:  cmdPartition,
+		archCmd:       cmdArch,
 		getenv:        getenv,
 	}
 }

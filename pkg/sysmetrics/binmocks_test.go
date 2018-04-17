@@ -93,6 +93,21 @@ DP-1 disconnected (normal left inverted right x axis y axis)`
    1920x1080     60.00  
    1600x1200     60.00*+
    1680x1050     59.95  `)
+		case "chosen resolution not prefered":
+			fmt.Println(`VGA-1 connected 1920x1080+0+0 (normal left inverted right x axis y axis) 510mm x 287mm
+   1920x1080     60.00* 
+   1600x1200     60.00 +
+   1680x1050     59.95  `)
+		case "multiple frequencies for resolution":
+			fmt.Println(`VGA-1 connected 1920x1080+0+0 (normal left inverted right x axis y axis) 510mm x 287mm
+   1920x1080     60.00*+  59.94    50.00    60.05    60.00    50.04`)
+		case "multiple frequencies select other resolution":
+			fmt.Println(`VGA-1 connected 1920x1080+0+0 (normal left inverted right x axis y axis) 510mm x 287mm
+   1920x1080     60.00 +  59.94    50.00*   60.05    60.00    50.04`)
+		case "multiple frequencies select other resolution on non preferred":
+			fmt.Println(`VGA-1 connected 1920x1080+0+0 (normal left inverted right x axis y axis) 510mm x 287mm
+   1920x1080     60.00    59.94    50.00*   60.05    60.00    50.04
+   1600x1200     60.00 +`)
 		case "no chosen resolution":
 			fmt.Println(`VGA-1 connected 1920x1080+0+0 (normal left inverted right x axis y axis) 510mm x 287mm
    1920x1080     60.00  
@@ -139,5 +154,20 @@ tmpfs                   5120         4       5116   1% /run/lock`
 			fmt.Println(regularOutput) // still print content
 			os.Exit(1)
 		}
+
+	case "dpkg":
+		if args[0] != "--print-architecture" {
+			fmt.Fprintf(os.Stderr, "Unexpected dpkg arguments: %v\n", args)
+			os.Exit(1)
+		}
+		switch args[1] {
+		case "regular":
+			fmt.Println("amd64")
+		case "empty":
+		case "fail":
+			fmt.Println("amd64") // still print content
+			os.Exit(1)
+		}
 	}
+
 }

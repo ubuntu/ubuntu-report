@@ -36,18 +36,19 @@ func TestMetricsCollect(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
-		name          string
-		root          string
-		caseGPU       string
-		caseScreen    string
-		casePartition string
-		env           map[string]string
+		name             string
+		root             string
+		caseGPU          string
+		caseScreen       string
+		casePartition    string
+		caseArchitecture string
+		env              map[string]string
 
 		// note that only an internal json package error can make it returning an error
 		wantErr bool
 	}{
 		{"regular",
-			"testdata/good", "one gpu", "one screen", "one partition",
+			"testdata/good", "one gpu", "one screen", "one partition", "regular",
 			map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12"},
 			false},
 	}
@@ -57,11 +58,12 @@ func TestMetricsCollect(t *testing.T) {
 			t.Parallel()
 			a := helper.Asserter{T: t}
 
-			m, cancelGPU, cancelScreen, cancelPartition := newTestMetricsWithCommands(t, tc.root,
-				tc.caseGPU, tc.caseScreen, tc.casePartition, tc.env)
+			m, cancelGPU, cancelScreen, cancelPartition, cancelArchitecture := newTestMetricsWithCommands(t, tc.root,
+				tc.caseGPU, tc.caseScreen, tc.casePartition, tc.caseArchitecture, tc.env)
 			defer cancelGPU()
 			defer cancelScreen()
 			defer cancelPartition()
+			defer cancelArchitecture()
 			b1, err1 := metricsCollect(m)
 
 			want := helper.LoadOrUpdateGolden(t, filepath.Join(tc.root, "gold", "metricscollect"), b1, *Update)
@@ -69,11 +71,12 @@ func TestMetricsCollect(t *testing.T) {
 			a.Equal(b1, want)
 
 			// second run should return the same thing (idemnpotence)
-			m, cancelGPU, cancelScreen, cancelPartition = newTestMetricsWithCommands(t, tc.root,
-				tc.caseGPU, tc.caseScreen, tc.casePartition, tc.env)
+			m, cancelGPU, cancelScreen, cancelPartition, cancelArchitecture = newTestMetricsWithCommands(t, tc.root,
+				tc.caseGPU, tc.caseScreen, tc.casePartition, tc.caseArchitecture, tc.env)
 			defer cancelGPU()
 			defer cancelScreen()
 			defer cancelPartition()
+			defer cancelArchitecture()
 			b2, err2 := metricsCollect(m)
 
 			a.CheckWantedErr(err2, tc.wantErr)
@@ -125,7 +128,7 @@ func TestMetricsSend(t *testing.T) {
 			t.Parallel()
 			a := helper.Asserter{T: t}
 
-			m := metrics.NewTestMetrics(tc.root, nil, nil, nil, os.Getenv)
+			m := metrics.NewTestMetrics(tc.root, nil, nil, nil, nil, os.Getenv)
 			out, tearDown := helper.TempDir(t)
 			defer tearDown()
 			if strings.HasPrefix(tc.cacheReportP, "/") {
@@ -195,7 +198,7 @@ func TestMultipleMetricsSend(t *testing.T) {
 			t.Parallel()
 			a := helper.Asserter{T: t}
 
-			m := metrics.NewTestMetrics("testdata/good", nil, nil, nil, os.Getenv)
+			m := metrics.NewTestMetrics("testdata/good", nil, nil, nil, nil, os.Getenv)
 			out, tearDown := helper.TempDir(t)
 			defer tearDown()
 			serverHitAt := ""
@@ -211,7 +214,7 @@ func TestMultipleMetricsSend(t *testing.T) {
 
 			// second call, reset server
 			serverHitAt = ""
-			m = metrics.NewTestMetrics("testdata/good", nil, nil, nil, os.Getenv)
+			m = metrics.NewTestMetrics("testdata/good", nil, nil, nil, nil, os.Getenv)
 			err = metricsSend(m, []byte(`{ "some-data": true }`), true, tc.alwaysReport, ts.URL, out, os.Stdout, os.Stdin)
 
 			a.CheckWantedErr(err, tc.wantErr)
@@ -244,14 +247,15 @@ func TestMetricsCollectAndSend(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
-		name            string
-		root            string
-		caseGPU         string
-		caseScreen      string
-		casePartition   string
-		env             map[string]string
-		r               ReportType
-		manualServerURL string
+		name             string
+		root             string
+		caseGPU          string
+		caseScreen       string
+		casePartition    string
+		caseArchitecture string
+		env              map[string]string
+		r                ReportType
+		manualServerURL  string
 
 		cacheReportP    string
 		shouldHitServer bool
@@ -259,23 +263,23 @@ func TestMetricsCollectAndSend(t *testing.T) {
 		wantErr         bool
 	}{
 		{"regular report auto",
-			"testdata/good", "one gpu", "one screen", "one partition",
+			"testdata/good", "one gpu", "one screen", "one partition", "regular",
 			map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12"},
 			ReportAuto, "",
 			"ubuntu-report/ubuntu.18.04", true, "/ubuntu/desktop/18.04", false},
 		{"regular report OptOut",
-			"testdata/good", "one gpu", "one screen", "one partition",
+			"testdata/good", "one gpu", "one screen", "one partition", "regular",
 			map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12"},
 			ReportOptOut, "",
 			"ubuntu-report/ubuntu.18.04", true, "/ubuntu/desktop/18.04", false},
 		{"No IDs (mandatory)",
-			"testdata/no-ids", "", "", "", nil, ReportAuto, "", "ubuntu-report", false, "", true},
+			"testdata/no-ids", "", "", "", "", nil, ReportAuto, "", "ubuntu-report", false, "", true},
 		{"Other URL",
-			"testdata/good", "", "", "", nil, ReportAuto, "localhost:4299", "ubuntu-report", false, "", true},
+			"testdata/good", "", "", "", "", nil, ReportAuto, "localhost:4299", "ubuntu-report", false, "", true},
 		{"Invalid URL",
-			"testdata/good", "", "", "", nil, ReportAuto, "http://a b.com/", "ubuntu-report", false, "", true},
+			"testdata/good", "", "", "", "", nil, ReportAuto, "http://a b.com/", "ubuntu-report", false, "", true},
 		{"Unwritable path",
-			"testdata/good", "", "", "", nil, ReportAuto, "", "/unwritable/cache/path", true, "/ubuntu/desktop/18.04", true},
+			"testdata/good", "", "", "", "", nil, ReportAuto, "", "/unwritable/cache/path", true, "/ubuntu/desktop/18.04", true},
 	}
 	for _, tc := range testCases {
 		tc := tc // capture range variable for parallel execution
@@ -283,11 +287,12 @@ func TestMetricsCollectAndSend(t *testing.T) {
 			t.Parallel()
 			a := helper.Asserter{T: t}
 
-			m, cancelGPU, cancelScreen, cancelPartition := newTestMetricsWithCommands(t, tc.root,
-				tc.caseGPU, tc.caseScreen, tc.casePartition, tc.env)
+			m, cancelGPU, cancelScreen, cancelPartition, cancelArchitecture := newTestMetricsWithCommands(t, tc.root,
+				tc.caseGPU, tc.caseScreen, tc.casePartition, tc.caseArchitecture, tc.env)
 			defer cancelGPU()
 			defer cancelScreen()
 			defer cancelPartition()
+			defer cancelArchitecture()
 			out, tearDown := helper.TempDir(t)
 			defer tearDown()
 			if strings.HasPrefix(tc.cacheReportP, "/") {
@@ -356,12 +361,13 @@ func TestMultipleMetricsCollectAndSend(t *testing.T) {
 			t.Parallel()
 			a := helper.Asserter{T: t}
 
-			m, cancelGPU, cancelScreen, cancelPartition := newTestMetricsWithCommands(t, "testdata/good",
-				"one gpu", "one screen", "one partition",
+			m, cancelGPU, cancelScreen, cancelPartition, cancelArchitecture := newTestMetricsWithCommands(t, "testdata/good",
+				"one gpu", "one screen", "one partition", "regular",
 				map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12"})
 			defer cancelGPU()
 			defer cancelScreen()
 			defer cancelPartition()
+			defer cancelArchitecture()
 			out, tearDown := helper.TempDir(t)
 			defer tearDown()
 			serverHitAt := ""
@@ -377,12 +383,13 @@ func TestMultipleMetricsCollectAndSend(t *testing.T) {
 
 			// second call, reset server
 			serverHitAt = ""
-			m, cancelGPU, cancelScreen, cancelPartition = newTestMetricsWithCommands(t, "testdata/good",
-				"one gpu", "one screen", "one partition",
+			m, cancelGPU, cancelScreen, cancelPartition, cancelArchitecture = newTestMetricsWithCommands(t, "testdata/good",
+				"one gpu", "one screen", "one partition", "regular",
 				map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12"})
 			defer cancelGPU()
 			defer cancelScreen()
 			defer cancelPartition()
+			defer cancelArchitecture()
 			err = metricsCollectAndSend(m, ReportAuto, tc.alwaysReport, ts.URL, out, os.Stdout, os.Stdin)
 
 			a.CheckWantedErr(err, tc.wantErr)
@@ -443,12 +450,13 @@ func TestInteractiveMetricsCollectAndSend(t *testing.T) {
 			t.Parallel()
 			a := helper.Asserter{T: t}
 
-			m, cancelGPU, cancelScreen, cancelPartition := newTestMetricsWithCommands(t, "testdata/good",
-				"one gpu", "one screen", "one partition",
+			m, cancelGPU, cancelScreen, cancelPartition, cancelArchitecture := newTestMetricsWithCommands(t, "testdata/good",
+				"one gpu", "one screen", "one partition", "regular",
 				map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12"})
 			defer cancelGPU()
 			defer cancelScreen()
 			defer cancelPartition()
+			defer cancelArchitecture()
 			out, tearDown := helper.TempDir(t)
 			defer tearDown()
 			serverHitAt := ""
@@ -525,14 +533,15 @@ func newMockShortCmd(t *testing.T, s ...string) (*exec.Cmd, context.CancelFunc) 
 	return helper.ShortProcess(t, "TestMetricsHelperProcess", s...)
 }
 
-func newTestMetricsWithCommands(t *testing.T, root, caseGPU, caseScreen, casePartition string, env map[string]string) (m metrics.Metrics,
-	cancelGPU, cancelSreen, cancelPartition context.CancelFunc) {
+func newTestMetricsWithCommands(t *testing.T, root, caseGPU, caseScreen, casePartition, caseArch string, env map[string]string) (m metrics.Metrics,
+	cancelGPU, cancelSreen, cancelPartition, cancelArchitecture context.CancelFunc) {
 	t.Helper()
 	cmdGPU, cancelGPU := newMockShortCmd(t, "lspci", "-n", caseGPU)
 	cmdScreen, cancelScreen := newMockShortCmd(t, "xrandr", caseScreen)
 	cmdPartition, cancelPartition := newMockShortCmd(t, "df", casePartition)
-	return metrics.NewTestMetrics(root, cmdGPU, cmdScreen, cmdPartition, helper.GetenvFromMap(env)),
-		cancelGPU, cancelScreen, cancelPartition
+	cmdArchitecture, cancelArchitecture := newMockShortCmd(t, "dpkg", "--print-architecture", caseArch)
+	return metrics.NewTestMetrics(root, cmdGPU, cmdScreen, cmdPartition, cmdArchitecture, helper.GetenvFromMap(env)),
+		cancelGPU, cancelScreen, cancelPartition, cancelArchitecture
 }
 
 // ScanLinesOrQuestion is copy of ScanLines, adding the expected question string as we don't return here

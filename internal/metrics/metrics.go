@@ -26,6 +26,7 @@ type Metrics struct {
 	screenInfoCmd *exec.Cmd
 	spaceInfoCmd  *exec.Cmd
 	gpuInfoCmd    *exec.Cmd
+	archCmd       *exec.Cmd
 	getenv        GetenvFn
 }
 
@@ -36,6 +37,7 @@ func New(options ...func(*Metrics) error) (Metrics, error) {
 		screenInfoCmd: setCommand("xrandr"),
 		spaceInfoCmd:  setCommand("df"),
 		gpuInfoCmd:    setCommand("lspci", "-n"),
+		archCmd:       setCommand("dpkg", "--print-architecture"),
 		getenv:        os.Getenv,
 	}
 
@@ -111,6 +113,7 @@ func (m Metrics) Collect() ([]byte, error) {
 	}
 
 	r.CPU = m.getCPU()
+	r.Arch = m.getArch()
 	r.GPU = m.getGPU()
 	r.RAM = m.getRAM()
 	r.Partitions = m.getPartitions()

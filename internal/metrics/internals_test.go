@@ -448,6 +448,35 @@ func TestGetPartitions(t *testing.T) {
 	}
 }
 
+func TestGetArch(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		name string
+
+		want string
+	}{
+		{"regular", "amd64"},
+		{"empty", ""},
+		{"fail", ""},
+	}
+	for _, tc := range testCases {
+		tc := tc // capture range variable for parallel execution
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			a := helper.Asserter{T: t}
+
+			cmd, cancel := newMockShortCmd(t, "dpkg", "--print-architecture", tc.name)
+			defer cancel()
+
+			m := newTestMetrics(t, WithArchitureCommand(cmd))
+			arch := m.getArch()
+
+			a.Equal(arch, tc.want)
+		})
+	}
+}
+
 func newTestMetrics(t *testing.T, fixtures ...func(m *Metrics) error) Metrics {
 	t.Helper()
 	m, err := New(fixtures...)

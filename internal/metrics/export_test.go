@@ -43,6 +43,15 @@ func WithSpaceInfoCommand(cmd *exec.Cmd) func(*Metrics) error {
 	}
 }
 
+// WithArchitureCommand tweaks the current given architecture
+func WithArchitureCommand(cmd *exec.Cmd) func(*Metrics) error {
+	log.Debugf("Setting architecture command to '%s'", cmd.Args)
+	return func(m *Metrics) error {
+		m.archCmd = cmd
+		return nil
+	}
+}
+
 // WithMapForEnv replace system getenv with given environ hashmap
 func WithMapForEnv(env map[string]string) func(*Metrics) error {
 	log.Debugf("Setting new environment to '%v'", env)

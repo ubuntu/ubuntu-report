@@ -88,6 +88,16 @@ func (m Metrics) getPartitions() []float64 {
 	return sizes
 }
 
+func (m Metrics) getArch() string {
+	b, err := m.archCmd.CombinedOutput()
+	if err != nil {
+		log.Infof("couldn't get Architecture: "+utils.ErrFormat, err)
+		return ""
+	}
+
+	return strings.TrimSpace(string(b))
+}
+
 func runCmd(cmd *exec.Cmd) io.Reader {
 	pr, pw := io.Pipe()
 	cmd.Stdout = pw

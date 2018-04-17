@@ -16,6 +16,7 @@
       "Stepping": "7"
     }
   ],
+  "Arch": "amd64",
   "GPU": [
     {
       "Vendor": "8086",

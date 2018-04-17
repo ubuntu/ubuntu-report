@@ -53,22 +53,23 @@ func TestCollect(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
-		name          string
-		root          string
-		caseGPU       string
-		caseScreen    string
-		casePartition string
-		env           map[string]string
+		name             string
+		root             string
+		caseGPU          string
+		caseScreen       string
+		casePartition    string
+		caseArchitecture string
+		env              map[string]string
 
 		// note that only an internal json package error can make it returning an error
 		wantErr bool
 	}{
 		{"regular",
-			"testdata/good", "one gpu", "one screen", "one partition",
+			"testdata/good", "one gpu", "one screen", "one partition", "regular",
 			map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12"},
 			false},
 		{"empty",
-			"testdata/none", "empty", "empty", "empty",
+			"testdata/none", "empty", "empty", "empty", "empty",
 			nil,
 			false},
 	}
@@ -84,11 +85,14 @@ func TestCollect(t *testing.T) {
 			defer cancel()
 			cmdPartition, cancel := newMockShortCmd(t, "df", tc.casePartition)
 			defer cancel()
+			cmdArchitecture, cancel := newMockShortCmd(t, "dpkg", "--print-architecture", tc.caseArchitecture)
+			defer cancel()
 
 			m := newTestMetrics(t, metrics.WithRootAt(tc.root),
 				metrics.WithGPUInfoCommand(cmdGPU),
 				metrics.WithScreenInfoCommand(cmdScreen),
 				metrics.WithSpaceInfoCommand(cmdPartition),
+				metrics.WithArchitureCommand(cmdArchitecture),
 				metrics.WithMapForEnv(tc.env))
 			got, err := m.Collect()
 

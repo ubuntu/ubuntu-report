@@ -154,5 +154,20 @@ tmpfs                   5120         4       5116   1% /run/lock`
 			fmt.Println(regularOutput) // still print content
 			os.Exit(1)
 		}
+
+	case "dpkg":
+		if args[0] != "--print-architecture" {
+			fmt.Fprintf(os.Stderr, "Unexpected dpkg arguments: %v\n", args)
+			os.Exit(1)
+		}
+		switch args[1] {
+		case "regular":
+			fmt.Println("amd64")
+		case "empty":
+		case "fail":
+			fmt.Println("amd64") // still print content
+			os.Exit(1)
+		}
 	}
+
 }

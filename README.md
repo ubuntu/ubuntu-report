@@ -153,6 +153,7 @@ The data is pretty printed here to be more readable.
       "Stepping": "7"
     }
   ],
+  "Arch": "amd64",
   "GPU": [
     {
       "Vendor": "8086",
