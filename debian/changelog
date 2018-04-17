@@ -1,3 +1,12 @@
+ubuntu-report (1.0.8) bionic; urgency=medium
+
+  * Handle complex screen config with multiple frequencies (LP: #1764427)
+  * Configure timeout to client for https POST request (LP: #1764655)
+  * List architecture as part of POST data (LP: #1764673)
+  * All 3 items above are covered by new tests
+
+ -- Didier Roche <didrocks@ubuntu.com>  Tue, 17 Apr 2018 10:31:49 +0200
+
 ubuntu-report (1.0.7) bionic; urgency=medium
 
   * Add crosscall_s390x@Base in symbols file for s390x
