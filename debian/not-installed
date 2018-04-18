@@ -1,0 +1,5 @@
+# we don't install vendor code in the golang binding package: nested vendor is going to be deprecated
+# in Go and people using the golang bindings would chose their own vendor version or packaged deps.
+usr/share/gocode/src/github.com/ubuntu/ubuntu-report/vendor
+# don't install command line code, we only ship the library and internals
+usr/share/gocode/src/github.com/ubuntu/ubuntu-report/cmd
