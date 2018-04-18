@@ -1,3 +1,15 @@
+ubuntu-report (1.0.9) bionic; urgency=medium
+
+  * Use vendoring instead of relying on build-deps (LP: #1764961):
+    - ship vendor as part of the source package and remove build-deps
+    - update debian/copyright to list vendored deps.
+    - ensure that golang-github-ubuntu-ubuntu-report-dev is still
+      depending on the packages deps and don't ship vendor deps to avoid
+      nested vendoring: we want developers using the bindings to have
+      the choice between distro version or their own vendored version.
+
+ -- Didier Roche <didrocks@ubuntu.com>  Wed, 18 Apr 2018 10:03:35 +0200
+
 ubuntu-report (1.0.8) bionic; urgency=medium
 
   * Handle complex screen config with multiple frequencies (LP: #1764427)
