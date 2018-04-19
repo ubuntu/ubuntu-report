@@ -1,3 +1,10 @@
+ubuntu-report (1.0.10) bionic; urgency=medium
+
+  * Fix failing autopktests: ensure we do use vendored dependencies
+    as we dropped distro build-deps.
+
+ -- Didier Roche <didrocks@ubuntu.com>  Thu, 19 Apr 2018 09:40:42 +0200
+
 ubuntu-report (1.0.9) bionic; urgency=medium
 
   * Use vendoring instead of relying on build-deps (LP: #1764961):
