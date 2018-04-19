@@ -110,7 +110,7 @@ func TestVerbosity(t *testing.T) {
 						if allowedLog {
 							continue
 						}
-						t.Errorf("Expected no log output with -v apart from missing telemetry, GPU, Disk, Screen, chassis and autologin information, but got: %s", l)
+						t.Errorf("Expected no log output with -v apart from missing telemetry, GPU, Disk, Screen, sys and autologin information, but got: %s", l)
 					}
 				}
 			case "-vv":

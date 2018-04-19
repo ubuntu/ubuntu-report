@@ -62,20 +62,20 @@ func (m Metrics) getAutologin() bool {
 }
 
 func (m Metrics) getOEM() (string, string) {
-	v, err := getFromFileTrimmed(filepath.Join(m.root, "sys/class/dmi/id/chassis_vendor"))
+	v, err := getFromFileTrimmed(filepath.Join(m.root, "sys/class/dmi/id/sys_vendor"))
 	if err != nil {
-		log.Infof("couldn't get chassis vendor information: "+utils.ErrFormat, err)
+		log.Infof("couldn't get sys vendor information: "+utils.ErrFormat, err)
 	}
 	if strings.Contains(v, "\n") {
-		log.Infof(utils.ErrFormat, errors.Errorf("malformed chassis vendor information, file contains: %s", v))
+		log.Infof(utils.ErrFormat, errors.Errorf("malformed sys vendor information, file contains: %s", v))
 		v = ""
 	}
 	p, err := getFromFileTrimmed(filepath.Join(m.root, "sys/class/dmi/id/product_name"))
 	if err != nil {
-		log.Infof("couldn't get chassis product name information: "+utils.ErrFormat, err)
+		log.Infof("couldn't get sys product name information: "+utils.ErrFormat, err)
 	}
 	if strings.Contains(p, "\n") {
-		log.Infof(utils.ErrFormat, errors.Errorf("malformed chassis product name information, file contains: %s", p))
+		log.Infof(utils.ErrFormat, errors.Errorf("malformed sys product name information, file contains: %s", p))
 		p = ""
 	}
 	return v, p
