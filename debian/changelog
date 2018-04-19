@@ -1,3 +1,13 @@
+ubuntu-report (1.0.11) bionic; urgency=medium
+
+  * Use sys_vendor to determine vendor (LP: #1765400)
+    After a discussion with Entroware, the SMBIOS spec infer that we should
+    prefer sys_vendor to chassis_vendor for collecting Vendor information.
+    Use that field and update tests thus.
+    Thanks to Michael Wilson for pointing it out.
+
+ -- Didier Roche <didrocks@ubuntu.com>  Thu, 19 Apr 2018 15:00:16 +0200
+
 ubuntu-report (1.0.10) bionic; urgency=medium
 
   * Fix failing autopktests: ensure we do use vendored dependencies
