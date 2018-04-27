@@ -16,3 +16,8 @@ coverage.txt
 # Packaging artefacts
 debian/
 obj-*
+parts/
+stage/
+prime/
+snap/.snapcraft/state
+*.snap

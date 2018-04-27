@@ -1,0 +1,24 @@
+name: ubuntu-report
+version: '1.0'
+summary: Report hardware and other collected metrics
+description: |
+  Command line tool to report hardware and other collected metrics like
+  installer or upgrade information.
+  .
+  Those information can't be used to identify a single machine and are
+  presented before being sent to the server.
+  More details on https://github.com/ubuntu/ubuntu-report
+grade: stable
+confinement: classic
+base: core18
+
+apps:
+  ubuntu-report:
+    command: bin/ubuntu-report
+
+parts:
+  cli:
+    source: .
+    plugin: go
+    go-importpath: github.com/ubuntu/ubuntu-report
+    stage: [bin/ubuntu-report]
