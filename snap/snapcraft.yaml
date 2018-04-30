@@ -29,3 +29,9 @@ parts:
     stage:
       - bin/ubuntu-report
       - bash-completion
+  tests:
+    plugin: nil
+    after: [cli]
+    override-build: |
+      cd ../../cli/go/src/github.com/ubuntu/ubuntu-report
+      GOPATH=`pwd`/../../../.. go test ./...
