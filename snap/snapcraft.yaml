@@ -15,10 +15,17 @@ base: core18
 apps:
   ubuntu-report:
     command: bin/ubuntu-report
+    completer: bash-completion
 
 parts:
   cli:
     source: .
     plugin: go
     go-importpath: github.com/ubuntu/ubuntu-report
-    stage: [bin/ubuntu-report]
+    override-build: |
+      snapcraftctl build
+      GOPATH=`pwd`/../go/ go generate cmd/ubuntu-report/generate_test.go
+      cp build/bash-completion $SNAPCRAFT_PART_INSTALL/
+    stage:
+      - bin/ubuntu-report
+      - bash-completion
