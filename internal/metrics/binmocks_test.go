@@ -54,11 +54,15 @@ func TestMetricsHelperProcess(*testing.T) {
 		case "multiple gpus":
 			fmt.Println(regularOutput)
 			fmt.Println("00:02.0 0300: 8086:0127 (rev 09)")
+		case "no revision number":
+			fmt.Println("00:02.0 0300: 8086:0126")
 		case "no gpu":
 			fmt.Println(`00:00.0 0600: 8086:0104 (rev 09)
 00:16.0 0780: 8086:1c3a (rev 04)
 00:16.3 0700: 8086:1c3d (rev 04)
 00:19.0 0200: 8086:1502 (rev 04)`)
+		case "hexa numbers":
+			fmt.Println("00:02.0 0300: 8b86:a126 (rev 09)")
 		case "empty":
 		case "malformed gpu line":
 			fmt.Println("00:02.0 0300: 80860127 (rev 09)")

@@ -15,7 +15,7 @@ func (m Metrics) getGPU() []gpuInfo {
 
 	r := runCmd(m.gpuInfoCmd)
 
-	results, err := filterAll(r, `^.* 0300: (.*) \(rev .*\)$`)
+	results, err := filterAll(r, `^.* 0300: ([a-zA-Z0-9]+:[a-zA-Z0-9]+)( \(rev .*\))?$`)
 	if err != nil {
 		log.Infof("couldn't get GPU info: "+utils.ErrFormat, err)
 		return nil
