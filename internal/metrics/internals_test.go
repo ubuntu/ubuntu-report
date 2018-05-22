@@ -480,6 +480,42 @@ func TestGetArch(t *testing.T) {
 	}
 }
 
+func TestGetLanguage(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		name string
+		env  map[string]string
+
+		want string
+	}{
+		{"regular", map[string]string{"LANG": "fr_FR.UTF-8", "LANGUAGE": "fr_FR.UTF-8"}, "fr_FR"},
+		{"LC_ALL override all", map[string]string{
+			"LC_ALL": "en_US.UTF-8", "LANG": "fr_FR.UTF-8", "LANGUAGE": "fr_FR.UTF-8"}, "en_US"},
+		{"LANG override LANGUAGE",
+			map[string]string{"LANG": "en_US.UTF-8", "LANGUAGE": "fr_FR.UTF-8"}, "en_US"},
+		{"LANGUAGE only",
+			map[string]string{"LANGUAGE": "fr_FR.UTF-8"}, "fr_FR"},
+		{"only first in LANGUAGE list",
+			map[string]string{"LANGUAGE": "fr_FR.UTF-8:en_US.UTF8"}, "fr_FR"},
+		{"without encoding", map[string]string{"LANG": "fr_FR", "LANGUAGE": "fr_FR"}, "fr_FR"},
+		{"none", nil, ""},
+	}
+	for _, tc := range testCases {
+		tc := tc // capture range variable for parallel execution
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			a := helper.Asserter{T: t}
+
+			m := newTestMetrics(t, WithMapForEnv(tc.env))
+			got := m.getLanguage()
+
+			a.Equal(got, tc.want)
+		})
+	}
+
+}
+
 func newTestMetrics(t *testing.T, fixtures ...func(m *Metrics) error) Metrics {
 	t.Helper()
 	m, err := New(fixtures...)
