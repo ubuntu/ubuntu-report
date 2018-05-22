@@ -179,6 +179,7 @@ The data is pretty printed here to be more readable.
     "Name": "ubuntu",
     "Type": "x11"
   },
+  "Language": "fr_FR",
   "Timezone": "Europe/Paris",
   "Install": {
     "Media": "Ubuntu 18.04 LTS \"Bionic Beaver\" - Alpha amd64 (20180305)",
