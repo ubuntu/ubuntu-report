@@ -66,7 +66,7 @@ func TestCollect(t *testing.T) {
 	}{
 		{"regular",
 			"testdata/good", "one gpu", "one screen", "one partition", "regular",
-			map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12"},
+			map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12", "LANG": "fr_FR.UTF-8", "LANGUAGE": "fr_FR.UTF-8"},
 			false},
 		{"empty",
 			"testdata/none", "empty", "empty", "empty", "empty",
@@ -119,7 +119,7 @@ func TestRunCollectTwice(t *testing.T) {
 	}{
 		{"regular",
 			"testdata/good", "one gpu", "one screen", "one partition",
-			map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12"},
+			map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12", "LANG": "fr_FR.UTF-8", "LANGUAGE": "fr_FR.UTF-8"},
 			false},
 		{"empty",
 			"testdata/none", "empty", "empty", "empty",

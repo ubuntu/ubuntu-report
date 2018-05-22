@@ -134,6 +134,7 @@ func (m Metrics) Collect() ([]byte, error) {
 			Type string
 		}{de, sessionName, sessionType}
 	}
+	r.Language = m.getLanguage()
 	r.Timezone = m.getTimeZone()
 
 	r.Install = m.installerInfo()
