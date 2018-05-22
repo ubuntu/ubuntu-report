@@ -264,12 +264,12 @@ func TestMetricsCollectAndSend(t *testing.T) {
 	}{
 		{"regular report auto",
 			"testdata/good", "one gpu", "one screen", "one partition", "regular",
-			map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12"},
+			map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12", "LANG": "fr_FR.UTF-8", "LANGUAGE": "fr_FR.UTF-8"},
 			ReportAuto, "",
 			"ubuntu-report/ubuntu.18.04", true, "/ubuntu/desktop/18.04", false},
 		{"regular report OptOut",
 			"testdata/good", "one gpu", "one screen", "one partition", "regular",
-			map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12"},
+			map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12", "LANG": "fr_FR.UTF-8", "LANGUAGE": "fr_FR.UTF-8"},
 			ReportOptOut, "",
 			"ubuntu-report/ubuntu.18.04", true, "/ubuntu/desktop/18.04", false},
 		{"No IDs (mandatory)",
@@ -363,7 +363,7 @@ func TestMultipleMetricsCollectAndSend(t *testing.T) {
 
 			m, cancelGPU, cancelScreen, cancelPartition, cancelArchitecture := newTestMetricsWithCommands(t, "testdata/good",
 				"one gpu", "one screen", "one partition", "regular",
-				map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12"})
+				map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12", "LANG": "fr_FR.UTF-8", "LANGUAGE": "fr_FR.UTF-8"})
 			defer cancelGPU()
 			defer cancelScreen()
 			defer cancelPartition()
@@ -385,7 +385,7 @@ func TestMultipleMetricsCollectAndSend(t *testing.T) {
 			serverHitAt = ""
 			m, cancelGPU, cancelScreen, cancelPartition, cancelArchitecture = newTestMetricsWithCommands(t, "testdata/good",
 				"one gpu", "one screen", "one partition", "regular",
-				map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12"})
+				map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12", "LANG": "fr_FR.UTF-8", "LANGUAGE": "fr_FR.UTF-8"})
 			defer cancelGPU()
 			defer cancelScreen()
 			defer cancelPartition()
@@ -452,7 +452,7 @@ func TestInteractiveMetricsCollectAndSend(t *testing.T) {
 
 			m, cancelGPU, cancelScreen, cancelPartition, cancelArchitecture := newTestMetricsWithCommands(t, "testdata/good",
 				"one gpu", "one screen", "one partition", "regular",
-				map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12"})
+				map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12", "LANG": "fr_FR.UTF-8", "LANGUAGE": "fr_FR.UTF-8"})
 			defer cancelGPU()
 			defer cancelScreen()
 			defer cancelPartition()
