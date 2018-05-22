@@ -163,6 +163,7 @@ The data is pretty printed here to be more readable.
   "RAM": 8,
   "Screens": [
     {
+      "Size": "277mmx156mm",
       "Resolution": "1366x768",
       "Frequency": "60.02"
     },
