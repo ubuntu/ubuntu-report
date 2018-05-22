@@ -29,6 +29,7 @@
   ],
   "Screens": [
     {
+      "Size": "277mmx156mm",
       "Resolution": "1366x768",
       "Frequency": "60.02"
     }
