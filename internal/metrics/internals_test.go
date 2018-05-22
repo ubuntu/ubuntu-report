@@ -384,15 +384,16 @@ func TestGetScreens(t *testing.T) {
 
 		want []screenInfo
 	}{
-		{"one screen", []screenInfo{{"1366x768", "60.02"}}},
-		{"multiple screens", []screenInfo{{"1366x768", "60.02"}, {"1920x1080", "60.00"}}},
+		{"one screen", []screenInfo{{"277mmx156mm", "1366x768", "60.02"}}},
+		{"multiple screens", []screenInfo{{"277mmx156mm", "1366x768", "60.02"}, {"510mmx287mm", "1920x1080", "60.00"}}},
 		{"no screen", nil},
-		{"chosen resolution not first", []screenInfo{{"1600x1200", "60.00"}}},
+		{"chosen resolution not first", []screenInfo{{"510mmx287mm", "1600x1200", "60.00"}}},
+		{"no specified screen size", nil},
 		{"no chosen resolution", nil},
-		{"chosen resolution not prefered", []screenInfo{{"1920x1080", "60.00"}}},
-		{"multiple frequencies for resolution", []screenInfo{{"1920x1080", "60.00"}}},
-		{"multiple frequencies select other resolution", []screenInfo{{"1920x1080", "50.00"}}},
-		{"multiple frequencies select other resolution on non preferred", []screenInfo{{"1920x1080", "50.00"}}},
+		{"chosen resolution not prefered", []screenInfo{{"510mmx287mm", "1920x1080", "60.00"}}},
+		{"multiple frequencies for resolution", []screenInfo{{"510mmx287mm", "1920x1080", "60.00"}}},
+		{"multiple frequencies select other resolution", []screenInfo{{"510mmx287mm", "1920x1080", "50.00"}}},
+		{"multiple frequencies select other resolution on non preferred", []screenInfo{{"510mmx287mm", "1920x1080", "50.00"}}},
 		{"empty", nil},
 		{"malformed screen line", nil},
 		{"garbage", nil},

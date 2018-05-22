@@ -112,6 +112,11 @@ DP-1 disconnected (normal left inverted right x axis y axis)`
 			fmt.Println(`VGA-1 connected 1920x1080+0+0 (normal left inverted right x axis y axis) 510mm x 287mm
    1920x1080     60.00    59.94    50.00*   60.05    60.00    50.04
    1600x1200     60.00 +`)
+		case "no specified screen size":
+			fmt.Println(`VGA-1 connected 1920x1080+0+0 (normal left inverted right x axis y axis)
+   1920x1080     60.00*+
+   1600x1200     60.00  
+   1680x1050     59.95  `)
 		case "no chosen resolution":
 			fmt.Println(`VGA-1 connected 1920x1080+0+0 (normal left inverted right x axis y axis) 510mm x 287mm
    1920x1080     60.00  
@@ -119,7 +124,7 @@ DP-1 disconnected (normal left inverted right x axis y axis)`
    1680x1050     59.95  `)
 		case "empty":
 		case "malformed screen line":
-			fmt.Println(`VGA-1 connected 1920x1080+0+0 (normal left inverted right x axis y axis) 510mm x 287mm
+			fmt.Println(`VGA-1 connected 1920x1080+0+0 (normal left inverted right x axis y axis) 510m x 287mm
    1920x108160.00*+`)
 		case "garbage":
 			fmt.Println(garbageOutput)

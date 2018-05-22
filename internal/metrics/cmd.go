@@ -38,19 +38,29 @@ func (m Metrics) getScreens() []screenInfo {
 
 	r := runCmd(m.screenInfoCmd)
 
-	results, err := filterAll(r, `^ +(.*)\*`)
+	var results []string
+	results, err := filterAll(r, `^(?: +(.*)\*|.* connected .* (\d+mm x \d+mm))`)
 	if err != nil {
 		log.Infof("couldn't get Screen info: "+utils.ErrFormat, err)
 		return nil
 	}
 
+	var lastSize string
 	for _, screeninfo := range results {
-		i := strings.Fields(screeninfo)
-		if len(i) < 2 {
-			log.Infof("screen info should be of form 'resolution     [freqs]*', got: %s", screeninfo)
+		if strings.Index(screeninfo, "mm") > -1 {
+			lastSize = strings.Replace(screeninfo, " ", "", -1)
 			continue
 		}
-		screens = append(screens, screenInfo{Resolution: i[0], Frequency: i[len(i)-1]})
+		i := strings.Fields(screeninfo)
+		if len(i) < 2 {
+			log.Infof("screen info should be either a screen physical size (connected) or a a resolution + freq, got: %s", screeninfo)
+			continue
+		}
+		if lastSize == "" {
+			log.Infof("We couldn't get physical info size prior to Resolution and Frequency information.")
+			continue
+		}
+		screens = append(screens, screenInfo{Size: lastSize, Resolution: i[0], Frequency: i[len(i)-1]})
 	}
 
 	return screens
