@@ -556,6 +556,136 @@ func TestInteractiveMetricsCollectAndSend(t *testing.T) {
 	}
 }
 
+func TestMetricsSendPendingReport(t *testing.T) {
+	t.Parallel()
+	initialReportTimeoutDuration = 0
+
+	testCases := []struct {
+		name            string
+		root            string
+		manualServerURL string
+
+		cacheReportP      string
+		pendingReportP    string
+		pendingReportKept bool
+		numHitServer      int
+		sHitHat           string
+		wantErr           bool
+	}{
+		{"send previous report",
+			"testdata/good", "",
+			"ubuntu-report/ubuntu.18.04", "ubuntu-report/pending", false, 1, "/ubuntu/desktop/18.04", false},
+		{"no previous report",
+			"testdata/good", "",
+			"", "", false, 0, "", true},
+		{"send previous report after backoff",
+			"testdata/good", "",
+			"ubuntu-report/ubuntu.18.04", "ubuntu-report/pending", false, 2, "/ubuntu/desktop/18.04", false},
+		{"no IDs (mandatory)",
+			"testdata/no-ids", "",
+			"", "", false, 0, "", true},
+		{"invalid URL",
+			"testdata/good", "http://a b.com/",
+			"", "", false, 0, "", true},
+		{"unwritable path",
+			"testdata/good", "",
+			"", "ubuntu-report/pending", true, 1, "/ubuntu/desktop/18.04", true},
+	}
+	for _, tc := range testCases {
+		tc := tc // capture range variable for parallel execution
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			a := helper.Asserter{T: t}
+
+			m := metrics.NewTestMetrics(tc.root, nil, nil, nil, nil, os.Getenv)
+			out, tearDown := helper.TempDir(t)
+			defer tearDown()
+			if strings.HasPrefix(tc.cacheReportP, "/") {
+				// absolute path, override temporary one
+				out = tc.cacheReportP
+			}
+			var pendingReportData []byte
+			var err error
+			resetwritable := func() {}
+			if tc.pendingReportP != "" {
+				if pendingReportData, err = ioutil.ReadFile(filepath.Join(tc.root, tc.pendingReportP)); err != nil {
+					t.Fatalf("couldn't open pending report file: %v", err)
+				}
+				tc.pendingReportP = filepath.Join(out, tc.pendingReportP)
+				d := filepath.Dir(tc.pendingReportP)
+				if err := os.MkdirAll(d, 0700); err != nil {
+					t.Fatal("couldn't create parent directory of pending report", err)
+				}
+				if err := ioutil.WriteFile(tc.pendingReportP, pendingReportData, 0644); err != nil {
+					t.Fatalf("couldn't copy pending report file to cache directory: %v", err)
+				}
+				// switch back mode to unwritable
+				if strings.HasPrefix(tc.name, "unwritable") {
+					if err := os.Chmod(d, 0500); err != nil {
+						t.Fatalf("couldn't switch %s to not being writable: %v", d, err)
+					}
+					resetwritable = func() {
+						if err := os.Chmod(d, 0700); err != nil {
+							t.Fatalf("couldn't switch %s back to being writable: %v", d, err)
+						}
+					}
+					defer resetwritable()
+				}
+			}
+
+			serverHitAt := ""
+			numHitServer := 0
+			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				numHitServer++
+				if numHitServer < tc.numHitServer {
+					http.NotFound(w, r)
+					return
+				}
+				serverHitAt = r.URL.String()
+			}))
+			defer ts.Close()
+			url := tc.manualServerURL
+			if url == "" {
+				url = ts.URL
+			}
+
+			err = metricsSendPendingReport(m, url, out, os.Stdout, os.Stdin)
+
+			// restore directory state for checking
+			resetwritable()
+
+			a.CheckWantedErr(err, tc.wantErr)
+			a.Equal(numHitServer, tc.numHitServer)
+			a.Equal(serverHitAt, tc.sHitHat)
+
+			_, pendingReportErr := os.Stat(tc.pendingReportP)
+			if !tc.pendingReportKept && os.IsExist(pendingReportErr) {
+				t.Errorf("we expected the pending report to be removed and it wasn't")
+			} else if tc.pendingReportKept && os.IsNotExist(pendingReportErr) {
+				t.Errorf("we expected the pending report to be kept and it was removed")
+			}
+
+			// check we didn't do too much work on error
+			if err != nil {
+				if _, err := os.Stat(filepath.Join(out, tc.cacheReportP)); os.IsExist(err) {
+					t.Errorf("we didn't expect finding a cache report path as we erroring out")
+				}
+				return
+			}
+
+			gotF, err := os.Open(filepath.Join(out, tc.cacheReportP))
+			if err != nil {
+				t.Fatal("didn't generate a report file on disk", err)
+			}
+			got, err := ioutil.ReadAll(gotF)
+			if err != nil {
+				t.Fatal("couldn't read generated report file", err)
+			}
+			a.Equal(got, pendingReportData)
+		})
+	}
+}
+
 func newMockShortCmd(t *testing.T, s ...string) (*exec.Cmd, context.CancelFunc) {
 	t.Helper()
 	return helper.ShortProcess(t, "TestMetricsHelperProcess", s...)

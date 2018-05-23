@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -19,6 +20,10 @@ import (
 
 // optOutJSON is the data sent in case of Opt-Out choice
 const optOutJSON = `{"OptOut": true}`
+
+var (
+	initialReportTimeoutDuration = 30 * time.Second
+)
 
 func metricsCollect(m metrics.Metrics) ([]byte, error) {
 	data, err := m.Collect()
@@ -154,4 +159,52 @@ func checkPreviousReport(distro, version, reportBasePath string, alwaysReport bo
 		log.Debug("ignore previous report requested")
 	}
 	return p, nil
+}
+
+func metricsSendPendingReport(m metrics.Metrics, baseURL, reportBasePath string, in io.Reader, out io.Writer) error {
+	distro, version, err := m.GetIDS()
+	if err != nil {
+		return errors.Wrapf(err, "couldn't get mandatory information")
+	}
+
+	reportP, err := utils.ReportPath(distro, version, reportBasePath)
+	if err != nil {
+		return errors.Wrapf(err, "couldn't get where to save reported metrics on disk")
+	}
+
+	pending, err := utils.PendingReportPath(reportBasePath)
+	if err != nil {
+		return errors.Wrapf(err, "couldn't get where to previous reported metrics are on disk")
+	}
+	data, err := ioutil.ReadFile(pending)
+	if err != nil {
+		return errors.Wrapf(err, "no pending report found")
+	}
+
+	if baseURL == "" {
+		baseURL = sender.BaseURL
+	}
+	u, err := sender.GetURL(baseURL, distro, version)
+	if err != nil {
+		return errors.Wrapf(err, "report destination url is invalid")
+	}
+
+	wait := time.Duration(initialReportTimeoutDuration)
+	for {
+		if err := sender.Send(u, data); err != nil {
+			log.Errorf("data were not delivered successfully to metrics server, retrying in %ds", wait/(1000*1000*1000))
+			time.Sleep(wait)
+			wait = wait * 2
+			if wait > time.Duration(30*time.Minute) {
+				wait = time.Duration(30 * time.Minute)
+			}
+			continue
+		}
+		break
+	}
+
+	if err := os.Remove(pending); err != nil {
+		return errors.Wrapf(err, "couldn't remove pending report after a successful report")
+	}
+	return saveMetrics(reportP, data)
 }
