@@ -538,3 +538,65 @@ func TestInteractiveCollectAndSend(t *testing.T) {
 		})
 	}
 }
+
+func TestSendPendingReport(t *testing.T) {
+	// we change current path and env variable: not parallelizable tests
+	helper.SkipIfShort(t)
+
+	testCases := []struct {
+		name string
+
+		shouldHitServer bool
+		wantErr         bool
+	}{
+		{"regular send", true, false},
+	}
+	for _, tc := range testCases {
+		tc := tc // capture range variable for parallel execution
+		t.Run(tc.name, func(t *testing.T) {
+			a := helper.Asserter{T: t}
+
+			out, tearDown := helper.TempDir(t)
+			defer tearDown()
+			defer helper.ChangeEnv("XDG_CACHE_HOME", out)()
+			out = filepath.Join(out, "ubuntu-report")
+
+			pendingReportData, err := ioutil.ReadFile(filepath.Join("testdata", "good", "ubuntu-report", "pending"))
+			if err != nil {
+				t.Fatalf("couldn't open pending report file: %v", err)
+			}
+			pendingReportPath := filepath.Join(out, "pending")
+			if err := os.MkdirAll(out, 0700); err != nil {
+				t.Fatal("couldn't create parent directory of pending report", err)
+			}
+			if err := ioutil.WriteFile(pendingReportPath, pendingReportData, 0644); err != nil {
+				t.Fatalf("couldn't copy pending report file to cache directory: %v", err)
+			}
+
+			// we don't really care where we hit for this API integration test, internal ones test it
+			// and we don't really control /etc/os-release version and id.
+			// Same for report file
+			serverHit := false
+			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				serverHit = true
+			}))
+			defer ts.Close()
+
+			err = sysmetrics.SendPendingReport(ts.URL)
+
+			a.CheckWantedErr(err, tc.wantErr)
+			a.Equal(serverHit, tc.shouldHitServer)
+
+			if _, pendingReportErr := os.Stat(pendingReportPath); os.IsExist(pendingReportErr) {
+				t.Errorf("we expected the pending report to be removed and it wasn't")
+			}
+
+			p := filepath.Join(out, helper.FindInDirectory(t, "", out))
+			got, err := ioutil.ReadFile(p)
+			if err != nil {
+				t.Fatalf("couldn't open report file %s", out)
+			}
+			a.Equal(got, pendingReportData)
+		})
+	}
+}

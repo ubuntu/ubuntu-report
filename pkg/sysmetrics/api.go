@@ -71,3 +71,15 @@ func CollectAndSend(r ReportType, alwaysReport bool, baseURL string) error {
 	}
 	return metricsCollectAndSend(m, r, alwaysReport, baseURL, "", os.Stdin, os.Stdout)
 }
+
+// SendPendingReport will try to send any pending report which didn't suceed previously due to network issues.
+// It will try sending and exponentially back off until a send is successful.
+func SendPendingReport(baseURL string) error {
+	log.Debug("try sending previous report")
+
+	m, err := metrics.New()
+	if err != nil {
+		return errors.Wrapf(err, "couldn't create a metric collector")
+	}
+	return metricsSendPendingReport(m, baseURL, "", os.Stdin, os.Stdout)
+}
