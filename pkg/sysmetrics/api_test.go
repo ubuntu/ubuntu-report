@@ -63,10 +63,7 @@ func TestSendReport(t *testing.T) {
 			err := sysmetrics.SendReport([]byte(fmt.Sprintf(`{ %s: "18.04" }`, sysmetrics.ExpectedReportItem)),
 				tc.alwaysReport, ts.URL)
 
-			if err != nil {
-				t.Fatal("we didn't expect getting an error, got:", err)
-			}
-
+			a.CheckWantedErr(err, tc.wantErr)
 			a.Equal(serverHit, tc.shouldHitServer)
 			p := filepath.Join(out, helper.FindInDirectory(t, "", out))
 			data, err := ioutil.ReadFile(p)
@@ -212,7 +209,7 @@ func TestSendReportTwice(t *testing.T) {
 	}
 }
 
-func TestSendDceclineTwice(t *testing.T) {
+func TestSendDeclineTwice(t *testing.T) {
 	// we change current path and env variable: not parallelizable tests
 	helper.SkipIfShort(t)
 
