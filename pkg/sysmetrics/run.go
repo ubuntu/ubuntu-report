@@ -55,7 +55,15 @@ func metricsSend(m metrics.Metrics, data []byte, acknowledgement, alwaysReport b
 		return errors.Wrapf(err, "report destination url is invalid")
 	}
 	if err := sender.Send(u, data); err != nil {
-		return errors.Wrapf(err, "data were not delivered successfully to metrics server")
+		returnErr := errors.Wrapf(err, "data were not delivered successfully to metrics server, saving for a later automated report")
+		p, err := utils.PendingReportPath(reportBasePath)
+		if err != nil {
+			return errors.Wrapf(err, "couldn't get where pending reported metrics should be stored on disk: %v", returnErr)
+		}
+		if err := saveMetrics(p, data); err != nil {
+			return errors.Wrapf(err, "couldn't save pending reported are on disk: %v", returnErr)
+		}
+		return returnErr
 	}
 
 	return saveMetrics(reportP, data)
@@ -127,7 +135,7 @@ func saveMetrics(p string, data []byte) error {
 	}
 
 	if err := ioutil.WriteFile(p, data, 0666); err != nil {
-		return errors.Wrap(err, "couldn't save reported metrics on disk")
+		return errors.Wrap(err, "couldn't save reported or pending metrics on disk")
 	}
 
 	return nil
