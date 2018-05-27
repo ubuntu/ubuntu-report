@@ -54,11 +54,15 @@ func TestMetricsHelperProcess(*testing.T) {
 		case "multiple gpus":
 			fmt.Println(regularOutput)
 			fmt.Println("00:02.0 0300: 8086:0127 (rev 09)")
+		case "no revision number":
+			fmt.Println("00:02.0 0300: 8086:0126")
 		case "no gpu":
 			fmt.Println(`00:00.0 0600: 8086:0104 (rev 09)
 00:16.0 0780: 8086:1c3a (rev 04)
 00:16.3 0700: 8086:1c3d (rev 04)
 00:19.0 0200: 8086:1502 (rev 04)`)
+		case "hexa numbers":
+			fmt.Println("00:02.0 0300: 8b86:a126 (rev 09)")
 		case "empty":
 		case "malformed gpu line":
 			fmt.Println("00:02.0 0300: 80860127 (rev 09)")
@@ -108,6 +112,11 @@ DP-1 disconnected (normal left inverted right x axis y axis)`
 			fmt.Println(`VGA-1 connected 1920x1080+0+0 (normal left inverted right x axis y axis) 510mm x 287mm
    1920x1080     60.00    59.94    50.00*   60.05    60.00    50.04
    1600x1200     60.00 +`)
+		case "no specified screen size":
+			fmt.Println(`VGA-1 connected 1920x1080+0+0 (normal left inverted right x axis y axis)
+   1920x1080     60.00*+
+   1600x1200     60.00  
+   1680x1050     59.95  `)
 		case "no chosen resolution":
 			fmt.Println(`VGA-1 connected 1920x1080+0+0 (normal left inverted right x axis y axis) 510mm x 287mm
    1920x1080     60.00  
@@ -115,7 +124,7 @@ DP-1 disconnected (normal left inverted right x axis y axis)`
    1680x1050     59.95  `)
 		case "empty":
 		case "malformed screen line":
-			fmt.Println(`VGA-1 connected 1920x1080+0+0 (normal left inverted right x axis y axis) 510mm x 287mm
+			fmt.Println(`VGA-1 connected 1920x1080+0+0 (normal left inverted right x axis y axis) 510m x 287mm
    1920x108160.00*+`)
 		case "garbage":
 			fmt.Println(garbageOutput)

@@ -25,7 +25,12 @@ func filter(r io.Reader, regex string) <-chan filterResult {
 		for scanner.Scan() {
 			m := re.FindStringSubmatch(scanner.Text())
 			if m != nil {
-				results <- filterResult{r: strings.TrimSpace(m[1])}
+				// we want the first non empty match (can be null in case of alternative regexp)
+				var match string
+				for i := 1; match == "" && i < len(m); i++ {
+					match = strings.TrimSpace(m[i])
+				}
+				results <- filterResult{r: match}
 			}
 		}
 

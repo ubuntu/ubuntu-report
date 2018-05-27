@@ -134,6 +134,7 @@ func (m Metrics) Collect() ([]byte, error) {
 			Type string
 		}{de, sessionName, sessionType}
 	}
+	r.Language = m.getLanguage()
 	r.Timezone = m.getTimeZone()
 
 	r.Install = m.installerInfo()
@@ -141,6 +142,17 @@ func (m Metrics) Collect() ([]byte, error) {
 
 	d, err := json.Marshal(r)
 	return d, errors.Wrapf(err, "can't be converted to a valid json")
+}
+
+func (m Metrics) getLanguage() string {
+	lang := m.getenv("LC_ALL")
+	if lang == "" {
+		lang = m.getenv("LANG")
+	}
+	if lang == "" {
+		lang = strings.Split(m.getenv("LANGUAGE"), ":")[0]
+	}
+	return strings.Split(lang, ".")[0]
 }
 
 func convKBToGB(s string) (float64, error) {

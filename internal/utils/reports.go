@@ -30,6 +30,17 @@ func ReportPath(distro, version string, cacheP string) (string, error) {
 	return filepath.Join(cacheP, reportDir, distro+"."+version), nil
 }
 
+// PendingReportPath of last saved pending report
+func PendingReportPath(cacheP string) (string, error) {
+	if cacheP == "" {
+		var err error
+		if cacheP, err = cacheDir(); err != nil {
+			return "", err
+		}
+	}
+	return filepath.Join(cacheP, reportDir, "pending"), nil
+}
+
 func cacheDir() (string, error) {
 	d := os.Getenv("XDG_CACHE_HOME")
 	if filepath.IsAbs(d) {

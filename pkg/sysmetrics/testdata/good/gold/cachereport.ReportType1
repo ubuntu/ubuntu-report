@@ -29,6 +29,7 @@
   ],
   "Screens": [
     {
+      "Size": "277mmx156mm",
       "Resolution": "1366x768",
       "Frequency": "60.02"
     }
@@ -40,6 +41,7 @@
     "Name": "ubuntusession",
     "Type": "x12"
   },
+  "Language": "fr_FR",
   "Timezone": "Europe/Paris",
   "Install": {
     "Media": "Ubuntu 18.04 LTS \"Bionic Beaver\" - Alpha amd64 (20180305)",

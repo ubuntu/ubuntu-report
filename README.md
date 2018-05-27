@@ -110,6 +110,14 @@ ubuntu-report show [flags]
   -v, --verbose count[=-1]   issue INFO (-v) and DEBUG (-vv) output
 ```
 
+## Service
+
+In case we can't report (due to limited network or other networking conditions) your report when you act on it,
+a little service will kick at login, and try to send the pending report data again. Note that it will exponentially
+back off.
+
+The service won't be active once the pending report is sent.
+
 ## APIS
 
 ### Go API
@@ -163,6 +171,7 @@ The data is pretty printed here to be more readable.
   "RAM": 8,
   "Screens": [
     {
+      "Size": "277mmx156mm",
       "Resolution": "1366x768",
       "Frequency": "60.02"
     },
@@ -178,6 +187,7 @@ The data is pretty printed here to be more readable.
     "Name": "ubuntu",
     "Type": "x11"
   },
+  "Language": "fr_FR",
   "Timezone": "Europe/Paris",
   "Install": {
     "Media": "Ubuntu 18.04 LTS \"Bionic Beaver\" - Alpha amd64 (20180305)",

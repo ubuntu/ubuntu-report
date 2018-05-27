@@ -351,7 +351,9 @@ func TestGetGPU(t *testing.T) {
 	}{
 		{"one gpu", []gpuInfo{{"8086", "0126"}}},
 		{"multiple gpus", []gpuInfo{{"8086", "0126"}, {"8086", "0127"}}},
+		{"no revision number", []gpuInfo{{"8086", "0126"}}},
 		{"no gpu", nil},
+		{"hexa numbers", []gpuInfo{{"8b86", "a126"}}},
 		{"empty", nil},
 		{"malformed gpu line", nil},
 		{"garbage", nil},
@@ -382,15 +384,16 @@ func TestGetScreens(t *testing.T) {
 
 		want []screenInfo
 	}{
-		{"one screen", []screenInfo{{"1366x768", "60.02"}}},
-		{"multiple screens", []screenInfo{{"1366x768", "60.02"}, {"1920x1080", "60.00"}}},
+		{"one screen", []screenInfo{{"277mmx156mm", "1366x768", "60.02"}}},
+		{"multiple screens", []screenInfo{{"277mmx156mm", "1366x768", "60.02"}, {"510mmx287mm", "1920x1080", "60.00"}}},
 		{"no screen", nil},
-		{"chosen resolution not first", []screenInfo{{"1600x1200", "60.00"}}},
+		{"chosen resolution not first", []screenInfo{{"510mmx287mm", "1600x1200", "60.00"}}},
+		{"no specified screen size", nil},
 		{"no chosen resolution", nil},
-		{"chosen resolution not prefered", []screenInfo{{"1920x1080", "60.00"}}},
-		{"multiple frequencies for resolution", []screenInfo{{"1920x1080", "60.00"}}},
-		{"multiple frequencies select other resolution", []screenInfo{{"1920x1080", "50.00"}}},
-		{"multiple frequencies select other resolution on non preferred", []screenInfo{{"1920x1080", "50.00"}}},
+		{"chosen resolution not prefered", []screenInfo{{"510mmx287mm", "1920x1080", "60.00"}}},
+		{"multiple frequencies for resolution", []screenInfo{{"510mmx287mm", "1920x1080", "60.00"}}},
+		{"multiple frequencies select other resolution", []screenInfo{{"510mmx287mm", "1920x1080", "50.00"}}},
+		{"multiple frequencies select other resolution on non preferred", []screenInfo{{"510mmx287mm", "1920x1080", "50.00"}}},
 		{"empty", nil},
 		{"malformed screen line", nil},
 		{"garbage", nil},
@@ -475,6 +478,42 @@ func TestGetArch(t *testing.T) {
 			a.Equal(arch, tc.want)
 		})
 	}
+}
+
+func TestGetLanguage(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		name string
+		env  map[string]string
+
+		want string
+	}{
+		{"regular", map[string]string{"LANG": "fr_FR.UTF-8", "LANGUAGE": "fr_FR.UTF-8"}, "fr_FR"},
+		{"LC_ALL override all", map[string]string{
+			"LC_ALL": "en_US.UTF-8", "LANG": "fr_FR.UTF-8", "LANGUAGE": "fr_FR.UTF-8"}, "en_US"},
+		{"LANG override LANGUAGE",
+			map[string]string{"LANG": "en_US.UTF-8", "LANGUAGE": "fr_FR.UTF-8"}, "en_US"},
+		{"LANGUAGE only",
+			map[string]string{"LANGUAGE": "fr_FR.UTF-8"}, "fr_FR"},
+		{"only first in LANGUAGE list",
+			map[string]string{"LANGUAGE": "fr_FR.UTF-8:en_US.UTF8"}, "fr_FR"},
+		{"without encoding", map[string]string{"LANG": "fr_FR", "LANGUAGE": "fr_FR"}, "fr_FR"},
+		{"none", nil, ""},
+	}
+	for _, tc := range testCases {
+		tc := tc // capture range variable for parallel execution
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			a := helper.Asserter{T: t}
+
+			m := newTestMetrics(t, WithMapForEnv(tc.env))
+			got := m.getLanguage()
+
+			a.Equal(got, tc.want)
+		})
+	}
+
 }
 
 func newTestMetrics(t *testing.T, fixtures ...func(m *Metrics) error) Metrics {

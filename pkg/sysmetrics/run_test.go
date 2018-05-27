@@ -99,28 +99,29 @@ func TestMetricsSend(t *testing.T) {
 		manualServerURL string
 
 		cacheReportP    string
+		pendingReportP  string
 		shouldHitServer bool
 		sHitHat         string
 		wantErr         bool
 	}{
 		{"send data",
 			"testdata/good", []byte(`{ "some-data": true }`), true, "",
-			"ubuntu-report/ubuntu.18.04", true, "/ubuntu/desktop/18.04", false},
+			"ubuntu-report/ubuntu.18.04", "", true, "/ubuntu/desktop/18.04", false},
 		{"nack send data",
 			"testdata/good", []byte(`{ "some-data": true }`), false, "",
-			"ubuntu-report/ubuntu.18.04", true, "/ubuntu/desktop/18.04", false},
+			"ubuntu-report/ubuntu.18.04", "", true, "/ubuntu/desktop/18.04", false},
 		{"no IDs (mandatory)",
 			"testdata/no-ids", []byte(`{ "some-data": true }`), true, "",
-			"ubuntu-report", false, "", true},
-		{"other URL",
-			"testdata/good", []byte(`{ "some-data": true }`), true, "localhost:4299",
-			"ubuntu-report", false, "", true},
+			"ubuntu-report", "", false, "", true},
+		{"no network",
+			"testdata/good", []byte(`{ "some-data": true }`), true, "http://localhost:4299",
+			"ubuntu-report", "ubuntu-report/pending", false, "", true},
 		{"invalid URL",
 			"testdata/good", []byte(`{ "some-data": true }`), true, "http://a b.com/",
-			"ubuntu-report", false, "", true},
+			"ubuntu-report", "", false, "", true},
 		{"unwritable path",
 			"testdata/good", []byte(`{ "some-data": true }`), true, "",
-			"/unwritable/cache/path", true, "/ubuntu/desktop/18.04", true},
+			"/unwritable/cache/path", "", true, "/ubuntu/desktop/18.04", true},
 	}
 	for _, tc := range testCases {
 		tc := tc // capture range variable for parallel execution
@@ -156,8 +157,21 @@ func TestMetricsSend(t *testing.T) {
 				if tc.shouldHitServer && serverHitAt == "" {
 					t.Error("we should have hit the local server and it didn't")
 				}
-				if _, err := os.Stat(filepath.Join(out, tc.cacheReportP)); !os.IsNotExist(err) {
-					t.Errorf("we didn't expect finding a cache report path as we erroring out")
+				if tc.pendingReportP == "" {
+					if _, err := os.Stat(filepath.Join(out, tc.cacheReportP)); !os.IsNotExist(err) {
+						t.Errorf("we didn't expect finding a cache report path as we erroring out")
+					}
+				} else {
+					gotF, err := os.Open(filepath.Join(out, tc.pendingReportP))
+					if err != nil {
+						t.Fatal("didn't generate a pending report file on disk", err)
+					}
+					got, err := ioutil.ReadAll(gotF)
+					if err != nil {
+						t.Fatal("couldn't read generated pending report file", err)
+					}
+					want := helper.LoadOrUpdateGolden(t, filepath.Join(tc.root, "gold", fmt.Sprintf("metricssendpending.%s.%t", strings.Replace(tc.name, " ", "_", -1), tc.ack)), got, *Update)
+					a.Equal(got, want)
 				}
 				return
 			}
@@ -258,28 +272,29 @@ func TestMetricsCollectAndSend(t *testing.T) {
 		manualServerURL  string
 
 		cacheReportP    string
+		pendingReportP  string
 		shouldHitServer bool
 		sHitHat         string
 		wantErr         bool
 	}{
 		{"regular report auto",
 			"testdata/good", "one gpu", "one screen", "one partition", "regular",
-			map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12"},
+			map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12", "LANG": "fr_FR.UTF-8", "LANGUAGE": "fr_FR.UTF-8"},
 			ReportAuto, "",
-			"ubuntu-report/ubuntu.18.04", true, "/ubuntu/desktop/18.04", false},
+			"ubuntu-report/ubuntu.18.04", "", true, "/ubuntu/desktop/18.04", false},
 		{"regular report OptOut",
 			"testdata/good", "one gpu", "one screen", "one partition", "regular",
-			map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12"},
+			map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12", "LANG": "fr_FR.UTF-8", "LANGUAGE": "fr_FR.UTF-8"},
 			ReportOptOut, "",
-			"ubuntu-report/ubuntu.18.04", true, "/ubuntu/desktop/18.04", false},
+			"ubuntu-report/ubuntu.18.04", "", true, "/ubuntu/desktop/18.04", false},
+		{"no network",
+			"testdata/good", "", "", "", "", nil, ReportAuto, "http://localhost:4299", "ubuntu-report", "ubuntu-report/pending", false, "", true},
 		{"No IDs (mandatory)",
-			"testdata/no-ids", "", "", "", "", nil, ReportAuto, "", "ubuntu-report", false, "", true},
-		{"Other URL",
-			"testdata/good", "", "", "", "", nil, ReportAuto, "localhost:4299", "ubuntu-report", false, "", true},
+			"testdata/no-ids", "", "", "", "", nil, ReportAuto, "", "ubuntu-report", "", false, "", true},
 		{"Invalid URL",
-			"testdata/good", "", "", "", "", nil, ReportAuto, "http://a b.com/", "ubuntu-report", false, "", true},
+			"testdata/good", "", "", "", "", nil, ReportAuto, "http://a b.com/", "ubuntu-report", "", false, "", true},
 		{"Unwritable path",
-			"testdata/good", "", "", "", "", nil, ReportAuto, "", "/unwritable/cache/path", true, "/ubuntu/desktop/18.04", true},
+			"testdata/good", "", "", "", "", nil, ReportAuto, "", "/unwritable/cache/path", "", true, "/ubuntu/desktop/18.04", true},
 	}
 	for _, tc := range testCases {
 		tc := tc // capture range variable for parallel execution
@@ -320,8 +335,21 @@ func TestMetricsCollectAndSend(t *testing.T) {
 				if tc.shouldHitServer && serverHitAt == "" {
 					t.Error("we should have hit the local server and it didn't")
 				}
-				if _, err := os.Stat(filepath.Join(out, tc.cacheReportP)); !os.IsNotExist(err) {
-					t.Errorf("we didn't expect finding a cache report path as we erroring out")
+				if tc.pendingReportP == "" {
+					if _, err := os.Stat(filepath.Join(out, tc.cacheReportP)); !os.IsNotExist(err) {
+						t.Errorf("we didn't expect finding a cache report path as we erroring out")
+					}
+				} else {
+					gotF, err := os.Open(filepath.Join(out, tc.pendingReportP))
+					if err != nil {
+						t.Fatal("didn't generate a pending report file on disk", err)
+					}
+					got, err := ioutil.ReadAll(gotF)
+					if err != nil {
+						t.Fatal("couldn't read generated pending report file", err)
+					}
+					want := helper.LoadOrUpdateGolden(t, filepath.Join(tc.root, "gold", fmt.Sprintf("pendingreport.ReportType%d", int(tc.r))), got, *Update)
+					a.Equal(got, want)
 				}
 				return
 			}
@@ -363,7 +391,7 @@ func TestMultipleMetricsCollectAndSend(t *testing.T) {
 
 			m, cancelGPU, cancelScreen, cancelPartition, cancelArchitecture := newTestMetricsWithCommands(t, "testdata/good",
 				"one gpu", "one screen", "one partition", "regular",
-				map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12"})
+				map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12", "LANG": "fr_FR.UTF-8", "LANGUAGE": "fr_FR.UTF-8"})
 			defer cancelGPU()
 			defer cancelScreen()
 			defer cancelPartition()
@@ -385,7 +413,7 @@ func TestMultipleMetricsCollectAndSend(t *testing.T) {
 			serverHitAt = ""
 			m, cancelGPU, cancelScreen, cancelPartition, cancelArchitecture = newTestMetricsWithCommands(t, "testdata/good",
 				"one gpu", "one screen", "one partition", "regular",
-				map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12"})
+				map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12", "LANG": "fr_FR.UTF-8", "LANGUAGE": "fr_FR.UTF-8"})
 			defer cancelGPU()
 			defer cancelScreen()
 			defer cancelPartition()
@@ -452,7 +480,7 @@ func TestInteractiveMetricsCollectAndSend(t *testing.T) {
 
 			m, cancelGPU, cancelScreen, cancelPartition, cancelArchitecture := newTestMetricsWithCommands(t, "testdata/good",
 				"one gpu", "one screen", "one partition", "regular",
-				map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12"})
+				map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12", "LANG": "fr_FR.UTF-8", "LANGUAGE": "fr_FR.UTF-8"})
 			defer cancelGPU()
 			defer cancelScreen()
 			defer cancelPartition()
@@ -524,6 +552,136 @@ func TestInteractiveMetricsCollectAndSend(t *testing.T) {
 			}
 			want := helper.LoadOrUpdateGolden(t, filepath.Join("testdata/good", "gold", fmt.Sprintf("cachereport-twice.ReportType%d-%s", int(ReportInteractive), strings.Replace(tc.name, " ", "-", -1))), got, *Update)
 			a.Equal(got, want)
+		})
+	}
+}
+
+func TestMetricsSendPendingReport(t *testing.T) {
+	t.Parallel()
+	initialReportTimeoutDuration = 0
+
+	testCases := []struct {
+		name            string
+		root            string
+		manualServerURL string
+
+		cacheReportP      string
+		pendingReportP    string
+		pendingReportKept bool
+		numHitServer      int
+		sHitHat           string
+		wantErr           bool
+	}{
+		{"send previous report",
+			"testdata/good", "",
+			"ubuntu-report/ubuntu.18.04", "ubuntu-report/pending", false, 1, "/ubuntu/desktop/18.04", false},
+		{"no previous report",
+			"testdata/good", "",
+			"", "", false, 0, "", true},
+		{"send previous report after backoff",
+			"testdata/good", "",
+			"ubuntu-report/ubuntu.18.04", "ubuntu-report/pending", false, 2, "/ubuntu/desktop/18.04", false},
+		{"no IDs (mandatory)",
+			"testdata/no-ids", "",
+			"", "", false, 0, "", true},
+		{"invalid URL",
+			"testdata/good", "http://a b.com/",
+			"", "", false, 0, "", true},
+		{"unwritable path",
+			"testdata/good", "",
+			"", "ubuntu-report/pending", true, 1, "/ubuntu/desktop/18.04", true},
+	}
+	for _, tc := range testCases {
+		tc := tc // capture range variable for parallel execution
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			a := helper.Asserter{T: t}
+
+			m := metrics.NewTestMetrics(tc.root, nil, nil, nil, nil, os.Getenv)
+			out, tearDown := helper.TempDir(t)
+			defer tearDown()
+			if strings.HasPrefix(tc.cacheReportP, "/") {
+				// absolute path, override temporary one
+				out = tc.cacheReportP
+			}
+			var pendingReportData []byte
+			var err error
+			resetwritable := func() {}
+			if tc.pendingReportP != "" {
+				if pendingReportData, err = ioutil.ReadFile(filepath.Join(tc.root, tc.pendingReportP)); err != nil {
+					t.Fatalf("couldn't open pending report file: %v", err)
+				}
+				tc.pendingReportP = filepath.Join(out, tc.pendingReportP)
+				d := filepath.Dir(tc.pendingReportP)
+				if err := os.MkdirAll(d, 0700); err != nil {
+					t.Fatal("couldn't create parent directory of pending report", err)
+				}
+				if err := ioutil.WriteFile(tc.pendingReportP, pendingReportData, 0644); err != nil {
+					t.Fatalf("couldn't copy pending report file to cache directory: %v", err)
+				}
+				// switch back mode to unwritable
+				if strings.HasPrefix(tc.name, "unwritable") {
+					if err := os.Chmod(d, 0500); err != nil {
+						t.Fatalf("couldn't switch %s to not being writable: %v", d, err)
+					}
+					resetwritable = func() {
+						if err := os.Chmod(d, 0700); err != nil {
+							t.Fatalf("couldn't switch %s back to being writable: %v", d, err)
+						}
+					}
+					defer resetwritable()
+				}
+			}
+
+			serverHitAt := ""
+			numHitServer := 0
+			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				numHitServer++
+				if numHitServer < tc.numHitServer {
+					http.NotFound(w, r)
+					return
+				}
+				serverHitAt = r.URL.String()
+			}))
+			defer ts.Close()
+			url := tc.manualServerURL
+			if url == "" {
+				url = ts.URL
+			}
+
+			err = metricsSendPendingReport(m, url, out, os.Stdout, os.Stdin)
+
+			// restore directory state for checking
+			resetwritable()
+
+			a.CheckWantedErr(err, tc.wantErr)
+			a.Equal(numHitServer, tc.numHitServer)
+			a.Equal(serverHitAt, tc.sHitHat)
+
+			_, pendingReportErr := os.Stat(tc.pendingReportP)
+			if !tc.pendingReportKept && os.IsExist(pendingReportErr) {
+				t.Errorf("we expected the pending report to be removed and it wasn't")
+			} else if tc.pendingReportKept && os.IsNotExist(pendingReportErr) {
+				t.Errorf("we expected the pending report to be kept and it was removed")
+			}
+
+			// check we didn't do too much work on error
+			if err != nil {
+				if _, err := os.Stat(filepath.Join(out, tc.cacheReportP)); os.IsExist(err) {
+					t.Errorf("we didn't expect finding a cache report path as we erroring out")
+				}
+				return
+			}
+
+			gotF, err := os.Open(filepath.Join(out, tc.cacheReportP))
+			if err != nil {
+				t.Fatal("didn't generate a report file on disk", err)
+			}
+			got, err := ioutil.ReadAll(gotF)
+			if err != nil {
+				t.Fatal("couldn't read generated report file", err)
+			}
+			a.Equal(got, pendingReportData)
 		})
 	}
 }

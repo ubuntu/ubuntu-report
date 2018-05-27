@@ -27,6 +27,7 @@ type metrics struct {
 		Name string
 		Type string
 	} `json:",omitempty"`
+	Language string `json:",omitempty"`
 	Timezone string `json:",omitempty"`
 
 	Install json.RawMessage `json:",omitempty"`
@@ -39,6 +40,7 @@ type gpuInfo struct {
 }
 
 type screenInfo struct {
+	Size       string
 	Resolution string
 	Frequency  string
 }
