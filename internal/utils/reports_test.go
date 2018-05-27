@@ -51,6 +51,44 @@ func TestReportPath(t *testing.T) {
 	}
 }
 
+func TestPendingReportPath(t *testing.T) {
+
+	// get current user for some tests
+	u, err := user.Current()
+	if err != nil {
+		t.Fatalf("couldn't get current user for testing: %v", err)
+	}
+
+	testCases := []struct {
+		name            string
+		home            string
+		xdg_cache_dir   string
+		explicitacheDir string
+
+		want    string
+		wantErr bool
+	}{
+		{"regular", "/some/dir", "", "", "/some/dir/.cache/ubuntu-report/pending", false},
+		{"relative xdg path", "/some/dir", "xdg_cache_path", "", "/some/dir/xdg_cache_path/ubuntu-report/pending", false},
+		{"absolute xdg path", "/some/dir", "/xdg_cache_path", "", "/xdg_cache_path/ubuntu-report/pending", false},
+		{"no home dir", "", "", "", u.HomeDir + "/.cache/ubuntu-report/pending", false},
+		{"explicit cache dir", "", "", "/explicit/cachedir", "/explicit/cachedir/ubuntu-report/pending", false},
+		{"explicit cache dir takes predecedence", "/some/dir", "/xdg_cache_path", "/explicit/cachedir", "/explicit/cachedir/ubuntu-report/pending", false},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			defer changeEnv(t, "HOME", tc.home)()
+			defer changeEnv(t, "XDG_CACHE_HOME", tc.xdg_cache_dir)()
+			a := helper.Asserter{T: t}
+
+			got, err := utils.PendingReportPath(tc.explicitacheDir)
+
+			a.CheckWantedErr(err, tc.wantErr)
+			a.Equal(got, tc.want)
+		})
+	}
+}
+
 func changeEnv(t *testing.T, key, value string) func() {
 	t.Helper()
 	orig := os.Getenv(key)

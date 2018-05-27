@@ -110,6 +110,22 @@ func generateRootCmd() *cobra.Command {
 	send.Flags().StringVarP(&flagServerURL, "url", "u", sender.BaseURL, "server url to send report to. Leave empty for default.")
 	rootCmd.AddCommand(send)
 
+	service := &cobra.Command{
+		Use:    "service",
+		Short:  "Try to send periodically previously collected data once network if previous send was unsuccessful",
+		Args:   cobra.NoArgs,
+		Hidden: true,
+		Run: func(cmd *cobra.Command, args []string) {
+			err := sysmetrics.SendPendingReport(flagServerURL)
+			if err != nil {
+				log.Errorf(utils.ErrFormat, err)
+				os.Exit(1)
+			}
+		},
+	}
+	service.Flags().StringVarP(&flagServerURL, "url", "u", sender.BaseURL, "server url to send report to. Leave empty for default.")
+	rootCmd.AddCommand(service)
+
 	interactiveCmd := &cobra.Command{
 		Use:   "interactive",
 		Short: "Interactive mode, alias to running this tool without any subcommands.",

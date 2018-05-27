@@ -1,0 +1,9 @@
+[Unit]
+Description=Pending report trigger for Ubuntu Report
+PartOf=default.target
+
+[Path]
+PathExists=%h/.cache/ubuntu-report/pending
+
+[Install]
+WantedBy=default.target

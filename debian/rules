@@ -27,6 +27,7 @@ override_dh_auto_install:
 	ln -s libsysmetrics.so.1 debian/tmp/usr/lib/$(DEB_HOST_MULTIARCH)/libsysmetrics.so
 	cp -a $(artefactsdir)/libsysmetrics.h debian/tmp/usr/include/sysmetrics
 	sed -e s/DEB_HOST_MULTIARCH/$(DEB_HOST_MULTIARCH)/ debian/sysmetrics.pc.in > debian/tmp/usr/lib/$(DEB_HOST_MULTIARCH)/pkgconfig/sysmetrics.pc
+	mkdir -p debian/ubuntu-report/etc/systemd/user/default.target.wants/
 	dh_auto_install
 
 override_dh_missing:

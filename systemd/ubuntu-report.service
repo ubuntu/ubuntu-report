@@ -1,0 +1,7 @@
+[Unit]
+Description=Ubuntu report sends pending metrics data
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/ubuntu-report service
+Restart=no
