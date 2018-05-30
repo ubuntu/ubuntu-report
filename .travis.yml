@@ -20,3 +20,17 @@ script:
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
+
+before_deploy:
+  - tar cf ubuntu-report-linux-amd64.tar.xz build/ --transform s/build/ubuntu-report-linux-amd64/
+deploy:
+  provider: releases
+  file: ubuntu-report-linux-amd64.tar.xz
+  api_key:
+    secure: cMSOmykNNeNIGbA9zBHRR7JP4iBuaB/v8EY3fjlNI7IjSQAW/9YsGi3g1syYUH3Hy31VQQh8dICocn2eWq6BG0WkUyyJb3XnB6hvwW+CwKCMWMxHFMjVsePLkLnrFNhazlbgJF1BvA7fDTVWvARwGT9FEIOJGkMKcjUBZOIpdGJNKcERPcV5SiCSQEhmVrxln4sQGFmENsgX2/467NIPy3dZSg/7ZiRKc4xRtiib7OKdGUannc5CnEyCX9pilsMtFwemZYOLQ6Hp0nOnGM2TrQnvTBZAmyFp23YRnMtgvDfLvyLp7zD/UEbD0eOxjZP7s3weyAvRIr1NtQZqwvUfz8+aAU9eLJxJVuXv749kbRt9N/p1NPob9GZuBL0YG1klIP7lmzfAMOyLaqvhgk377RbqDXzwdLsriNsCp4stLjWQCbMO/Pppk1b2GVEjIHe0VP5qXaC5doLA+hZmfrfoJsE5UguD4/u5A2I1cRibemj8joHs0iUleML9yUj/VNZMgAs+skMaWL8JaGBhNn84gkiO+A/zZL9gvpewZiabS9k4heY+mk5XzcxbdDf0VwRVUJSNjV+GbN2/8ORrgAFUPB5NWUn4Pe/Qq+e+5AicFG6xeUBh0PW05tnXYxrQTsXf9NhKJCESTj90FCnDI11SYfwIDufXaT6nGqh51kJx3/8=
+  skip_cleanup: true
+  on:
+    tags: true
+    repo: ubuntu/ubuntu-report
+    branch: master
+    condition: $TRAVIS_GO_VERSION != master
