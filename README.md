@@ -84,6 +84,33 @@ ubuntu-report send yes|no [flags]
   -v, --verbose count[=-1]   issue INFO (-v) and DEBUG (-vv) output
 ```
 
+### ubuntu-report service
+
+Try to send periodically previously collected data once network if previous send was unsuccessful
+
+#### Synopsis
+
+
+Try to send periodically previously collected data once network if previous send was unsuccessful
+
+```
+ubuntu-report service [flags]
+```
+
+#### Options
+
+```
+  -h, --help         help for service
+  -u, --url string   server url to send report to. Leave empty for default. (default "https://metrics.ubuntu.com")
+```
+
+#### Options inherited from parent commands
+
+```
+  -f, --force                collect and send new report even if already reported
+  -v, --verbose count[=-1]   issue INFO (-v) and DEBUG (-vv) output
+```
+
 ### ubuntu-report show
 
 Only collect and display metrics without sending
