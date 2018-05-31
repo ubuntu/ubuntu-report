@@ -1,3 +1,15 @@
+ubuntu-report (1.1.0) bionic; urgency=medium
+
+  * Delay reporting of system metrics when there is no network.
+    A service then kicks in and try to report with exponential
+    backoff until success (LP: #1774354)
+  * Ensure that LANG is the user's language reported even in OEM
+    mode (LP: #1765672)
+  * Collect physical screen size (LP: #1771976)
+  * Incorrect regex for GPU info (LP: #1765614)
+
+ -- Didier Roche <didrocks@ubuntu.com>  Thu, 31 May 2018 09:58:03 +0200
+
 ubuntu-report (1.0.11) bionic; urgency=medium
 
   * Use sys_vendor to determine vendor (LP: #1765400)
