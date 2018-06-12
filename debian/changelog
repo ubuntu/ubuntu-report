@@ -1,4 +1,4 @@
-ubuntu-report (1.1.0cosmic) UNRELEASED; urgency=medium
+ubuntu-report (1.1.0cosmic) cosmic; urgency=medium
 
   * debian/gbp.conf: remove prebuild hook as exported in build-already now
 
