@@ -1,3 +1,9 @@
+ubuntu-report (1.1.0cosmic) UNRELEASED; urgency=medium
+
+  * debian/gbp.conf: remove prebuild hook as exported in build-already now
+
+ -- Didier Roche <didrocks@ubuntu.com>  Tue, 12 Jun 2018 10:49:37 +0200
+
 ubuntu-report (1.1.0) bionic; urgency=medium
 
   * Delay reporting of system metrics when there is no network.
