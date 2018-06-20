@@ -180,14 +180,19 @@ The data is pretty printed here to be more readable.
     "Vendor": "Vendor Name",
     "Version": "8DET52WW (1.27)"
   },
-  "CPU": [
-    {
-      "Vendor": "Genuine",
-      "Family": "6",
-      "Model": "42",
-      "Stepping": "7"
-    }
-  ],
+  "CPU": {
+    "OpMode": "32-bit, 64-bit",
+    "CPUs": "8",
+    "Threads": "2",
+    "Cores": "4",
+    "Sockets": "1",
+    "Vendor": "Genuine",
+    "Family": "6",
+    "Model": "158",
+    "Stepping": "10",
+    "Name": "Intius Corus i5-8300H CPU @ 2.30GHz",
+    "Virtualization": "VT-x"
+  },
   "Arch": "amd64",
   "GPU": [
     {
@@ -196,6 +201,10 @@ The data is pretty printed here to be more readable.
     }
   ],
   "RAM": 8,
+  "Partitions": [
+    229.2,
+    479.7
+  ],
   "Screens": [
     {
       "Size": "277mmx156mm",
