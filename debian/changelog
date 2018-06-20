@@ -1,3 +1,12 @@
+ubuntu-report (1.2.0) cosmic; urgency=medium
+
+  * Add more information to determine CPU (LP: #1777651)
+  * Refactor some test helpers to enable running lscpu command instead
+    of looking at /proc/cpuinfo
+  * Fix some typos and increase some timeouts in tests.
+
+ -- Didier Roche <didrocks@ubuntu.com>  Wed, 20 Jun 2018 12:22:34 +0200
+
 ubuntu-report (1.1.0cosmic) cosmic; urgency=medium
 
   * debian/gbp.conf: remove prebuild hook as exported in build-already now
