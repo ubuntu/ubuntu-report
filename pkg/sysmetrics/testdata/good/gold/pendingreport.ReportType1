@@ -8,14 +8,6 @@
     "Vendor": "DID",
     "Version": "42 (maybe 43)"
   },
-  "CPU": [
-    {
-      "Vendor": "Genuine",
-      "Family": "6",
-      "Model": "42",
-      "Stepping": "7"
-    }
-  ],
   "RAM": 8,
   "Autologin": false,
   "LivePatch": true,

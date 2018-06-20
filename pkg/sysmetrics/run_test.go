@@ -39,6 +39,7 @@ func TestMetricsCollect(t *testing.T) {
 		name             string
 		root             string
 		caseGPU          string
+		caseCPU          string
 		caseScreen       string
 		casePartition    string
 		caseArchitecture string
@@ -48,7 +49,7 @@ func TestMetricsCollect(t *testing.T) {
 		wantErr bool
 	}{
 		{"regular",
-			"testdata/good", "one gpu", "one screen", "one partition", "regular",
+			"testdata/good", "one gpu", "regular", "one screen", "one partition", "regular",
 			map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12"},
 			false},
 	}
@@ -58,9 +59,10 @@ func TestMetricsCollect(t *testing.T) {
 			t.Parallel()
 			a := helper.Asserter{T: t}
 
-			m, cancelGPU, cancelScreen, cancelPartition, cancelArchitecture := newTestMetricsWithCommands(t, tc.root,
-				tc.caseGPU, tc.caseScreen, tc.casePartition, tc.caseArchitecture, tc.env)
+			m, cancelGPU, cancelCPU, cancelScreen, cancelPartition, cancelArchitecture := newTestMetricsWithCommands(t, tc.root,
+				tc.caseGPU, tc.caseCPU, tc.caseScreen, tc.casePartition, tc.caseArchitecture, tc.env)
 			defer cancelGPU()
+			defer cancelCPU()
 			defer cancelScreen()
 			defer cancelPartition()
 			defer cancelArchitecture()
@@ -71,9 +73,10 @@ func TestMetricsCollect(t *testing.T) {
 			a.Equal(b1, want)
 
 			// second run should return the same thing (idemnpotence)
-			m, cancelGPU, cancelScreen, cancelPartition, cancelArchitecture = newTestMetricsWithCommands(t, tc.root,
-				tc.caseGPU, tc.caseScreen, tc.casePartition, tc.caseArchitecture, tc.env)
+			m, cancelGPU, cancelCPU, cancelScreen, cancelPartition, cancelArchitecture = newTestMetricsWithCommands(t, tc.root,
+				tc.caseGPU, tc.caseCPU, tc.caseScreen, tc.casePartition, tc.caseArchitecture, tc.env)
 			defer cancelGPU()
+			defer cancelCPU()
 			defer cancelScreen()
 			defer cancelPartition()
 			defer cancelArchitecture()
@@ -129,7 +132,7 @@ func TestMetricsSend(t *testing.T) {
 			t.Parallel()
 			a := helper.Asserter{T: t}
 
-			m := metrics.NewTestMetrics(tc.root, nil, nil, nil, nil, os.Getenv)
+			m := metrics.NewTestMetrics(tc.root, nil, nil, nil, nil, nil, os.Getenv)
 			out, tearDown := helper.TempDir(t)
 			defer tearDown()
 			if strings.HasPrefix(tc.cacheReportP, "/") {
@@ -212,7 +215,7 @@ func TestMultipleMetricsSend(t *testing.T) {
 			t.Parallel()
 			a := helper.Asserter{T: t}
 
-			m := metrics.NewTestMetrics("testdata/good", nil, nil, nil, nil, os.Getenv)
+			m := metrics.NewTestMetrics("testdata/good", nil, nil, nil, nil, nil, os.Getenv)
 			out, tearDown := helper.TempDir(t)
 			defer tearDown()
 			serverHitAt := ""
@@ -228,7 +231,7 @@ func TestMultipleMetricsSend(t *testing.T) {
 
 			// second call, reset server
 			serverHitAt = ""
-			m = metrics.NewTestMetrics("testdata/good", nil, nil, nil, nil, os.Getenv)
+			m = metrics.NewTestMetrics("testdata/good", nil, nil, nil, nil, nil, os.Getenv)
 			err = metricsSend(m, []byte(`{ "some-data": true }`), true, tc.alwaysReport, ts.URL, out, os.Stdout, os.Stdin)
 
 			a.CheckWantedErr(err, tc.wantErr)
@@ -264,6 +267,7 @@ func TestMetricsCollectAndSend(t *testing.T) {
 		name             string
 		root             string
 		caseGPU          string
+		caseCPU          string
 		caseScreen       string
 		casePartition    string
 		caseArchitecture string
@@ -278,23 +282,23 @@ func TestMetricsCollectAndSend(t *testing.T) {
 		wantErr         bool
 	}{
 		{"regular report auto",
-			"testdata/good", "one gpu", "one screen", "one partition", "regular",
+			"testdata/good", "one gpu", "regular", "one screen", "one partition", "regular",
 			map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12", "LANG": "fr_FR.UTF-8", "LANGUAGE": "fr_FR.UTF-8"},
 			ReportAuto, "",
 			"ubuntu-report/ubuntu.18.04", "", true, "/ubuntu/desktop/18.04", false},
 		{"regular report OptOut",
-			"testdata/good", "one gpu", "one screen", "one partition", "regular",
+			"testdata/good", "one gpu", "regular", "one screen", "one partition", "regular",
 			map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12", "LANG": "fr_FR.UTF-8", "LANGUAGE": "fr_FR.UTF-8"},
 			ReportOptOut, "",
 			"ubuntu-report/ubuntu.18.04", "", true, "/ubuntu/desktop/18.04", false},
 		{"no network",
-			"testdata/good", "", "", "", "", nil, ReportAuto, "http://localhost:4299", "ubuntu-report", "ubuntu-report/pending", false, "", true},
+			"testdata/good", "", "", "", "", "", nil, ReportAuto, "http://localhost:4299", "ubuntu-report", "ubuntu-report/pending", false, "", true},
 		{"No IDs (mandatory)",
-			"testdata/no-ids", "", "", "", "", nil, ReportAuto, "", "ubuntu-report", "", false, "", true},
+			"testdata/no-ids", "", "", "", "", "", nil, ReportAuto, "", "ubuntu-report", "", false, "", true},
 		{"Invalid URL",
-			"testdata/good", "", "", "", "", nil, ReportAuto, "http://a b.com/", "ubuntu-report", "", false, "", true},
+			"testdata/good", "", "", "", "", "", nil, ReportAuto, "http://a b.com/", "ubuntu-report", "", false, "", true},
 		{"Unwritable path",
-			"testdata/good", "", "", "", "", nil, ReportAuto, "", "/unwritable/cache/path", "", true, "/ubuntu/desktop/18.04", true},
+			"testdata/good", "", "", "", "", "", nil, ReportAuto, "", "/unwritable/cache/path", "", true, "/ubuntu/desktop/18.04", true},
 	}
 	for _, tc := range testCases {
 		tc := tc // capture range variable for parallel execution
@@ -302,9 +306,10 @@ func TestMetricsCollectAndSend(t *testing.T) {
 			t.Parallel()
 			a := helper.Asserter{T: t}
 
-			m, cancelGPU, cancelScreen, cancelPartition, cancelArchitecture := newTestMetricsWithCommands(t, tc.root,
-				tc.caseGPU, tc.caseScreen, tc.casePartition, tc.caseArchitecture, tc.env)
+			m, cancelGPU, cancelCPU, cancelScreen, cancelPartition, cancelArchitecture := newTestMetricsWithCommands(t, tc.root,
+				tc.caseGPU, tc.caseCPU, tc.caseScreen, tc.casePartition, tc.caseArchitecture, tc.env)
 			defer cancelGPU()
+			defer cancelCPU()
 			defer cancelScreen()
 			defer cancelPartition()
 			defer cancelArchitecture()
@@ -389,10 +394,11 @@ func TestMultipleMetricsCollectAndSend(t *testing.T) {
 			t.Parallel()
 			a := helper.Asserter{T: t}
 
-			m, cancelGPU, cancelScreen, cancelPartition, cancelArchitecture := newTestMetricsWithCommands(t, "testdata/good",
-				"one gpu", "one screen", "one partition", "regular",
+			m, cancelGPU, cancelCPU, cancelScreen, cancelPartition, cancelArchitecture := newTestMetricsWithCommands(t, "testdata/good",
+				"one gpu", "regular", "one screen", "one partition", "regular",
 				map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12", "LANG": "fr_FR.UTF-8", "LANGUAGE": "fr_FR.UTF-8"})
 			defer cancelGPU()
+			defer cancelCPU()
 			defer cancelScreen()
 			defer cancelPartition()
 			defer cancelArchitecture()
@@ -411,10 +417,11 @@ func TestMultipleMetricsCollectAndSend(t *testing.T) {
 
 			// second call, reset server
 			serverHitAt = ""
-			m, cancelGPU, cancelScreen, cancelPartition, cancelArchitecture = newTestMetricsWithCommands(t, "testdata/good",
-				"one gpu", "one screen", "one partition", "regular",
+			m, cancelGPU, cancelCPU, cancelScreen, cancelPartition, cancelArchitecture = newTestMetricsWithCommands(t, "testdata/good",
+				"one gpu", "regular", "one screen", "one partition", "regular",
 				map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12", "LANG": "fr_FR.UTF-8", "LANGUAGE": "fr_FR.UTF-8"})
 			defer cancelGPU()
+			defer cancelCPU()
 			defer cancelScreen()
 			defer cancelPartition()
 			defer cancelArchitecture()
@@ -478,10 +485,11 @@ func TestInteractiveMetricsCollectAndSend(t *testing.T) {
 			t.Parallel()
 			a := helper.Asserter{T: t}
 
-			m, cancelGPU, cancelScreen, cancelPartition, cancelArchitecture := newTestMetricsWithCommands(t, "testdata/good",
-				"one gpu", "one screen", "one partition", "regular",
+			m, cancelGPU, cancelCPU, cancelScreen, cancelPartition, cancelArchitecture := newTestMetricsWithCommands(t, "testdata/good",
+				"one gpu", "regular", "one screen", "one partition", "regular",
 				map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12", "LANG": "fr_FR.UTF-8", "LANGUAGE": "fr_FR.UTF-8"})
 			defer cancelGPU()
+			defer cancelCPU()
 			defer cancelScreen()
 			defer cancelPartition()
 			defer cancelArchitecture()
@@ -597,7 +605,7 @@ func TestMetricsSendPendingReport(t *testing.T) {
 			t.Parallel()
 			a := helper.Asserter{T: t}
 
-			m := metrics.NewTestMetrics(tc.root, nil, nil, nil, nil, os.Getenv)
+			m := metrics.NewTestMetrics(tc.root, nil, nil, nil, nil, nil, os.Getenv)
 			out, tearDown := helper.TempDir(t)
 			defer tearDown()
 			if strings.HasPrefix(tc.cacheReportP, "/") {
@@ -691,15 +699,16 @@ func newMockShortCmd(t *testing.T, s ...string) (*exec.Cmd, context.CancelFunc) 
 	return helper.ShortProcess(t, "TestMetricsHelperProcess", s...)
 }
 
-func newTestMetricsWithCommands(t *testing.T, root, caseGPU, caseScreen, casePartition, caseArch string, env map[string]string) (m metrics.Metrics,
-	cancelGPU, cancelSreen, cancelPartition, cancelArchitecture context.CancelFunc) {
+func newTestMetricsWithCommands(t *testing.T, root, caseGPU, caseCPU, caseScreen, casePartition, caseArch string, env map[string]string) (m metrics.Metrics,
+	cancelGPU, cancelCPU, cancelSreen, cancelPartition, cancelArchitecture context.CancelFunc) {
 	t.Helper()
 	cmdGPU, cancelGPU := newMockShortCmd(t, "lspci", "-n", caseGPU)
+	cmdCPU, cancelCPU := newMockShortCmd(t, "lscpu", "-J", caseCPU)
 	cmdScreen, cancelScreen := newMockShortCmd(t, "xrandr", caseScreen)
 	cmdPartition, cancelPartition := newMockShortCmd(t, "df", casePartition)
 	cmdArchitecture, cancelArchitecture := newMockShortCmd(t, "dpkg", "--print-architecture", caseArch)
-	return metrics.NewTestMetrics(root, cmdGPU, cmdScreen, cmdPartition, cmdArchitecture, helper.GetenvFromMap(env)),
-		cancelGPU, cancelScreen, cancelPartition, cancelArchitecture
+	return metrics.NewTestMetrics(root, cmdGPU, cmdCPU, cmdScreen, cmdPartition, cmdArchitecture, helper.GetenvFromMap(env)),
+		cancelGPU, cancelCPU, cancelScreen, cancelPartition, cancelArchitecture
 }
 
 // ScanLinesOrQuestion is copy of ScanLines, adding the expected question string as we don't return here

@@ -8,12 +8,13 @@ type GetenvFn func(key string) string
 // NewTestMetrics create a full mocking testing metrics element.
 // This is only a mock for testing, not for real use
 func NewTestMetrics(root string,
-	cmdGPU *exec.Cmd, cmdScreen *exec.Cmd, cmdPartition *exec.Cmd,
+	cmdGPU *exec.Cmd, cmdCPU *exec.Cmd, cmdScreen *exec.Cmd, cmdPartition *exec.Cmd,
 	cmdArch *exec.Cmd, getenv GetenvFn) Metrics {
 	// do not use helper as in _test.go package
 	return Metrics{
 		root:          root,
 		gpuInfoCmd:    cmdGPU,
+		cpuInfoCmd:    cmdCPU,
 		screenInfoCmd: cmdScreen,
 		spaceInfoCmd:  cmdPartition,
 		archCmd:       cmdArch,

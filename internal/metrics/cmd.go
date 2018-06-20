@@ -33,6 +33,52 @@ func (m Metrics) getGPU() []gpuInfo {
 	return gpus
 }
 
+func (m Metrics) getCPU() cpuInfo {
+	c := cpuInfo{}
+
+	r := runCmd(m.cpuInfoCmd)
+
+	for result := range filter(r, `{"field": "(.*)", "data": "(.*)"},`, true) {
+		if result.err != nil {
+			log.Infof("Couldn't get CPU info: "+utils.ErrFormat, result.err)
+			return cpuInfo{}
+		}
+
+		key, v := result.r[0], result.r[1]
+
+		switch strings.TrimSpace(key) {
+		case "CPU op-mode(s):":
+			c.OpMode = v
+		case "CPU(s):":
+			c.CPUs = v
+		case "Thread(s) per core:":
+			c.Threads = v
+		case "Core(s) per socket:":
+			c.Cores = v
+		case "Socket(s):":
+			c.Sockets = v
+		case "Vendor ID:":
+			c.Vendor = v
+		case "CPU family:":
+			c.Family = v
+		case "Model:":
+			c.Model = v
+		case "Stepping:":
+			c.Stepping = v
+		case "Model name:":
+			c.Name = v
+		case "Virtualization:":
+			c.Virtualization = v
+		case "Hypervisor vendor:":
+			c.Hypervisor = v
+		case "Virtualization type:":
+			c.VirtualizationType = v
+		}
+	}
+
+	return c
+}
+
 func (m Metrics) getScreens() []screenInfo {
 	var screens []screenInfo
 

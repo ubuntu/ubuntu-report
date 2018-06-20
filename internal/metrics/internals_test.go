@@ -292,40 +292,20 @@ func TestGetCPU(t *testing.T) {
 
 	testCases := []struct {
 		name string
-		root string
 
-		wantInfo []cpuInfo
+		want cpuInfo
 	}{
-		{"regular multi-core", "testdata/good", []cpuInfo{{"Genuine", "6", "42", "7"}}},
-		{"one cpu one core", "testdata/specials/cpu/onecpu-onecore", []cpuInfo{{"Genuine", "6", "42", "7"}}},
-		{"multi cpus", "testdata/specials/cpu/multicpus",
-			[]cpuInfo{
-				{"Genuine", "6", "42", "7"},
-				{"Genuine2", "7", "42", "7"},
-				{"Genuine3", "6", "1337", "7"},
-				{"Genuine4", "6", "42", "8"},
-			}},
-		{"multi cpus multi core", "testdata/specials/cpu/multicpus-multicores",
-			[]cpuInfo{
-				{"Genuine", "6", "42", "7"},
-				{"Genuine2", "7", "42", "7"},
-				{"Genuine4", "6", "42", "8"},
-			}},
-		{"missing physical id", "testdata/missing-fields/cpu/physical-id", []cpuInfo{{"Genuine", "6", "42", "7"}}},
-		{"missing vendor", "testdata/missing-fields/cpu/vendor", []cpuInfo{{"", "6", "42", "7"}}},
-		{"missing family", "testdata/missing-fields/cpu/family", []cpuInfo{{"Genuine", "", "42", "7"}}},
-		{"missing model", "testdata/missing-fields/cpu/model", []cpuInfo{{"Genuine", "6", "", "7"}}},
-		{"missing stepping", "testdata/missing-fields/cpu/stepping", []cpuInfo{{"Genuine", "6", "42", ""}}},
-		{"missing all", "testdata/missing-fields/cpu/all", nil},
-		{"malformed", "testdata/specials/cpu/malformed", nil},
-		{"empty physical id", "testdata/empty-fields/cpu/physical-id", []cpuInfo{{"Genuine", "6", "42", "7"}}},
-		{"empty vendor", "testdata/empty-fields/cpu/vendor", []cpuInfo{{"", "6", "42", "7"}}},
-		{"empty family", "testdata/empty-fields/cpu/family", []cpuInfo{{"Genuine", "", "42", "7"}}},
-		{"empty model", "testdata/empty-fields/cpu/model", []cpuInfo{{"Genuine", "6", "", "7"}}},
-		{"empty stepping", "testdata/empty-fields/cpu/stepping", []cpuInfo{{"Genuine", "6", "42", ""}}},
-		{"empty all", "testdata/empty-fields/cpu/all", nil},
-		{"doesn't exist", "testdata/none", nil},
-		{"garbage content", "testdata/garbage", nil},
+		{"regular", cpuInfo{"32-bit, 64-bit", "8", "2", "4", "1", "Genuine", "6", "158", "10",
+			"Intuis Corus i5-8300H CPU @ 2.30GHz", "VT-x", "", ""}},
+		{"missing one expected field", cpuInfo{"32-bit, 64-bit", "8", "2", "4", "1", "", "6", "158", "10",
+			"Intuis Corus i5-8300H CPU @ 2.30GHz", "VT-x", "", ""}},
+		{"missing one optional field", cpuInfo{"32-bit, 64-bit", "8", "2", "4", "1", "Genuine", "6", "158", "10",
+			"Intuis Corus i5-8300H CPU @ 2.30GHz", "VT-x", "", ""}},
+		{"virtualized", cpuInfo{"32-bit, 64-bit", "8", "2", "4", "1", "Genuine", "6", "158", "10",
+			"Intuis Corus i5-8300H CPU @ 2.30GHz", "VT-x", "KVM", "full"}},
+		{"empty", cpuInfo{}},
+		{"garbage", cpuInfo{}},
+		{"fail", cpuInfo{}},
 	}
 	for _, tc := range testCases {
 		tc := tc // capture range variable for parallel execution
@@ -333,10 +313,13 @@ func TestGetCPU(t *testing.T) {
 			t.Parallel()
 			a := helper.Asserter{T: t}
 
-			m := newTestMetrics(t, WithRootAt(tc.root))
+			cmd, cancel := newMockShortCmd(t, "lscpu", "-J", tc.name)
+			defer cancel()
+
+			m := newTestMetrics(t, WithCPUInfoCommand(cmd))
 			info := m.getCPU()
 
-			a.Equal(info, tc.wantInfo)
+			a.Equal(info, tc.want)
 		})
 	}
 }

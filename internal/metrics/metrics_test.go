@@ -56,6 +56,7 @@ func TestCollect(t *testing.T) {
 		name             string
 		root             string
 		caseGPU          string
+		caseCPU          string
 		caseScreen       string
 		casePartition    string
 		caseArchitecture string
@@ -65,11 +66,11 @@ func TestCollect(t *testing.T) {
 		wantErr bool
 	}{
 		{"regular",
-			"testdata/good", "one gpu", "one screen", "one partition", "regular",
+			"testdata/good", "one gpu", "regular", "one screen", "one partition", "regular",
 			map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12", "LANG": "fr_FR.UTF-8", "LANGUAGE": "fr_FR.UTF-8"},
 			false},
 		{"empty",
-			"testdata/none", "empty", "empty", "empty", "empty",
+			"testdata/none", "empty", "empty", "empty", "empty", "empty",
 			nil,
 			false},
 	}
@@ -81,6 +82,8 @@ func TestCollect(t *testing.T) {
 
 			cmdGPU, cancel := newMockShortCmd(t, "lspci", "-n", tc.caseGPU)
 			defer cancel()
+			cmdCPU, cancel := newMockShortCmd(t, "lscpu", "-J", tc.caseCPU)
+			defer cancel()
 			cmdScreen, cancel := newMockShortCmd(t, "xrandr", tc.caseScreen)
 			defer cancel()
 			cmdPartition, cancel := newMockShortCmd(t, "df", tc.casePartition)
@@ -90,6 +93,7 @@ func TestCollect(t *testing.T) {
 
 			m := newTestMetrics(t, metrics.WithRootAt(tc.root),
 				metrics.WithGPUInfoCommand(cmdGPU),
+				metrics.WithCPUInfoCommand(cmdCPU),
 				metrics.WithScreenInfoCommand(cmdScreen),
 				metrics.WithSpaceInfoCommand(cmdPartition),
 				metrics.WithArchitureCommand(cmdArchitecture),
@@ -110,6 +114,7 @@ func TestRunCollectTwice(t *testing.T) {
 		name          string
 		root          string
 		caseGPU       string
+		caseCPU       string
 		caseScreen    string
 		casePartition string
 		env           map[string]string
@@ -118,11 +123,11 @@ func TestRunCollectTwice(t *testing.T) {
 		wantErr bool
 	}{
 		{"regular",
-			"testdata/good", "one gpu", "one screen", "one partition",
+			"testdata/good", "one gpu", "regular", "one screen", "one partition",
 			map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12", "LANG": "fr_FR.UTF-8", "LANGUAGE": "fr_FR.UTF-8"},
 			false},
 		{"empty",
-			"testdata/none", "empty", "empty", "empty",
+			"testdata/none", "empty", "empty", "empty", "empty",
 			nil,
 			false},
 	}
@@ -134,6 +139,8 @@ func TestRunCollectTwice(t *testing.T) {
 
 			cmdGPU, cancel := newMockShortCmd(t, "lspci", "-n", tc.caseGPU)
 			defer cancel()
+			cmdCPU, cancel := newMockShortCmd(t, "lscpu", "-J", tc.caseCPU)
+			defer cancel()
 			cmdScreen, cancel := newMockShortCmd(t, "xrandr", tc.caseScreen)
 			defer cancel()
 			cmdPartition, cancel := newMockShortCmd(t, "df", tc.casePartition)
@@ -141,6 +148,7 @@ func TestRunCollectTwice(t *testing.T) {
 
 			m := newTestMetrics(t, metrics.WithRootAt(tc.root),
 				metrics.WithGPUInfoCommand(cmdGPU),
+				metrics.WithCPUInfoCommand(cmdCPU),
 				metrics.WithScreenInfoCommand(cmdScreen),
 				metrics.WithSpaceInfoCommand(cmdPartition),
 				metrics.WithMapForEnv(tc.env))

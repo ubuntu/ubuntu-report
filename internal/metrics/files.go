@@ -1,7 +1,6 @@
 package metrics
 
 import (
-	"bufio"
 	"encoding/json"
 	"io/ioutil"
 	"os"
@@ -79,66 +78,6 @@ func (m Metrics) getOEM() (string, string) {
 		p = ""
 	}
 	return v, p
-}
-
-func (m Metrics) getCPU() []cpuInfo {
-	indexedCPUInfo := make(map[string]cpuInfo)
-
-	p := filepath.Join(m.root, "proc/cpuinfo")
-	f, err := os.Open(p)
-	if err != nil {
-		err = errors.Wrapf(err, "couldn't open %s", p)
-		log.Infof(utils.ErrFormat, err)
-		return nil
-	}
-	defer f.Close()
-
-	scanner := bufio.NewScanner(f)
-	i := cpuInfo{}
-	var physicalID string
-	for scanner.Scan() {
-		t := scanner.Text()
-
-		fields := strings.Split(t, ":")
-		if len(fields) > 2 {
-			log.Debug("fields are expected to have one element only")
-			continue
-		} else if len(fields) < 2 {
-			if (i != cpuInfo{}) {
-				// we only store the CPU info once per physical unit (multiple core)
-				indexedCPUInfo[physicalID] = i
-			}
-			i = cpuInfo{}
-			continue
-		}
-		v := strings.TrimSpace(fields[1])
-
-		switch strings.TrimSpace(fields[0]) {
-		case "vendor_id":
-			i.Vendor = v
-		case "cpu family":
-			i.Family = v
-		case "model":
-			i.Model = v
-		case "stepping":
-			i.Stepping = v
-		case "physical id":
-			physicalID = v
-		}
-	}
-	// Store last cpu
-	if (i != cpuInfo{}) {
-		indexedCPUInfo[physicalID] = i
-	}
-
-	var r []cpuInfo
-	for _, v := range indexedCPUInfo {
-		r = append(r, v)
-	}
-	if len(r) < 1 {
-		log.Infof("Didn't find any CPU info in %s", p)
-	}
-	return r
 }
 
 func (m Metrics) getBIOS() (string, string) {

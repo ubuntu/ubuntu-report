@@ -25,6 +25,7 @@ type Metrics struct {
 	root          string
 	screenInfoCmd *exec.Cmd
 	spaceInfoCmd  *exec.Cmd
+	cpuInfoCmd    *exec.Cmd
 	gpuInfoCmd    *exec.Cmd
 	archCmd       *exec.Cmd
 	getenv        GetenvFn
@@ -32,14 +33,17 @@ type Metrics struct {
 
 // New return a new metrics element with optional testing functions
 func New(options ...func(*Metrics) error) (Metrics, error) {
+
 	m := Metrics{
 		root:          "/",
 		screenInfoCmd: setCommand("xrandr"),
 		spaceInfoCmd:  setCommand("df"),
+		cpuInfoCmd:    setCommand("lscpu", "-J"),
 		gpuInfoCmd:    setCommand("lspci", "-n"),
 		archCmd:       setCommand("dpkg", "--print-architecture"),
 		getenv:        os.Getenv,
 	}
+	m.cpuInfoCmd.Env = []string{"LANG=C"}
 
 	for _, options := range options {
 		if err := options(&m); err != nil {
@@ -112,7 +116,12 @@ func (m Metrics) Collect() ([]byte, error) {
 		}{vendor, version}
 	}
 
-	r.CPU = m.getCPU()
+	cpu := m.getCPU()
+	if cpu != (cpuInfo{}) {
+		r.CPU = &cpu
+	} else {
+		r.CPU = nil
+	}
 	r.Arch = m.getArch()
 	r.GPU = m.getGPU()
 	r.RAM = m.getRAM()

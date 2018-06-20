@@ -16,6 +16,15 @@ func WithRootAt(p string) func(*Metrics) error {
 	}
 }
 
+// WithCPUInfoCommand tweaks the default cpu info command
+func WithCPUInfoCommand(cmd *exec.Cmd) func(*Metrics) error {
+	log.Debugf("Setting cpu info command to '%s'", cmd.Args)
+	return func(m *Metrics) error {
+		m.cpuInfoCmd = cmd
+		return nil
+	}
+}
+
 // WithGPUInfoCommand tweaks the default gpu info command
 func WithGPUInfoCommand(cmd *exec.Cmd) func(*Metrics) error {
 	log.Debugf("Setting gpu info command to '%s'", cmd.Args)

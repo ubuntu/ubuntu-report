@@ -13,7 +13,7 @@ type metrics struct {
 		Vendor  string
 		Version string
 	} `json:",omitempty"`
-	CPU        []cpuInfo    `json:",omitempty"`
+	CPU        *cpuInfo     `json:",omitempty"`
 	Arch       string       `json:",omitempty"`
 	GPU        []gpuInfo    `json:",omitempty"`
 	RAM        *float64     `json:",omitempty"`
@@ -46,8 +46,17 @@ type screenInfo struct {
 }
 
 type cpuInfo struct {
-	Vendor   string
-	Family   string
-	Model    string
-	Stepping string
+	OpMode             string
+	CPUs               string
+	Threads            string
+	Cores              string
+	Sockets            string
+	Vendor             string
+	Family             string
+	Model              string
+	Stepping           string
+	Name               string
+	Virtualization     string `json:",omitempty"`
+	Hypervisor         string `json:",omitempty"`
+	VirtualizationType string `json:",omitempty"`
 }
