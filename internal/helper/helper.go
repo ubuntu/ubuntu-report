@@ -139,7 +139,7 @@ func ShortProcess(t *testing.T, helper string, s ...string) (*exec.Cmd, context.
 	cs := []string{"-test.run=" + helper, "--"}
 	cs = append(cs, s...)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 
 	cmd := exec.CommandContext(ctx, os.Args[0], cs...)
 	cmd.Env = []string{"GO_WANT_HELPER_PROCESS=1"}
@@ -281,7 +281,7 @@ func RunFunctionWithTimeout(t *testing.T, fn func() error) chan error {
 		select {
 		case err := <-cmd():
 			errs <- err
-		case <-time.After(5 * time.Second):
+		case <-time.After(10 * time.Second):
 			errs <- errors.New("function under test timed out")
 		}
 	}()
