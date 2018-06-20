@@ -10,11 +10,11 @@ import (
 )
 
 type filterResult struct {
-	r   string
+	r   []string
 	err error
 }
 
-func filter(r io.Reader, regex string) <-chan filterResult {
+func filter(r io.Reader, regex string, getAll bool) <-chan filterResult {
 	re := regexp.MustCompile(regex)
 	scanner := bufio.NewScanner(r)
 	results := make(chan filterResult)
@@ -25,12 +25,18 @@ func filter(r io.Reader, regex string) <-chan filterResult {
 		for scanner.Scan() {
 			m := re.FindStringSubmatch(scanner.Text())
 			if m != nil {
+
+				if getAll {
+					results <- filterResult{r: m[1:]}
+					continue
+				}
+
 				// we want the first non empty match (can be null in case of alternative regexp)
 				var match string
 				for i := 1; match == "" && i < len(m); i++ {
 					match = strings.TrimSpace(m[i])
 				}
-				results <- filterResult{r: match}
+				results <- filterResult{r: []string{match}}
 			}
 		}
 
@@ -43,20 +49,23 @@ func filter(r io.Reader, regex string) <-chan filterResult {
 }
 
 func filterFirst(r io.Reader, regex string, notFoundOk bool) (string, error) {
-	result := <-filter(r, regex)
-	if !notFoundOk && result.err == nil && result.r == "" {
+	result := <-filter(r, regex, false)
+	if !notFoundOk && result.err == nil && len(result.r) < 1 {
 		result.err = errors.Errorf("couldn't find any line matching %s", regex)
 	}
-	return result.r, result.err
+	if len(result.r) < 1 {
+		result.r = []string{""}
+	}
+	return result.r[0], result.err
 }
 
 func filterAll(r io.Reader, regex string) ([]string, error) {
 	var results []string
-	for result := range filter(r, regex) {
+	for result := range filter(r, regex, false) {
 		if result.err != nil {
 			return nil, result.err
 		}
-		results = append(results, result.r)
+		results = append(results, result.r[0])
 	}
 
 	if len(results) < 1 {
