@@ -96,7 +96,7 @@ func TestCollect(t *testing.T) {
 				metrics.WithCPUInfoCommand(cmdCPU),
 				metrics.WithScreenInfoCommand(cmdScreen),
 				metrics.WithSpaceInfoCommand(cmdPartition),
-				metrics.WithArchitureCommand(cmdArchitecture),
+				metrics.WithArchitectureCommand(cmdArchitecture),
 				metrics.WithMapForEnv(tc.env))
 			got, err := m.Collect()
 
@@ -111,23 +111,24 @@ func TestRunCollectTwice(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
-		name          string
-		root          string
-		caseGPU       string
-		caseCPU       string
-		caseScreen    string
-		casePartition string
-		env           map[string]string
+		name             string
+		root             string
+		caseGPU          string
+		caseCPU          string
+		caseScreen       string
+		casePartition    string
+		caseArchitecture string
+		env              map[string]string
 
 		// note that only an internal json package error can make it returning an error
 		wantErr bool
 	}{
 		{"regular",
-			"testdata/good", "one gpu", "regular", "one screen", "one partition",
+			"testdata/good", "one gpu", "regular", "one screen", "one partition", "regular",
 			map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12", "LANG": "fr_FR.UTF-8", "LANGUAGE": "fr_FR.UTF-8"},
 			false},
 		{"empty",
-			"testdata/none", "empty", "empty", "empty", "empty",
+			"testdata/none", "empty", "empty", "empty", "empty", "empty",
 			nil,
 			false},
 	}
@@ -145,12 +146,15 @@ func TestRunCollectTwice(t *testing.T) {
 			defer cancel()
 			cmdPartition, cancel := newMockShortCmd(t, "df", tc.casePartition)
 			defer cancel()
+			cmdArchitecture, cancel := newMockShortCmd(t, "dpkg", "--print-architecture", tc.caseArchitecture)
+			defer cancel()
 
 			m := newTestMetrics(t, metrics.WithRootAt(tc.root),
 				metrics.WithGPUInfoCommand(cmdGPU),
 				metrics.WithCPUInfoCommand(cmdCPU),
 				metrics.WithScreenInfoCommand(cmdScreen),
 				metrics.WithSpaceInfoCommand(cmdPartition),
+				metrics.WithArchitectureCommand(cmdArchitecture),
 				metrics.WithMapForEnv(tc.env))
 			b1, err1 := m.Collect()
 			b2, err2 := m.Collect()

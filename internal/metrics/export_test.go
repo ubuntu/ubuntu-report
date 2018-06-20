@@ -52,8 +52,8 @@ func WithSpaceInfoCommand(cmd *exec.Cmd) func(*Metrics) error {
 	}
 }
 
-// WithArchitureCommand tweaks the current given architecture
-func WithArchitureCommand(cmd *exec.Cmd) func(*Metrics) error {
+// WithArchitectureCommand tweaks the current given architecture
+func WithArchitectureCommand(cmd *exec.Cmd) func(*Metrics) error {
 	log.Debugf("Setting architecture command to '%s'", cmd.Args)
 	return func(m *Metrics) error {
 		m.archCmd = cmd

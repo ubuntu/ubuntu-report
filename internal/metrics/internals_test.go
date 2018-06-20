@@ -455,7 +455,7 @@ func TestGetArch(t *testing.T) {
 			cmd, cancel := newMockShortCmd(t, "dpkg", "--print-architecture", tc.name)
 			defer cancel()
 
-			m := newTestMetrics(t, WithArchitureCommand(cmd))
+			m := newTestMetrics(t, WithArchitectureCommand(cmd))
 			arch := m.getArch()
 
 			a.Equal(arch, tc.want)
