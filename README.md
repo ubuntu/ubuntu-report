@@ -249,7 +249,7 @@ The data is pretty printed here to be more readable.
 }
 ```
 
-### Data being sent if agreement if denied
+### Data being sent if agreement is denied
 
 The data is pretty printed here to be more readable.
 
