@@ -165,7 +165,7 @@ You can regenerate previous README section, shell completion support and man pag
 
 ## Send data to server
 
-### Example of data being sent if agreement if performed
+### Example of data being sent if agreement is accepted
 
 The data is pretty printed here to be more readable.
 
@@ -249,7 +249,7 @@ The data is pretty printed here to be more readable.
 }
 ```
 
-### Data being sent if agreement if denied
+### Data being sent if agreement is denied
 
 The data is pretty printed here to be more readable.
 
