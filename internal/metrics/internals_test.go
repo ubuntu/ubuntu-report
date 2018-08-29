@@ -207,13 +207,16 @@ func TestGetOEM(t *testing.T) {
 
 		wantVendor  string
 		wantProduct string
+		wantDCD     string
 	}{
-		{"regular", "testdata/good", "DID", "4287CTO"},
-		{"empty vendor", "testdata/empty-fields/oem/vendor", "", "4287CTO"},
-		{"empty product", "testdata/empty-fields/oem/product", "DID", ""},
-		{"empty both", "testdata/empty", "", ""},
-		{"doesn't exist", "testdata/none", "", ""},
-		{"garbage content", "testdata/garbage", "", ""},
+		{"regular", "testdata/good", "DID", "4287CTO", ""},
+		{"with dcd", "testdata/specials/oem/with-dcd", "", "", "canonical-oem-somerville-xenial-amd64-20160624-2"},
+		{"empty vendor", "testdata/empty-fields/oem/vendor", "", "4287CTO", ""},
+		{"empty product", "testdata/empty-fields/oem/product", "DID", "", ""},
+		{"empty dcd", "testdata/empty-fields/oem/dcd", "", "", ""},
+		{"empty both", "testdata/empty", "", "", ""},
+		{"doesn't exist", "testdata/none", "", "", ""},
+		{"garbage content", "testdata/garbage", "", "", ""},
 	}
 	for _, tc := range testCases {
 		tc := tc // capture range variable for parallel execution
@@ -222,10 +225,11 @@ func TestGetOEM(t *testing.T) {
 			a := helper.Asserter{T: t}
 
 			m := newTestMetrics(t, WithRootAt(tc.root))
-			vendor, product := m.getOEM()
+			vendor, product, dcd := m.getOEM()
 
 			a.Equal(vendor, tc.wantVendor)
 			a.Equal(product, tc.wantProduct)
+			a.Equal(dcd, tc.wantDCD)
 		})
 	}
 }

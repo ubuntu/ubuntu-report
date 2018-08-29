@@ -103,11 +103,12 @@ func (m Metrics) Collect() ([]byte, error) {
 
 	r.Version = m.getVersion()
 
-	if vendor, product := m.getOEM(); vendor != "" || product != "" {
+	if vendor, product, dcd := m.getOEM(); vendor != "" || product != "" {
 		r.OEM = &struct {
 			Vendor  string
 			Product string
-		}{vendor, product}
+			DCD     string `json:",omitempty"`
+		}{vendor, product, dcd}
 	}
 	if vendor, version := m.getBIOS(); vendor != "" || version != "" {
 		r.BIOS = &struct {

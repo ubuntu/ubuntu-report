@@ -60,7 +60,7 @@ func (m Metrics) getAutologin() bool {
 	return true
 }
 
-func (m Metrics) getOEM() (string, string) {
+func (m Metrics) getOEM() (string, string, string) {
 	v, err := getFromFileTrimmed(filepath.Join(m.root, "sys/class/dmi/id/sys_vendor"))
 	if err != nil {
 		log.Infof("couldn't get sys vendor information: "+utils.ErrFormat, err)
@@ -77,7 +77,11 @@ func (m Metrics) getOEM() (string, string) {
 		log.Infof(utils.ErrFormat, errors.Errorf("malformed sys product name information, file contains: %s", p))
 		p = ""
 	}
-	return v, p
+	dcd, err := matchFromFile(filepath.Join(m.root, "var/lib/ubuntu_dist_channel"), `^([^\s#]+)$`, true)
+	if err != nil {
+		log.Infof("no DCD information: "+utils.ErrFormat, err)
+	}
+	return v, p, dcd
 }
 
 func (m Metrics) getBIOS() (string, string) {

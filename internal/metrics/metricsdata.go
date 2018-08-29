@@ -8,6 +8,7 @@ type metrics struct {
 	OEM *struct {
 		Vendor  string
 		Product string
+		DCD     string `json:",omitempty"`
 	} `json:",omitempty"`
 	BIOS *struct {
 		Vendor  string
