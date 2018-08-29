@@ -2,7 +2,8 @@
   "Version": "18.04",
   "OEM": {
     "Vendor": "DID",
-    "Product": "4287CTO"
+    "Product": "4287CTO",
+    "DCD": "canonical-oem-somerville-xenial-amd64-20160624-2"
   },
   "BIOS": {
     "Vendor": "DID",
