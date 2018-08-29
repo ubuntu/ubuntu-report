@@ -95,14 +95,14 @@ func TestVerbosity(t *testing.T) {
 			case "":
 				a.Equal(got.String(), "")
 			case "-v":
-				// empty logs, apart info on installer or upgrade telemetry (file can be missing)
+				// empty logs, apart info on dcd, installer or upgrade telemetry (file can be missing)
 				// and other GPU, screen and autologin that you won't have in Travis CI.
 				scanner := bufio.NewScanner(bytes.NewReader(got.Bytes()))
 				for scanner.Scan() {
 					l := scanner.Text()
 					if strings.Contains(l, "level=info") {
 						allowedLog := false
-						for _, msg := range []string{"/telemetry", "GPU info", "Disk info", "Screen info", "CPU info", "autologin information", "/sys/class/dmi/id/"} {
+						for _, msg := range []string{"/telemetry", "DCD", "GPU info", "Disk info", "Screen info", "CPU info", "autologin information", "/sys/class/dmi/id/"} {
 							if strings.Contains(l, msg) {
 								allowedLog = true
 							}
