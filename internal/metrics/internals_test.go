@@ -291,6 +291,40 @@ func TestGetLivePatch(t *testing.T) {
 		})
 	}
 }
+
+func TestGetDisks(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		name string
+		root string
+
+		wantSize []float64
+	}{
+		{"one disk", "testdata/good", []float64{240.1}},
+		{"multiple disks", "testdata/specials/disks/multiple", []float64{240.1, 500.1}},
+		{"all supported formats", "testdata/specials/disks/all-formats", []float64{500.1, 240.1, 192.9}},
+		{"no disks", "testdata/specials/disks/no-disks", nil},
+		{"filters undesired devices", "testdata/specials/disks/filter-devices", []float64{240.1}},
+		{"no block numbers", "testdata/empty-fields/disks/block-numbers", nil},
+		{"no block logical size", "testdata/empty-fields/disks/block-logical-size", nil},
+		{"none", "testdata/none", nil},
+		{"garbage block numbers", "testdata/specials/disks/garbage-block-numbers", nil},
+		{"garbage block size", "testdata/specials/disks/garbage-block-size", nil},
+	}
+	for _, tc := range testCases {
+		tc := tc // capture range variable for parallel execution
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			a := helper.Asserter{T: t}
+
+			m := newTestMetrics(t, WithRootAt(tc.root))
+			disks := m.getDisks()
+
+			a.Equal(disks, tc.wantSize)
+		})
+	}
+}
 func TestGetCPU(t *testing.T) {
 	t.Parallel()
 

@@ -18,6 +18,7 @@ type metrics struct {
 	Arch       string       `json:",omitempty"`
 	GPU        []gpuInfo    `json:",omitempty"`
 	RAM        *float64     `json:",omitempty"`
+	Disks      []float64    `json:",omitempty"`
 	Partitions []float64    `json:",omitempty"`
 	Screens    []screenInfo `json:",omitempty"`
 

@@ -3,8 +3,10 @@ package metrics
 import (
 	"encoding/json"
 	"io/ioutil"
+	"math"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -111,6 +113,53 @@ func (m Metrics) getLivePatch() bool {
 		return false
 	}
 	return true
+}
+
+func (m Metrics) getDisks() []float64 {
+	var sizes []float64
+
+	blockFolder := filepath.Join(m.root, "sys/block")
+	dirs, err := ioutil.ReadDir(blockFolder)
+	if err != nil {
+		log.Infof("couldn't get disk block information: "+utils.ErrFormat, err)
+		return nil
+	}
+
+	for _, d := range dirs {
+		if !(strings.HasPrefix(d.Name(), "hd") || strings.HasPrefix(d.Name(), "sd") || strings.HasPrefix(d.Name(), "vd")) {
+			continue
+		}
+
+		v, err := getFromFileTrimmed(filepath.Join(blockFolder, d.Name(), "size"))
+		if err != nil {
+			log.Infof("couldn't get disk block information for %s: "+utils.ErrFormat, d.Name(), err)
+			continue
+		}
+		s, err := strconv.Atoi(v)
+		if err != nil {
+			log.Infof("number of block for disk %s isn't an integer: "+utils.ErrFormat, d.Name(), err)
+			continue
+		}
+
+		v, err = getFromFileTrimmed(filepath.Join(blockFolder, d.Name(), "queue/logical_block_size"))
+		if err != nil {
+			log.Infof("couldn't get disk block information for %s: "+utils.ErrFormat, d.Name(), err)
+			continue
+		}
+		bs, err := strconv.Atoi(v)
+		if err != nil {
+			log.Infof("block size for disk %s isn't an integer: "+utils.ErrFormat, d.Name(), err)
+			continue
+		}
+
+		// convert in Gib in .1 precision
+		size := float64(s) * float64(bs) / (1000 * 1000 * 1000)
+		size = math.Round(size*10) / 10
+
+		sizes = append(sizes, size)
+	}
+
+	return sizes
 }
 
 func (m Metrics) installerInfo() json.RawMessage {
