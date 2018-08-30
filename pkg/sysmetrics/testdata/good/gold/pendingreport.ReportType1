@@ -10,6 +10,9 @@
     "Version": "42 (maybe 43)"
   },
   "RAM": 8,
+  "Disks": [
+    240.1
+  ],
   "Autologin": false,
   "LivePatch": true,
   "Timezone": "Europe/Paris",
