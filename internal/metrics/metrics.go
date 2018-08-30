@@ -126,6 +126,7 @@ func (m Metrics) Collect() ([]byte, error) {
 	r.Arch = m.getArch()
 	r.GPU = m.getGPU()
 	r.RAM = m.getRAM()
+	r.Disks = m.getDisks()
 	r.Partitions = m.getPartitions()
 	r.Screens = m.getScreens()
 
