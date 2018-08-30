@@ -1,3 +1,11 @@
+ubuntu-report (1.3.0) cosmic; urgency=medium
+
+  * Include optional DCD OEM file (LP: #1786432)
+  * Collect number of disks and their sizes (LP: #1784383)
+  * Misc grammar updates, thanks Robin Hood
+
+ -- Didier Roche <didrocks@ubuntu.com>  Thu, 30 Aug 2018 10:05:54 +0200
+
 ubuntu-report (1.2.0) cosmic; urgency=medium
 
   * Add more information to determine CPU (LP: #1777651)
