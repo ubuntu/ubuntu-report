@@ -201,6 +201,10 @@ The data is pretty printed here to be more readable.
     }
   ],
   "RAM": 8,
+  "Disks": [
+    240.1,
+    500.1
+  ],
   "Partitions": [
     229.2,
     479.7
