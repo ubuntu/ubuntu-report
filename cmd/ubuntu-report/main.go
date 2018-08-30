@@ -14,7 +14,7 @@ import (
 )
 
 // generate README, shell completion and manpages
-//go:generate go test generate_test.go main.go --generate --path ../../build/
+//go:generate go test . --generate --path ../../build/
 
 func main() {
 	rootCmd := generateRootCmd()
