@@ -536,6 +536,101 @@ func TestInteractiveCollectAndSend(t *testing.T) {
 	}
 }
 
+func TestCollectAndSendOnUpgrade(t *testing.T) {
+	// we change current path and env variable: not parallelizable tests
+	helper.SkipIfShort(t)
+
+	testCases := []struct {
+		name            string
+		previousReportP string
+
+		shouldHitServer bool
+		wantOptOut      bool
+		wantErr         bool
+	}{
+		{"with previous report, previous release opt in",
+			"testdata/previous_reports/previous_release_optin",
+			true, false, false},
+		{"with previous report, previous release opt out",
+			"testdata/previous_reports/previous_release_optout",
+			true, true, false},
+	}
+	for _, tc := range testCases {
+		tc := tc // capture range variable for parallel execution
+		t.Run(tc.name, func(t *testing.T) {
+			a := helper.Asserter{T: t}
+
+			out, tearDown := helper.TempDir(t)
+			defer tearDown()
+			defer helper.ChangeEnv("XDG_CACHE_HOME", out)()
+			out = filepath.Join(out, "ubuntu-report")
+			// we don't really care where we hit for this API integration test, internal ones test it
+			// and we don't really control /etc/os-release version and id.
+			// Same for report file
+			serverHit := false
+			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				serverHit = true
+			}))
+			defer ts.Close()
+
+			if tc.previousReportP != "" {
+				if err := os.MkdirAll(out, 0700); err != nil {
+					t.Fatalf("couldn't create report directory: %v", err)
+				}
+				files, err := ioutil.ReadDir(tc.previousReportP)
+				if err != nil {
+					t.Fatalf("couldn't list files under %s: %v", tc.previousReportP, err)
+				}
+				for _, file := range files {
+					data, err := ioutil.ReadFile(filepath.Join(tc.previousReportP, file.Name()))
+					if err != nil {
+						t.Fatalf("couldn't read report file: %v", err)
+					}
+					if err = ioutil.WriteFile(filepath.Join(out, file.Name()), data, 0644); err != nil {
+						t.Fatalf("couldn't write to destination report file in setup: %v", err)
+					}
+				}
+			}
+
+			err := sysmetrics.CollectAndSendOnUpgrade(false, ts.URL)
+
+			if err != nil {
+				t.Fatal("we didn't expect getting an error, got:", err)
+			}
+
+			a.Equal(serverHit, tc.shouldHitServer)
+
+			// get highest report path
+			reportP := ""
+			files, err := ioutil.ReadDir(out)
+			if err != nil {
+				t.Fatalf("couldn't scan %s: %v", out, err)
+			}
+			for _, f := range files {
+				if f.Name() > reportP {
+					reportP = f.Name()
+				}
+			}
+
+			gotF, err := os.Open(filepath.Join(out, reportP))
+			if err != nil {
+				t.Fatal("didn't generate a report file on disk", err)
+			}
+			got, err := ioutil.ReadAll(gotF)
+			if err != nil {
+				t.Fatal("couldn't read generated report file", err)
+			}
+			isOptOut := sysmetrics.OptOutJSON == string(got)
+
+			if tc.wantOptOut && !isOptOut {
+				t.Errorf("we wanted an opt out as we opted out in previous release but got some data in: %s", got)
+			} else if !tc.wantOptOut && isOptOut {
+				t.Errorf("we wanted some data which are not opt out information, but got opt out content instead")
+			}
+		})
+	}
+}
+
 func TestSendPendingReport(t *testing.T) {
 	// we change current path and env variable: not parallelizable tests
 	helper.SkipIfShort(t)

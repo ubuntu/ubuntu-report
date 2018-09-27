@@ -72,6 +72,21 @@ func CollectAndSend(r ReportType, alwaysReport bool, baseURL string) error {
 	return metricsCollectAndSend(m, r, alwaysReport, baseURL, "", os.Stdin, os.Stdout)
 }
 
+// CollectAndSendUpgrade  gather system info and send them
+// The report will not be sent if a report has already been sent for this version unless "alwaysReport" is true.
+// It will only send if a previous report has been found, collect latest report answer (opt-in or opt-out)
+// and decides what to send on that new version based on those facts.
+// If "baseURL" is not an empty string, this overrides the server the report is sent to.
+func CollectAndSendOnUpgrade(alwaysReport bool, baseURL string) error {
+	log.Debug("collect and report system information on upgrade")
+
+	m, err := metrics.New()
+	if err != nil {
+		return errors.Wrapf(err, "couldn't create a metric collector")
+	}
+	return metricsCollectAndSendOnUpgrade(m, alwaysReport, baseURL, "", os.Stdin, os.Stdout)
+}
+
 // SendPendingReport will try to send any pending report which didn't suceed previously due to network issues.
 // It will try sending and exponentially back off until a send is successful.
 func SendPendingReport(baseURL string) error {
