@@ -36,7 +36,6 @@ Report metrics from your system, install and upgrades
 
 #### Synopsis
 
-
 This tool will collect and report metrics from current hardware, partition and session information.
 This information can't be used to identify a single machine and is presented before being sent to the server.
 
@@ -47,10 +46,10 @@ ubuntu-report [flags]
 #### Options
 
 ```
-  -f, --force                collect and send new report even if already reported
-  -h, --help                 help for ubuntu-report
-  -u, --url string           server url to send report to. Leave empty for default. (default "https://metrics.ubuntu.com")
-  -v, --verbose count[=-1]   issue INFO (-v) and DEBUG (-vv) output
+  -f, --force           collect and send new report even if already reported
+  -h, --help            help for ubuntu-report
+  -u, --url string      server url to send report to. Leave empty for default. (default "https://metrics.ubuntu.com")
+  -v, --verbose count   issue INFO (-v) and DEBUG (-vv) output
 ```
 
 ### ubuntu-report interactive
@@ -62,7 +61,6 @@ Interactive mode, alias to running this tool without any subcommands.
 Send or opt-out directly from metric reports without interactions
 
 #### Synopsis
-
 
 Send or opt-out directly from metric reports without interactions
 
@@ -80,18 +78,17 @@ ubuntu-report send yes|no [flags]
 #### Options inherited from parent commands
 
 ```
-  -f, --force                collect and send new report even if already reported
-  -v, --verbose count[=-1]   issue INFO (-v) and DEBUG (-vv) output
+  -f, --force           collect and send new report even if already reported
+  -v, --verbose count   issue INFO (-v) and DEBUG (-vv) output
 ```
 
 ### ubuntu-report service
 
-Try to send periodically previously collected data once network if previous send was unsuccessful
+Try to send periodically previously unsent but collected data once network is avaiable
 
 #### Synopsis
 
-
-Try to send periodically previously collected data once network if previous send was unsuccessful
+Try to send periodically previously unsent but collected data once network is avaiable
 
 ```
 ubuntu-report service [flags]
@@ -107,8 +104,8 @@ ubuntu-report service [flags]
 #### Options inherited from parent commands
 
 ```
-  -f, --force                collect and send new report even if already reported
-  -v, --verbose count[=-1]   issue INFO (-v) and DEBUG (-vv) output
+  -f, --force           collect and send new report even if already reported
+  -v, --verbose count   issue INFO (-v) and DEBUG (-vv) output
 ```
 
 ### ubuntu-report show
@@ -116,7 +113,6 @@ ubuntu-report service [flags]
 Only collect and display metrics without sending
 
 #### Synopsis
-
 
 Only collect and display metrics without sending
 
@@ -133,8 +129,8 @@ ubuntu-report show [flags]
 #### Options inherited from parent commands
 
 ```
-  -f, --force                collect and send new report even if already reported
-  -v, --verbose count[=-1]   issue INFO (-v) and DEBUG (-vv) output
+  -f, --force           collect and send new report even if already reported
+  -v, --verbose count   issue INFO (-v) and DEBUG (-vv) output
 ```
 
 ## Service
