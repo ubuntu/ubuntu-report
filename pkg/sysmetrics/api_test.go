@@ -620,7 +620,7 @@ func TestCollectAndSendOnUpgrade(t *testing.T) {
 			if err != nil {
 				t.Fatal("couldn't read generated report file", err)
 			}
-			isOptOut := sysmetrics.OptOutJSON == string(got)
+			isOptOut := strings.Contains(string(got), sysmetrics.OptOutJSON)
 
 			if tc.wantOptOut && !isOptOut {
 				t.Errorf("we wanted an opt out as we opted out in previous release but got some data in: %s", got)
