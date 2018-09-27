@@ -453,6 +453,128 @@ func TestMultipleMetricsCollectAndSend(t *testing.T) {
 	}
 }
 
+func TestMetricsCollectAndSendOnUpgrade(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		name            string
+		previousReportP string
+
+		cacheReportP    string
+		shouldHitServer bool
+		wantOptOut      bool
+		wantErr         bool
+	}{
+		{"without previous report",
+			"",
+			"", false, false, false},
+		{"with previous report, current release",
+			"testdata/previous_reports/current_release",
+			"", false, false, true},
+		{"with previous report, previous release opt in",
+			"testdata/previous_reports/previous_release_optin",
+			"ubuntu-report/ubuntu.18.04", true, false, false},
+		{"with previous report, previous release opt out",
+			"testdata/previous_reports/previous_release_optout",
+			"ubuntu-report/ubuntu.18.04", true, true, false},
+		{"with two previous reports, latest previous release opt in",
+			"testdata/previous_reports/latest_previous_release_optin",
+			"ubuntu-report/ubuntu.18.04", true, false, false},
+		{"with two previous reports, latest previous release opt out",
+			"testdata/previous_reports/latest_previous_release_optout",
+			"ubuntu-report/ubuntu.18.04", true, true, false},
+	}
+	for _, tc := range testCases {
+		tc := tc // capture range variable for parallel execution
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			a := helper.Asserter{T: t}
+
+			m, cancelGPU, cancelCPU, cancelScreen, cancelPartition, cancelArchitecture := newTestMetricsWithCommands(t,
+				"testdata/good",
+				"one gpu", "regular", "one screen", "one partition", "regular",
+				map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession",
+					"XDG_SESSION_TYPE": "x12", "LANG": "fr_FR.UTF-8", "LANGUAGE": "fr_FR.UTF-8"})
+			defer cancelGPU()
+			defer cancelCPU()
+			defer cancelScreen()
+			defer cancelPartition()
+			defer cancelArchitecture()
+			out, tearDown := helper.TempDir(t)
+			defer tearDown()
+
+			if tc.previousReportP != "" {
+				reportDir := filepath.Join(out, "ubuntu-report")
+				if err := os.MkdirAll(reportDir, 0700); err != nil {
+					t.Fatalf("couldn't create report directory: %v", err)
+				}
+				files, err := ioutil.ReadDir(tc.previousReportP)
+				if err != nil {
+					t.Fatalf("couldn't list files under %s: %v", tc.previousReportP, err)
+				}
+				for _, file := range files {
+					data, err := ioutil.ReadFile(filepath.Join(tc.previousReportP, file.Name()))
+					if err != nil {
+						t.Fatalf("couldn't read report file: %v", err)
+					}
+					if err = ioutil.WriteFile(filepath.Join(reportDir, file.Name()), data, 0644); err != nil {
+						t.Fatalf("couldn't write to destination report file in setup: %v", err)
+					}
+				}
+			}
+
+			serverHit := false
+			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				serverHit = true
+			}))
+			defer ts.Close()
+			url := ts.URL
+
+			err := metricsCollectAndSendOnUpgrade(m, false, url, out, os.Stdout, os.Stdin)
+
+			a.CheckWantedErr(err, tc.wantErr)
+			// check we didn't do too much work on error
+			if err != nil {
+				if tc.shouldHitServer && serverHit == false {
+					t.Error("we should have hit the local server and we didn't")
+				}
+				if !tc.shouldHitServer && serverHit == true {
+					t.Error("we have hit the local server when we shouldn't have")
+				}
+				return
+			}
+			a.Equal(serverHit, tc.shouldHitServer)
+			// case with no report to generate (no previous answer)
+			if tc.cacheReportP == "" {
+				files, err := ioutil.ReadDir(filepath.Join(out, "ubuntu-report"))
+				if err != nil {
+					return
+				}
+				if len(files) != 0 {
+					t.Fatalf("we expected no report to be generated but we found some")
+				}
+				return
+			}
+
+			gotF, err := os.Open(filepath.Join(out, tc.cacheReportP))
+			if err != nil {
+				t.Fatal("didn't generate a report file on disk", err)
+			}
+			got, err := ioutil.ReadAll(gotF)
+			if err != nil {
+				t.Fatal("couldn't read generated report file", err)
+			}
+			isOptOut := optOutJSON == string(got)
+
+			if tc.wantOptOut && !isOptOut {
+				t.Errorf("we wanted an opt out as we opted out in previous release but got some data in: %s", got)
+			} else if !tc.wantOptOut && isOptOut {
+				t.Errorf("we wanted some data which are not opt out information, but got opt out content instead")
+			}
+		})
+	}
+}
+
 func TestInteractiveMetricsCollectAndSend(t *testing.T) {
 	t.Parallel()
 

@@ -131,6 +131,37 @@ func metricsCollectAndSend(m metrics.Metrics, r ReportType, alwaysReport bool, b
 	return metricsSend(m, data, sendMetrics, alwaysReport, baseURL, reportBasePath, in, out)
 }
 
+func metricsCollectAndSendOnUpgrade(m metrics.Metrics, alwaysReport bool, baseURL string, reportBasePath string, in io.Reader, out io.Writer) error {
+	distro, version, err := m.GetIDS()
+	if err != nil {
+		return errors.Wrapf(err, "couldn't get mandatory information")
+	}
+
+	if _, err := checkPreviousReport(distro, version, reportBasePath, alwaysReport); err != nil {
+		return err
+	}
+
+	latestReportFile, err := getLastReport(distro, reportBasePath, alwaysReport)
+	if err != nil {
+		return err
+	}
+	if latestReportFile == "" {
+		log.Debug("no previous report found, no upgrade report to generate then")
+		return nil
+	}
+
+	r := ReportOptOut
+	b, err := ioutil.ReadFile(latestReportFile)
+	if err != nil {
+		return errors.Wrapf(err, "not able to read latest report content")
+	}
+	if strings.TrimSpace(string(b)) != optOutJSON {
+		r = ReportAuto
+	}
+
+	return metricsCollectAndSend(m, r, alwaysReport, baseURL, reportBasePath, in, out)
+}
+
 func saveMetrics(p string, data []byte) error {
 	log.Debugf("save sent metrics to %s", p)
 
@@ -159,6 +190,25 @@ func checkPreviousReport(distro, version, reportBasePath string, alwaysReport bo
 		log.Debug("ignore previous report requested")
 	}
 	return p, nil
+}
+
+func getLastReport(distro, reportBasePath string, alwaysReport bool) (string, error) {
+	p, err := utils.ReportPath(distro, "*", reportBasePath)
+	if err != nil {
+		return "", errors.Wrapf(err, "couldn't get path where metrics are reported on disk")
+	}
+
+	files, err := filepath.Glob(p)
+	if err != nil {
+		return "", errors.Wrapf(err, "incorrect pattern: %s", p)
+	}
+	newestReport := ""
+	for _, f := range files {
+		if f > newestReport {
+			newestReport = f
+		}
+	}
+	return newestReport, nil
 }
 
 func metricsSendPendingReport(m metrics.Metrics, baseURL, reportBasePath string, in io.Reader, out io.Writer) error {
