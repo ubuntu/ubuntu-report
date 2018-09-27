@@ -1,0 +1,5 @@
+[Desktop Entry]
+Type=Application
+Name=Ubuntu report try to sends metrics data on release upgrade
+Exec=/usr/bin/ubuntu-report send upgrade
+NoDisplay=true

@@ -1,4 +1,5 @@
 usr/bin
 obj-*/build/ubuntu-report usr/share/bash-completion/completions/
 obj-*/build/_ubuntu-report usr/share/zsh/vendor-completions/
+autostart/ubuntu-report-on-upgrade.desktop etc/xdg/autostart/
 autostart/systemd/* usr/lib/systemd/user
