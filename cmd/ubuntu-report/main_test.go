@@ -149,7 +149,7 @@ func TestSend(t *testing.T) {
 			if err := os.MkdirAll(out, 0700); err != nil {
 				t.Fatalf("couldn't create ubuntu-report directory: %v", err)
 			}
-			if err := ioutil.WriteFile(filepath.Join(out, "ubuntu.14.04"), []byte(`{ "some-opt-in-data': true}`), 0644); err != nil {
+			if err := ioutil.WriteFile(filepath.Join(out, "ubuntu.10.10"), []byte(`{ "some-opt-in-data': true}`), 0644); err != nil {
 				t.Fatalf("couldn't setup previous report file: %v", err)
 			}
 
