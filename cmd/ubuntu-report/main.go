@@ -118,7 +118,7 @@ func generateRootCmd() *cobra.Command {
 
 	service := &cobra.Command{
 		Use:    "service",
-		Short:  "Try to send periodically previously collected data once network if previous send was unsuccessful",
+		Short:  "Try to send periodically previously unsent but collected data once network is avaiable",
 		Args:   cobra.NoArgs,
 		Hidden: true,
 		Run: func(cmd *cobra.Command, args []string) {
