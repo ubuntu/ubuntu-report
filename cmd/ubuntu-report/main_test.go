@@ -134,6 +134,7 @@ func TestSend(t *testing.T) {
 	}{
 		{"regular report auto", "yes", true, false},
 		{"regular report opt-out", "no", true, false},
+		{"dist-upgrade report", "upgrade", true, false},
 	}
 	for _, tc := range testCases {
 		tc := tc // capture range variable for parallel execution
@@ -144,6 +145,14 @@ func TestSend(t *testing.T) {
 			defer tearDown()
 			defer helper.ChangeEnv("XDG_CACHE_HOME", out)()
 			out = filepath.Join(out, "ubuntu-report")
+			// create a previous report with fake json data (which isn't optout)
+			if err := os.MkdirAll(out, 0700); err != nil {
+				t.Fatalf("couldn't create ubuntu-report directory: %v", err)
+			}
+			if err := ioutil.WriteFile(filepath.Join(out, "ubuntu.14.04"), []byte(`{ "some-opt-in-data': true}`), 0644); err != nil {
+				t.Fatalf("couldn't setup previous report file: %v", err)
+			}
+
 			// we don't really care where we hit for this API integration test, internal ones test it
 			// and we don't really control /etc/os-release version and id.
 			// Same for report file
@@ -168,15 +177,27 @@ func TestSend(t *testing.T) {
 			}
 
 			a.Equal(serverHit, tc.shouldHitServer)
-			p := filepath.Join(out, helper.FindInDirectory(t, "", out))
-			data, err := ioutil.ReadFile(p)
+			// get highest report path
+			reportP := ""
+			files, err := ioutil.ReadDir(out)
 			if err != nil {
-				t.Fatalf("couldn't open report file %s", out)
+				t.Fatalf("couldn't scan %s: %v", out, err)
+			}
+			for _, f := range files {
+				if f.Name() > reportP {
+					reportP = f.Name()
+				}
+			}
+			data, err := ioutil.ReadFile(filepath.Join(out, reportP))
+			if err != nil {
+				t.Fatalf("couldn't open report file %s", reportP)
 			}
 			d := string(data)
 
 			switch tc.answer {
 			case "yes":
+				fallthrough
+			case "upgrade":
 				if !strings.Contains(d, expectedReportItem) {
 					t.Errorf("we expected to find %s in report file, got: %s", expectedReportItem, d)
 				}

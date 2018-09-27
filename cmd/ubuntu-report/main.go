@@ -81,9 +81,9 @@ func generateRootCmd() *cobra.Command {
 		Use:   "send yes|no",
 		Short: "Send or opt-out directly from metric reports without interactions",
 
-		// we want exactly one arg by in ValidArgs list
+		// we want exactly one arg by in ValidArgs list or upgrade internal command
 		Args: func(cmd *cobra.Command, args []string) error {
-			if len(args) != 1 || !stringInSlice(args[0], cmd.ValidArgs) {
+			if len(args) != 1 || !stringInSlice(args[0], append(cmd.ValidArgs, "upgrade")) {
 				return fmt.Errorf("Only accept one argument: yes or no, received '%s'", strings.Join(args, " "))
 			}
 			return nil
@@ -96,6 +96,12 @@ func generateRootCmd() *cobra.Command {
 				r = sysmetrics.ReportAuto
 			} else if args[0] == "no" {
 				r = sysmetrics.ReportOptOut
+			} else if args[0] == "upgrade" {
+				if err := sysmetrics.CollectAndSendOnUpgrade(flagForce, flagServerURL); err != nil {
+					// log a warning, but don't error out as this is an automated upgrade call
+					log.Warningf(utils.ErrFormat, err)
+				}
+				return
 			} else {
 				log.Error("Invalid arg")
 				os.Exit(1)
