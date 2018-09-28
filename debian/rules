@@ -13,6 +13,11 @@ artefactsdir = $(builddir)/build
 %:
 	dh $@ --buildsystem=golang --with=golang
 
+override_dh_auto_clean:
+	dh_auto_clean
+	# create the vendor directory when building the source package
+	[ -d vendor/ ] || go mod vendor
+
 override_dh_auto_build:
 	dh_auto_build
 	# move shell completion, man pages and shared lib
