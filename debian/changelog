@@ -2,6 +2,8 @@ ubuntu-report (1.4.0) UNRELEASED; urgency=medium
 
   * Send updated report on distribution upgrade based on previous user's
     choice (opt-in or opt-out) (LP: #1794930)
+  * go.*: refresh vendor directory (same dependency version though) based
+    on go 1.11 module filters.
 
  -- Didier Roche <didrocks@ubuntu.com>  Fri, 28 Sep 2018 09:18:46 +0200
 
