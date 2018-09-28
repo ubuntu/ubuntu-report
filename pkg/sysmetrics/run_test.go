@@ -483,6 +483,9 @@ func TestMetricsCollectAndSendOnUpgrade(t *testing.T) {
 		{"with two previous reports, latest previous release opt out",
 			"testdata/previous_reports/latest_previous_release_optout",
 			"ubuntu-report/ubuntu.18.04", true, true, false},
+		{"with different distro reports, current optin, other distro more recent opt out",
+			"testdata/previous_reports/previous_with_different_distros",
+			"ubuntu-report/ubuntu.18.04", true, false, false},
 	}
 	for _, tc := range testCases {
 		tc := tc // capture range variable for parallel execution
