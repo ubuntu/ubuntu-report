@@ -1,4 +1,4 @@
-ubuntu-report (1.4.0) UNRELEASED; urgency=medium
+ubuntu-report (1.4.0) cosmic; urgency=medium
 
   * Send updated report on distribution upgrade based on previous user's
     choice (opt-in or opt-out) (LP: #1794930)
