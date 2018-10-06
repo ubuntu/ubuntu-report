@@ -84,11 +84,11 @@ ubuntu-report send yes|no [flags]
 
 ### ubuntu-report service
 
-Try to send periodically previously unsent but collected data once network is avaiable
+Try to send periodically previously unsent but collected data once network is available
 
 #### Synopsis
 
-Try to send periodically previously unsent but collected data once network is avaiable
+Try to send periodically previously unsent but collected data once network is available
 
 ```
 ubuntu-report service [flags]
