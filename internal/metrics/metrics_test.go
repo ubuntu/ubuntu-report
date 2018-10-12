@@ -157,6 +157,24 @@ func TestRunCollectTwice(t *testing.T) {
 				metrics.WithArchitectureCommand(cmdArchitecture),
 				metrics.WithMapForEnv(tc.env))
 			b1, err1 := m.Collect()
+
+			cmdGPU, cancel = newMockShortCmd(t, "lspci", "-n", tc.caseGPU)
+			defer cancel()
+			cmdCPU, cancel = newMockShortCmd(t, "lscpu", "-J", tc.caseCPU)
+			defer cancel()
+			cmdScreen, cancel = newMockShortCmd(t, "xrandr", tc.caseScreen)
+			defer cancel()
+			cmdPartition, cancel = newMockShortCmd(t, "df", tc.casePartition)
+			defer cancel()
+			cmdArchitecture, cancel = newMockShortCmd(t, "dpkg", "--print-architecture", tc.caseArchitecture)
+			defer cancel()
+			m = newTestMetrics(t, metrics.WithRootAt(tc.root),
+				metrics.WithGPUInfoCommand(cmdGPU),
+				metrics.WithCPUInfoCommand(cmdCPU),
+				metrics.WithScreenInfoCommand(cmdScreen),
+				metrics.WithSpaceInfoCommand(cmdPartition),
+				metrics.WithArchitectureCommand(cmdArchitecture),
+				metrics.WithMapForEnv(tc.env))
 			b2, err2 := m.Collect()
 
 			a.CheckWantedErr(err1, tc.wantErr)
