@@ -72,7 +72,7 @@ func CollectAndSend(r ReportType, alwaysReport bool, baseURL string) error {
 	return metricsCollectAndSend(m, r, alwaysReport, baseURL, "", os.Stdin, os.Stdout)
 }
 
-// CollectAndSendUpgrade  gather system info and send them
+// CollectAndSendOnUpgrade gather system info and send them
 // The report will not be sent if a report has already been sent for this version unless "alwaysReport" is true.
 // It will only send if a previous report has been found, collect latest report answer (opt-in or opt-out)
 // and decides what to send on that new version based on those facts.
