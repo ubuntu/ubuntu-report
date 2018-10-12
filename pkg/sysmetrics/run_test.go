@@ -84,8 +84,8 @@ func TestMetricsCollect(t *testing.T) {
 
 			a.CheckWantedErr(err2, tc.wantErr)
 			var got1, got2 json.RawMessage
-			json.Unmarshal(b1, got1)
-			json.Unmarshal(b2, got2)
+			json.Unmarshal(b1, &got1)
+			json.Unmarshal(b2, &got2)
 			a.Equal(got1, got2)
 		})
 	}
