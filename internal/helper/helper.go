@@ -29,7 +29,7 @@ type Asserter struct {
 func (m Asserter) Equal(got, want interface{}) {
 	m.Helper()
 
-	same := false
+	var same bool
 	switch t := reflect.TypeOf(got); t.Kind() {
 	case reflect.Slice:
 		// We treat slice of bytes differently, order is important
