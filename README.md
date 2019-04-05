@@ -5,6 +5,7 @@ This information can't be used to identify a single machine and is presented bef
 
 [![Build & Tests Status](https://travis-ci.org/ubuntu/ubuntu-report.svg?branch=master)](https://travis-ci.org/ubuntu/ubuntu-report)
 [![codecov](https://codecov.io/gh/ubuntu/ubuntu-report/branch/master/graph/badge.svg)](https://codecov.io/gh/ubuntu/ubuntu-report)
+[![Go Report Card](https://goreportcard.com/badge/github.com/ubuntu/ubuntu-report)](https://goreportcard.com/report/github.com/ubuntu/ubuntu-report)
 
 APIS:
  * Go: [![Go API](https://godoc.org/github.com/ubuntu/ubuntu-report?status.svg)](https://godoc.org/github.com/ubuntu/ubuntu-report/pkg/sysmetrics)
