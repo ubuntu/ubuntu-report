@@ -87,7 +87,7 @@ func CollectAndSendOnUpgrade(alwaysReport bool, baseURL string) error {
 	return metricsCollectAndSendOnUpgrade(m, alwaysReport, baseURL, "", os.Stdin, os.Stdout)
 }
 
-// SendPendingReport will try to send any pending report which didn't suceed previously due to network issues.
+// SendPendingReport will try to send any pending report which didn't succeed previously due to network issues.
 // It will try sending and exponentially back off until a send is successful.
 func SendPendingReport(baseURL string) error {
 	log.Debug("try sending previous report")

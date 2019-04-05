@@ -411,7 +411,7 @@ func TestGetScreens(t *testing.T) {
 		{"chosen resolution not first", []screenInfo{{"510mmx287mm", "1600x1200", "60.00"}}},
 		{"no specified screen size", nil},
 		{"no chosen resolution", nil},
-		{"chosen resolution not prefered", []screenInfo{{"510mmx287mm", "1920x1080", "60.00"}}},
+		{"chosen resolution not preferred", []screenInfo{{"510mmx287mm", "1920x1080", "60.00"}}},
 		{"multiple frequencies for resolution", []screenInfo{{"510mmx287mm", "1920x1080", "60.00"}}},
 		{"multiple frequencies select other resolution", []screenInfo{{"510mmx287mm", "1920x1080", "50.00"}}},
 		{"multiple frequencies select other resolution on non preferred", []screenInfo{{"510mmx287mm", "1920x1080", "50.00"}}},

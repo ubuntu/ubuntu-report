@@ -84,7 +84,7 @@ func TestSendReportExample(t *testing.T) {
 	}
 
 	// There isn't a data race as only the external binary can hit test server,
-	// but Go can't know it. To prevent that, shutdown the test server explicitely
+	// but Go can't know it. To prevent that, shutdown the test server explicitly
 	ts.Close()
 
 	a.Equal(serverHit, true)
@@ -132,7 +132,7 @@ func TestSendDeclineExample(t *testing.T) {
 	}
 
 	// There isn't a data race as only the external binary can hit test server,
-	// but Go can't know it. To prevent that, shutdown the test server explicitely
+	// but Go can't know it. To prevent that, shutdown the test server explicitly
 	ts.Close()
 
 	a.Equal(serverHit, true)
@@ -180,7 +180,7 @@ func TestCollectAndSendExample(t *testing.T) {
 	}
 
 	// There isn't a data race as only the external binary can hit test server,
-	// but Go can't know it. To prevent that, shutdown the test server explicitely
+	// but Go can't know it. To prevent that, shutdown the test server explicitly
 	ts.Close()
 
 	a.Equal(serverHit, true)
