@@ -92,17 +92,18 @@ func generateRootCmd() *cobra.Command {
 
 		Run: func(cmd *cobra.Command, args []string) {
 			var r sysmetrics.ReportType
-			if args[0] == "yes" {
+			switch args[0] {
+			case "yes":
 				r = sysmetrics.ReportAuto
-			} else if args[0] == "no" {
+			case "no":
 				r = sysmetrics.ReportOptOut
-			} else if args[0] == "upgrade" {
+			case "upgrade":
 				if err := sysmetrics.CollectAndSendOnUpgrade(flagForce, flagServerURL); err != nil {
 					// log a warning, but don't error out as this is an automated upgrade call
 					log.Warningf(utils.ErrFormat, err)
 				}
 				return
-			} else {
+			default:
 				log.Error("Invalid arg")
 				os.Exit(1)
 			}
