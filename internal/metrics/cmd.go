@@ -38,7 +38,7 @@ func (m Metrics) getCPU() cpuInfo {
 
 	r := runCmd(m.cpuInfoCmd)
 
-	for result := range filter(r, `{"field": "(.*)", "data": "(.*)"},`, true) {
+	for result := range filter(r, `{"field": *"(.*)", *"data": *"(.*)"},`, true) {
 		if result.err != nil {
 			log.Infof("Couldn't get CPU info: "+utils.ErrFormat, result.err)
 			return cpuInfo{}

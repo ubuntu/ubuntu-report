@@ -341,6 +341,8 @@ func TestGetCPU(t *testing.T) {
 			"Intuis Corus i5-8300H CPU @ 2.30GHz", "VT-x", "", ""}},
 		{"virtualized", cpuInfo{"32-bit, 64-bit", "8", "2", "4", "1", "Genuine", "6", "158", "10",
 			"Intuis Corus i5-8300H CPU @ 2.30GHz", "VT-x", "KVM", "full"}},
+		{"without space", cpuInfo{"32-bit, 64-bit", "8", "2", "4", "1", "Genuine", "6", "158", "10",
+			"Intuis Corus i5-8300H CPU @ 2.30GHz", "VT-x", "", ""}},
 		{"empty", cpuInfo{}},
 		{"garbage", cpuInfo{}},
 		{"fail", cpuInfo{}},
