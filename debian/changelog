@@ -1,3 +1,26 @@
+ubuntu-report (1.5.0) UNRELEASED; urgency=medium
+
+  * Fix CPU record not present in virtualbox (LP: #1819129)
+    Virtualbox is having a special lspcu syntax without spaces between
+    fields and values. Fix the regexp and tests to cover that use-case.
+  * Fix go ineffassign warning
+  * Fix golint false positive
+  * Fix invalid tests comparison which was passing by chance. Ensure we
+    can rerun commands in multiple runs tests.
+  * Fix documentation vet error
+  * Refresh go modules files with go 1.12. Prune uneeded indirect dep list
+    now that more modules ships with go.mod.
+  * Various typos fix
+
+ -- Didier Roche <didrocks@ubuntu.com>  Fri, 26 Apr 2019 08:18:24 +0200
+
+ubuntu-report (1.4.1) disco; urgency=medium
+
+  * Ship go modules files for -dev now that distro moved to 1.11.
+    (LP: #1823440)
+
+ -- Didier Roche <didrocks@ubuntu.com>  Tue, 09 Apr 2019 15:16:07 +0200
+
 ubuntu-report (1.4.0) cosmic; urgency=medium
 
   * Send updated report on distribution upgrade based on previous user's
