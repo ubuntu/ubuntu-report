@@ -1,4 +1,4 @@
-ubuntu-report (1.5.0) UNRELEASED; urgency=medium
+ubuntu-report (1.5.0) eoan; urgency=medium
 
   * Fix CPU record not present in virtualbox (LP: #1819129)
     Virtualbox is having a special lspcu syntax without spaces between
