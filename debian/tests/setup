@@ -1,6 +1,7 @@
 #!/bin/sh
 set -e
 export GOPATH=/tmp:/usr/share/gocode
+export GOFLAGS=-mod=vendor
 
 rm -rf /tmp/src/github.com/ubuntu/
 mkdir -p /tmp/src/github.com/ubuntu/
