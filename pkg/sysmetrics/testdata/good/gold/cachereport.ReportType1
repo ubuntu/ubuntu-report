@@ -3,6 +3,7 @@
   "OEM": {
     "Vendor": "DID",
     "Product": "4287CTO",
+    "Family": "Thinkpad",
     "DCD": "canonical-oem-somerville-xenial-amd64-20160624-2"
   },
   "BIOS": {
