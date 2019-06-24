@@ -1,3 +1,10 @@
+ubuntu-report (1.6.0) eoan; urgency=medium
+
+  * Add product_family to OEM information (LP: #1833555)
+  * Various test fixes
+
+ -- Jean-Baptiste Lallement <jean-baptiste.lallement@ubuntu.com>  Mon, 24 Jun 2019 11:10:02 +0200
+
 ubuntu-report (1.5.1) eoan; urgency=medium
 
   * Unbreak autopkgtests with golang-go 1.11 by default.
