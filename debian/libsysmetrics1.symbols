@@ -11,5 +11,4 @@ libsysmetrics.so.1 libsysmetrics1 #MINVER#
  (arch=ppc64el)crosscall_ppc64@Base 1.0.0
  (arch=s390x)crosscall_s390x@Base 1.0.0
  fatalf@Base 1.0.0
- (arch=armhf arm64)setg_gcc@Base 1.0.0
  (regex|optional)"_cgo.*" 1.0.0
