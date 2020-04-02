@@ -1,3 +1,11 @@
+ubuntu-report (1.6.1) focal; urgency=medium
+
+  * Update for removed symbol on armhf/arm64:
+    - This symbol was removed by gcc go in 1.13 but was not used by its
+      reverse dependencies (private one). (LP: #1870084)
+
+ -- Didier Roche <didrocks@ubuntu.com>  Thu, 02 Apr 2020 10:27:44 +0200
+
 ubuntu-report (1.6.0) eoan; urgency=medium
 
   * Add product_family to OEM information (LP: #1833555)
