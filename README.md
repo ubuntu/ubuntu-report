@@ -164,7 +164,7 @@ You can regenerate previous README section, shell completion support and man pag
 
 ### Example of data being sent if agreement is accepted
 
-The data is pretty printed here to be more readable.
+The data are pretty printed here to be more readable.
 
 ```json
 {
@@ -252,7 +252,7 @@ The data is pretty printed here to be more readable.
 
 ### Data being sent if agreement is denied
 
-The data is pretty printed here to be more readable.
+The data are pretty printed here to be more readable.
 
 ```json
 {
