@@ -1,3 +1,11 @@
+ubuntu-report (1.6.2) hirsute; urgency=medium
+
+  * Fix tests failing due to invalid casting
+    This is spotted by go 1.15.
+  * Updated README.
+
+ -- Didier Roche <didrocks@ubuntu.com>  Tue, 10 Nov 2020 10:12:57 +0100
+
 ubuntu-report (1.6.1) focal; urgency=medium
 
   * Update for removed symbol on armhf/arm64:
