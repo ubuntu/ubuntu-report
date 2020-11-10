@@ -1,6 +1,7 @@
 package sender_test
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -52,7 +53,7 @@ func TestSend(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		tc := tc // capture range variable for parallel execution
-		t.Run(string(tc.status), func(t *testing.T) {
+		t.Run(fmt.Sprint(tc.status), func(t *testing.T) {
 			t.Parallel()
 			a := helper.Asserter{T: t}
 
