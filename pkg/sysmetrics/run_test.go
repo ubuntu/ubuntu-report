@@ -63,7 +63,7 @@ func TestMetricsCollect(t *testing.T) {
 			a := helper.Asserter{T: t}
 
 			m, cancelGPU, cancelCPU, cancelScreen, cancelPartition,
-			cancelArchitecture, cancelLibc6, cancelHwCap := newTestMetricsWithCommands(t, tc.root,
+				cancelArchitecture, cancelLibc6, cancelHwCap := newTestMetricsWithCommands(t, tc.root,
 				tc.caseGPU, tc.caseCPU, tc.caseScreen, tc.casePartition,
 				tc.caseArchitecture, tc.caseLibc6, tc.caseHwCap, tc.env)
 			defer cancelGPU()
@@ -81,7 +81,7 @@ func TestMetricsCollect(t *testing.T) {
 
 			// second run should return the same thing (idemnpotence)
 			m, cancelGPU, cancelCPU, cancelScreen, cancelPartition,
-			cancelArchitecture, cancelLibc6, cancelHwCap = newTestMetricsWithCommands(t,
+				cancelArchitecture, cancelLibc6, cancelHwCap = newTestMetricsWithCommands(t,
 				tc.root, tc.caseGPU, tc.caseCPU, tc.caseScreen, tc.casePartition,
 				tc.caseArchitecture, tc.caseLibc6, tc.caseHwCap, tc.env)
 			defer cancelGPU()
@@ -326,7 +326,7 @@ func TestMetricsCollectAndSend(t *testing.T) {
 			a := helper.Asserter{T: t}
 
 			m, cancelGPU, cancelCPU, cancelScreen, cancelPartition,
-			cancelArchitecture, cancelLibc6, cancelHwCap := newTestMetricsWithCommands(t, tc.root,
+				cancelArchitecture, cancelLibc6, cancelHwCap := newTestMetricsWithCommands(t, tc.root,
 				tc.caseGPU, tc.caseCPU, tc.caseScreen, tc.casePartition,
 				tc.caseArchitecture, tc.caseLibc6, tc.caseHwCap, tc.env)
 			defer cancelGPU()
@@ -418,7 +418,7 @@ func TestMultipleMetricsCollectAndSend(t *testing.T) {
 			a := helper.Asserter{T: t}
 
 			m, cancelGPU, cancelCPU, cancelScreen, cancelPartition,
-			cancelArchitecture, cancelLibc6, cancelHwCap := newTestMetricsWithCommands(t,
+				cancelArchitecture, cancelLibc6, cancelHwCap := newTestMetricsWithCommands(t,
 				"testdata/good", "one gpu", "regular", "one screen",
 				"one partition", "regular", "regular", "regular",
 				map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12", "LANG": "fr_FR.UTF-8", "LANGUAGE": "fr_FR.UTF-8"})
@@ -445,7 +445,7 @@ func TestMultipleMetricsCollectAndSend(t *testing.T) {
 			// second call, reset server
 			serverHitAt = ""
 			m, cancelGPU, cancelCPU, cancelScreen, cancelPartition,
-			cancelArchitecture, cancelLibc6, cancelHwCap = newTestMetricsWithCommands(t,
+				cancelArchitecture, cancelLibc6, cancelHwCap = newTestMetricsWithCommands(t,
 				"testdata/good", "one gpu", "regular", "one screen",
 				"one partition", "regular", "regular", "regular",
 				map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12", "LANG": "fr_FR.UTF-8", "LANGUAGE": "fr_FR.UTF-8"})
@@ -525,7 +525,7 @@ func TestMetricsCollectAndSendOnUpgrade(t *testing.T) {
 			a := helper.Asserter{T: t}
 
 			m, cancelGPU, cancelCPU, cancelScreen, cancelPartition,
-			cancelArchitecture, cancelLibc6, cancelHwCap := newTestMetricsWithCommands(t,
+				cancelArchitecture, cancelLibc6, cancelHwCap := newTestMetricsWithCommands(t,
 				"testdata/good", "one gpu", "regular", "one screen",
 				"one partition", "regular", "regular", "regular",
 				map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession",
@@ -645,7 +645,7 @@ func TestInteractiveMetricsCollectAndSend(t *testing.T) {
 			a := helper.Asserter{T: t}
 
 			m, cancelGPU, cancelCPU, cancelScreen, cancelPartition,
-			cancelArchitecture, cancelLibc6, cancelHwCap := newTestMetricsWithCommands(t,
+				cancelArchitecture, cancelLibc6, cancelHwCap := newTestMetricsWithCommands(t,
 				"testdata/good", "one gpu", "regular", "one screen",
 				"one partition", "regular", "regular", "regular",
 				map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12", "LANG": "fr_FR.UTF-8", "LANGUAGE": "fr_FR.UTF-8"})

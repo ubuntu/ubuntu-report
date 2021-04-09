@@ -1,11 +1,11 @@
 package metrics
 
 import (
+	"bytes"
 	"io"
 	"io/ioutil"
 	"os/exec"
 	"strings"
-	"bytes"
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
