@@ -321,6 +321,17 @@ Legacy HWCAP subdirectories under library search path directories:
  *** 2.33-0ubuntu4 500
         500 http://us.archive.ubuntu.com/ubuntu hirsute/main amd64 Packages
         100 /var/lib/dpkg/status`)
+		case "empty:":
+		case "fail":
+			// still print content
+			fmt.Println(`libc6:
+  Installed: 2.33-0ubuntu4
+  Candidate: 2.33-0ubuntu4
+  Version table:
+ *** 2.33-0ubuntu4 500
+        500 http://us.archive.ubuntu.com/ubuntu hirsute/main amd64 Packages
+        100 /var/lib/dpkg/status`)
+			os.Exit(1)
 		}
 	}
 }

@@ -524,10 +524,12 @@ func TestGetHwCap(t *testing.T) {
 			t.Parallel()
 			a := helper.Asserter{T: t}
 
-			cmd, cancel := newMockShortCmd(t, "/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2", "--help", tc.name)
+			hwCapCmd, cancel := newMockShortCmd(t, "/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2", "--help", tc.name)
+			defer cancel()
+			libc6Cmd, cancel := newMockShortCmd(t, "apt-cache", "policy", "libc6", tc.name)
 			defer cancel()
 
-			m := newTestMetrics(t, WithHwCapCommand(cmd))
+			m := newTestMetrics(t, WithLibc6Command(libc6Cmd), WithHwCapCommand(hwCapCmd))
 			hwCap := m.getHwCap()
 
 			a.Equal(hwCap, tc.want)

@@ -60,6 +60,7 @@ func TestCollect(t *testing.T) {
 		caseScreen       string
 		casePartition    string
 		caseArchitecture string
+		caseLibc6        string
 		caseHwCap        string
 		env              map[string]string
 
@@ -68,11 +69,11 @@ func TestCollect(t *testing.T) {
 	}{
 		{"regular",
 			"testdata/good", "one gpu", "regular", "one screen",
-			"one partition", "regular", "regular",
+			"one partition", "regular", "regular", "regular",
 			map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12", "LANG": "fr_FR.UTF-8", "LANGUAGE": "fr_FR.UTF-8"},
 			false},
 		{"empty",
-			"testdata/none", "empty", "empty", "empty", "empty", "empty", "empty",
+			"testdata/none", "empty", "empty", "empty", "empty", "empty", "empty", "empty",
 			nil,
 			false},
 	}
@@ -92,6 +93,8 @@ func TestCollect(t *testing.T) {
 			defer cancel()
 			cmdArchitecture, cancel := newMockShortCmd(t, "dpkg", "--print-architecture", tc.caseArchitecture)
 			defer cancel()
+			cmdLibc6, cancel := newMockShortCmd(t, "apt-cache", "policy", "libc6", tc.caseHwCap)
+			defer cancel()
 			cmdHwCap, cancel := newMockShortCmd(t, "/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2", "--help", tc.caseHwCap)
 			defer cancel()
 
@@ -102,6 +105,7 @@ func TestCollect(t *testing.T) {
 				metrics.WithSpaceInfoCommand(cmdPartition),
 				metrics.WithArchitectureCommand(cmdArchitecture),
 				metrics.WithHwCapCommand(cmdHwCap),
+				metrics.WithLibc6Command(cmdLibc6),
 				metrics.WithMapForEnv(tc.env))
 			got, err := m.Collect()
 
@@ -123,6 +127,7 @@ func TestRunCollectTwice(t *testing.T) {
 		caseScreen       string
 		casePartition    string
 		caseArchitecture string
+		caseLibc6        string
 		caseHwCap        string
 		env              map[string]string
 
@@ -131,11 +136,11 @@ func TestRunCollectTwice(t *testing.T) {
 	}{
 		{"regular",
 			"testdata/good", "one gpu", "regular", "one screen",
-			"one partition", "regular", "regular",
+			"one partition", "regular", "regular", "regular",
 			map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12", "LANG": "fr_FR.UTF-8", "LANGUAGE": "fr_FR.UTF-8"},
 			false},
 		{"empty",
-			"testdata/none", "empty", "empty", "empty", "empty", "empty", "empty",
+			"testdata/none", "empty", "empty", "empty", "empty", "empty", "empty", "empty",
 			nil,
 			false},
 	}
@@ -155,6 +160,8 @@ func TestRunCollectTwice(t *testing.T) {
 			defer cancel()
 			cmdArchitecture, cancel := newMockShortCmd(t, "dpkg", "--print-architecture", tc.caseArchitecture)
 			defer cancel()
+			cmdLibc6, cancel := newMockShortCmd(t, "apt-cache", "policy", "libc6", tc.caseHwCap)
+			defer cancel()
 			cmdHwCap, cancel := newMockShortCmd(t, "/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2", "--help", tc.caseHwCap)
 			defer cancel()
 
@@ -165,6 +172,7 @@ func TestRunCollectTwice(t *testing.T) {
 				metrics.WithSpaceInfoCommand(cmdPartition),
 				metrics.WithArchitectureCommand(cmdArchitecture),
 				metrics.WithHwCapCommand(cmdHwCap),
+				metrics.WithLibc6Command(cmdLibc6),
 				metrics.WithMapForEnv(tc.env))
 			b1, err1 := m.Collect()
 
@@ -178,6 +186,8 @@ func TestRunCollectTwice(t *testing.T) {
 			defer cancel()
 			cmdArchitecture, cancel = newMockShortCmd(t, "dpkg", "--print-architecture", tc.caseArchitecture)
 			defer cancel()
+			cmdLibc6, cancel = newMockShortCmd(t, "apt-cache", "policy", "libc6", tc.caseHwCap)
+			defer cancel()
 			cmdHwCap, cancel = newMockShortCmd(t, "/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2", "--help", tc.caseHwCap)
 			defer cancel()
 			m = newTestMetrics(t, metrics.WithRootAt(tc.root),
@@ -187,6 +197,7 @@ func TestRunCollectTwice(t *testing.T) {
 				metrics.WithSpaceInfoCommand(cmdPartition),
 				metrics.WithArchitectureCommand(cmdArchitecture),
 				metrics.WithHwCapCommand(cmdHwCap),
+				metrics.WithLibc6Command(cmdLibc6),
 				metrics.WithMapForEnv(tc.env))
 			b2, err2 := m.Collect()
 

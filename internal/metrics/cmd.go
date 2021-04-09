@@ -2,6 +2,7 @@ package metrics
 
 import (
 	"io"
+	"io/ioutil"
 	"os/exec"
 	"strings"
 	"bytes"
@@ -173,7 +174,7 @@ func (m Metrics) getHwCap() string {
 
 	// remove the legacy hwcap section, as we don't want to report those
 	legacyBytes := []byte("Legacy HWCAP subdirectories")
-	bytesSupported, err := io.ReadAll(rSupported)
+	bytesSupported, err := ioutil.ReadAll(rSupported)
 	if err != nil {
 		log.Infof("Couldn't get hwcap: "+utils.ErrFormat, err)
 		return ""
