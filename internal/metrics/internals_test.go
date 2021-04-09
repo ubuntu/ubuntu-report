@@ -506,6 +506,66 @@ func TestGetArch(t *testing.T) {
 	}
 }
 
+func TestGetHwCap(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		name string
+
+		want string
+	}{
+		{"regular", "x86-64-v3"},
+		{"empty", ""},
+		{"fail", ""},
+	}
+	for _, tc := range testCases {
+		tc := tc // capture range variable for parallel execution
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			a := helper.Asserter{T: t}
+
+			cmd, cancel := newMockShortCmd(t, "/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2", "--help", tc.name)
+			defer cancel()
+
+			m := newTestMetrics(t, WithHwCapCommand(cmd))
+			hwCap := m.getHwCap()
+
+			a.Equal(hwCap, tc.want)
+		})
+	}
+}
+
+func TestGetLibc6Ver(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		name string
+
+		want string
+	}{
+		{"regular", "x86-64-v3"},
+		{"old version", "N/A"},
+		{"not installed", "N/A"},
+	}
+	for _, tc := range testCases {
+		tc := tc // capture range variable for parallel execution
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			a := helper.Asserter{T: t}
+
+			hwCapCmd, cancel := newMockShortCmd(t, "/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2", "--help", tc.name)
+			defer cancel()
+			libc6Cmd, cancel := newMockShortCmd(t, "apt-cache", "policy", "libc6", tc.name)
+			defer cancel()
+
+			m := newTestMetrics(t, WithLibc6Command(libc6Cmd), WithHwCapCommand(hwCapCmd))
+			hwCap := m.getHwCap()
+
+			a.Equal(hwCap, tc.want)
+		})
+	}
+}
+
 func TestGetLanguage(t *testing.T) {
 	t.Parallel()
 

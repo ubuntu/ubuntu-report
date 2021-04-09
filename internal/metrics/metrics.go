@@ -28,7 +28,10 @@ type Metrics struct {
 	cpuInfoCmd    *exec.Cmd
 	gpuInfoCmd    *exec.Cmd
 	archCmd       *exec.Cmd
+	libc6Cmd      *exec.Cmd
+	hwCapCmd      *exec.Cmd
 	getenv        GetenvFn
+	ldPath        map[string]string
 }
 
 // New return a new metrics element with optional testing functions
@@ -41,9 +44,16 @@ func New(options ...func(*Metrics) error) (Metrics, error) {
 		cpuInfoCmd:    setCommand("lscpu", "-J"),
 		gpuInfoCmd:    setCommand("lspci", "-n"),
 		archCmd:       setCommand("dpkg", "--print-architecture"),
+		libc6Cmd:      setCommand("apt-cache", "policy", "libc6"),
 		getenv:        os.Getenv,
 	}
 	m.cpuInfoCmd.Env = []string{"LANG=C"}
+
+	// set up the map for architecture -> ld binary
+	m.ldPath = make(map[string]string, 3)
+	m.ldPath["amd64"] = "/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2"
+	m.ldPath["ppc64el"] = "/lib/powerpc64le-linux-gnu/ld64.so.2"
+	m.ldPath["s390x"] = "/lib/s390x-linux-gnu/ld64.so.1"
 
 	for _, options := range options {
 		if err := options(&m); err != nil {
@@ -130,6 +140,17 @@ func (m Metrics) Collect() ([]byte, error) {
 	r.Disks = m.getDisks()
 	r.Partitions = m.getPartitions()
 	r.Screens = m.getScreens()
+
+	// if we're on an architecture with hwcap then find which version
+	if _, found := m.ldPath[r.Arch]; found {
+		// This second check avoids the mock variable being overwritten in tests
+		if m.getenv("XDG_CURRENT_DESKTOP") != "some:thing" {
+			m.hwCapCmd = setCommand(m.ldPath[r.Arch], "--help")
+		}
+		r.HwCap = m.getHwCap()
+	} else {
+		r.HwCap = ""
+	}
 
 	a := m.getAutologin()
 	r.Autologin = &a

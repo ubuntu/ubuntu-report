@@ -102,7 +102,7 @@ func TestVerbosity(t *testing.T) {
 					l := scanner.Text()
 					if strings.Contains(l, "level=info") {
 						allowedLog := false
-						for _, msg := range []string{"/telemetry", "DCD", "GPU info", "Disk info", "Screen info", "CPU info", "autologin information", "/sys/class/dmi/id/"} {
+						for _, msg := range []string{"/telemetry", "DCD", "GPU info", "Disk info", "Screen info", "CPU info", "autologin information", "/sys/class/dmi/id/", "hwcap"} {
 							if strings.Contains(l, msg) {
 								allowedLog = true
 							}

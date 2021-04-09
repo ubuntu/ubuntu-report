@@ -60,17 +60,19 @@ func TestCollect(t *testing.T) {
 		caseScreen       string
 		casePartition    string
 		caseArchitecture string
+		caseHwCap        string
 		env              map[string]string
 
 		// note that only an internal json package error can make it returning an error
 		wantErr bool
 	}{
 		{"regular",
-			"testdata/good", "one gpu", "regular", "one screen", "one partition", "regular",
+			"testdata/good", "one gpu", "regular", "one screen",
+			"one partition", "regular", "regular",
 			map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12", "LANG": "fr_FR.UTF-8", "LANGUAGE": "fr_FR.UTF-8"},
 			false},
 		{"empty",
-			"testdata/none", "empty", "empty", "empty", "empty", "empty",
+			"testdata/none", "empty", "empty", "empty", "empty", "empty", "empty",
 			nil,
 			false},
 	}
@@ -90,6 +92,8 @@ func TestCollect(t *testing.T) {
 			defer cancel()
 			cmdArchitecture, cancel := newMockShortCmd(t, "dpkg", "--print-architecture", tc.caseArchitecture)
 			defer cancel()
+			cmdHwCap, cancel := newMockShortCmd(t, "/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2", "--help", tc.caseHwCap)
+			defer cancel()
 
 			m := newTestMetrics(t, metrics.WithRootAt(tc.root),
 				metrics.WithGPUInfoCommand(cmdGPU),
@@ -97,6 +101,7 @@ func TestCollect(t *testing.T) {
 				metrics.WithScreenInfoCommand(cmdScreen),
 				metrics.WithSpaceInfoCommand(cmdPartition),
 				metrics.WithArchitectureCommand(cmdArchitecture),
+				metrics.WithHwCapCommand(cmdHwCap),
 				metrics.WithMapForEnv(tc.env))
 			got, err := m.Collect()
 
@@ -118,17 +123,19 @@ func TestRunCollectTwice(t *testing.T) {
 		caseScreen       string
 		casePartition    string
 		caseArchitecture string
+		caseHwCap        string
 		env              map[string]string
 
 		// note that only an internal json package error can make it returning an error
 		wantErr bool
 	}{
 		{"regular",
-			"testdata/good", "one gpu", "regular", "one screen", "one partition", "regular",
+			"testdata/good", "one gpu", "regular", "one screen",
+			"one partition", "regular", "regular",
 			map[string]string{"XDG_CURRENT_DESKTOP": "some:thing", "XDG_SESSION_DESKTOP": "ubuntusession", "XDG_SESSION_TYPE": "x12", "LANG": "fr_FR.UTF-8", "LANGUAGE": "fr_FR.UTF-8"},
 			false},
 		{"empty",
-			"testdata/none", "empty", "empty", "empty", "empty", "empty",
+			"testdata/none", "empty", "empty", "empty", "empty", "empty", "empty",
 			nil,
 			false},
 	}
@@ -148,6 +155,8 @@ func TestRunCollectTwice(t *testing.T) {
 			defer cancel()
 			cmdArchitecture, cancel := newMockShortCmd(t, "dpkg", "--print-architecture", tc.caseArchitecture)
 			defer cancel()
+			cmdHwCap, cancel := newMockShortCmd(t, "/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2", "--help", tc.caseHwCap)
+			defer cancel()
 
 			m := newTestMetrics(t, metrics.WithRootAt(tc.root),
 				metrics.WithGPUInfoCommand(cmdGPU),
@@ -155,6 +164,7 @@ func TestRunCollectTwice(t *testing.T) {
 				metrics.WithScreenInfoCommand(cmdScreen),
 				metrics.WithSpaceInfoCommand(cmdPartition),
 				metrics.WithArchitectureCommand(cmdArchitecture),
+				metrics.WithHwCapCommand(cmdHwCap),
 				metrics.WithMapForEnv(tc.env))
 			b1, err1 := m.Collect()
 
@@ -168,12 +178,15 @@ func TestRunCollectTwice(t *testing.T) {
 			defer cancel()
 			cmdArchitecture, cancel = newMockShortCmd(t, "dpkg", "--print-architecture", tc.caseArchitecture)
 			defer cancel()
+			cmdHwCap, cancel = newMockShortCmd(t, "/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2", "--help", tc.caseHwCap)
+			defer cancel()
 			m = newTestMetrics(t, metrics.WithRootAt(tc.root),
 				metrics.WithGPUInfoCommand(cmdGPU),
 				metrics.WithCPUInfoCommand(cmdCPU),
 				metrics.WithScreenInfoCommand(cmdScreen),
 				metrics.WithSpaceInfoCommand(cmdPartition),
 				metrics.WithArchitectureCommand(cmdArchitecture),
+				metrics.WithHwCapCommand(cmdHwCap),
 				metrics.WithMapForEnv(tc.env))
 			b2, err2 := m.Collect()
 

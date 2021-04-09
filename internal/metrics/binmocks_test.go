@@ -261,6 +261,66 @@ tmpfs                   5120         4       5116   1% /run/lock`
 			fmt.Println("amd64") // still print content
 			os.Exit(1)
 		}
-	}
 
+	case "/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2":
+		regularOutput := `Shared library search path:
+  (libraries located via /etc/ld.so.cache)
+  /lib/x86_64-linux-gnu (system search path)
+  /usr/lib/x86_64-linux-gnu (system search path)
+  /lib (system search path)
+  /usr/lib (system search path)
+
+Subdirectories of glibc-hwcaps directories, in priority order:
+  x86-64-v4
+  x86-64-v3 (supported, searched)
+  x86-64-v2 (supported, searched)
+
+Legacy HWCAP subdirectories under library search path directories:
+  x86_64 (AT_PLATFORM; supported, searched)
+  tls (supported, searched)
+  avx512_1
+  x86_64 (supported, searched)`
+		if args[0] != "--help" {
+			fmt.Fprintf(os.Stderr, "Unexpected ld arguments: %v\n", args)
+			os.Exit(1)
+		}
+		switch args[1] {
+		case "regular":
+			fmt.Println(regularOutput)
+		case "empty":
+		case "fail":
+			os.Exit(1)
+		}
+	case "apt-cache":
+		if args[0] != "policy" && args[1] != "libc6" {
+			fmt.Fprintf(os.Stderr, "Unexpected ld arguments: %v\n", args)
+			os.Exit(1)
+		}
+		switch args[2] {
+		case "regular":
+			fmt.Println(`libc6:
+  Installed: 2.33-0ubuntu4
+  Candidate: 2.33-0ubuntu4
+  Version table:
+ *** 2.33-0ubuntu4 500
+        500 http://us.archive.ubuntu.com/ubuntu hirsute/main amd64 Packages
+        100 /var/lib/dpkg/status`)
+		case "old version":
+			fmt.Println(`libc6:
+  Installed: 2.32
+  Candidate: 2.33-0ubuntu4
+  Version table:
+ *** 2.33-0ubuntu4 500
+        500 http://us.archive.ubuntu.com/ubuntu hirsute/main amd64 Packages
+        100 /var/lib/dpkg/status`)
+		case "not installed":
+			fmt.Println(`libc6:
+  Installed: (none)
+  Candidate: 2.33-0ubuntu4
+  Version table:
+ *** 2.33-0ubuntu4 500
+        500 http://us.archive.ubuntu.com/ubuntu hirsute/main amd64 Packages
+        100 /var/lib/dpkg/status`)
+		}
+	}
 }
