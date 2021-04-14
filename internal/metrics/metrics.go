@@ -2,6 +2,7 @@ package metrics
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/json"
 	"math"
 	"os"
@@ -13,6 +14,7 @@ import (
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
+	"github.com/ubuntu/ubuntu-report/internal/utils"
 )
 
 const (
@@ -31,11 +33,12 @@ type Metrics struct {
 	libc6Cmd      *exec.Cmd
 	hwCapCmd      *exec.Cmd
 	getenv        GetenvFn
-	ldPath        map[string]string
 }
 
 // New return a new metrics element with optional testing functions
 func New(options ...func(*Metrics) error) (Metrics, error) {
+
+	hwCapCmd := getHwCapCmd(options)
 
 	m := Metrics{
 		root:          "/",
@@ -44,16 +47,10 @@ func New(options ...func(*Metrics) error) (Metrics, error) {
 		cpuInfoCmd:    setCommand("lscpu", "-J"),
 		gpuInfoCmd:    setCommand("lspci", "-n"),
 		archCmd:       setCommand("dpkg", "--print-architecture"),
-		libc6Cmd:      setCommand("apt-cache", "policy", "libc6"),
+		hwCapCmd:      hwCapCmd,
 		getenv:        os.Getenv,
 	}
 	m.cpuInfoCmd.Env = []string{"LANG=C"}
-
-	// set up the map for architecture -> ld binary
-	m.ldPath = make(map[string]string, 3)
-	m.ldPath["amd64"] = "/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2"
-	m.ldPath["ppc64el"] = "/lib/powerpc64le-linux-gnu/ld64.so.2"
-	m.ldPath["s390x"] = "/lib/s390x-linux-gnu/ld64.so.1"
 
 	for _, options := range options {
 		if err := options(&m); err != nil {
@@ -140,17 +137,7 @@ func (m Metrics) Collect() ([]byte, error) {
 	r.Disks = m.getDisks()
 	r.Partitions = m.getPartitions()
 	r.Screens = m.getScreens()
-
-	// if we're on an architecture with hwcap then find which version
-	if _, found := m.ldPath[r.Arch]; found {
-		// This second check avoids the mock variable being overwritten in tests
-		if m.getenv("XDG_CURRENT_DESKTOP") != "some:thing" {
-			m.hwCapCmd = setCommand(m.ldPath[r.Arch], "--help")
-		}
-		r.HwCap = m.getHwCap()
-	} else {
-		r.HwCap = ""
-	}
+	r.HwCap = m.getHwCap()
 
 	a := m.getAutologin()
 	r.Autologin = &a
@@ -196,4 +183,50 @@ func convKBToGB(s string) (float64, error) {
 	// convert in GB (SI) and round it to 0.1
 	f := float64(v) / (1000 * 1000)
 	return math.Round(f*10) / 10, nil
+}
+
+func getHwCapCmd(options []func(*Metrics) error) *exec.Cmd {
+	// set up the map for architecture -> ld binary
+	ldPath := make(map[string]string, 3)
+	ldPath["amd64"] = "/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2"
+	ldPath["ppc64el"] = "/lib/powerpc64le-linux-gnu/ld64.so.2"
+	ldPath["s390x"] = "/lib/s390x-linux-gnu/ld64.so.1"
+
+	// check if libc6Cmd has been mocked
+	mTemp := Metrics{}
+	for _, mockFuncs := range options {
+		mockFuncs(&mTemp)
+	}
+	var libc6Cmd *exec.Cmd
+	if mTemp.libc6Cmd != nil {
+		libc6Cmd = mTemp.libc6Cmd
+	} else {
+		libc6Cmd = setCommand("dpkg", "--status", "libc6")
+	}
+
+	// Make sure we have glibc version > 2.33
+	r := runCmd(libc6Cmd)
+	libc6Result, err := filterFirst(r, `^(?:Version: (.*))`, false)
+	if err != nil {
+		log.Infof("Couldn't get glibc version: "+utils.ErrFormat, err)
+		return nil
+	}
+	if strings.Compare(libc6Result, "2.33") < 0 {
+		// glibc versions older than 2.33 cannot report hwcap
+		return nil
+	}
+
+	// find the architecture so we can directly assign hwCapCmd
+	archCmd := setCommand("dpkg", "--print-architecture")
+	r = runCmd(archCmd)
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(r)
+	arch := strings.TrimSpace(buf.String())
+
+	if _, found := ldPath[arch]; found {
+		return setCommand(ldPath[arch], "--help")
+	} else {
+		// architecture has no supported hwcap, string will be empty
+		return nil
+	}
 }

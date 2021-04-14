@@ -157,40 +157,44 @@ func (m Metrics) getArch() string {
 }
 
 func (m Metrics) getHwCap() string {
-	// Make sure we have glibc version > 2.33
-	r := runCmd(m.libc6Cmd)
-	result, err := filterFirst(r, `^(?: +Installed: (.*))`, false)
-	if err != nil {
-		log.Infof("Couldn't get glibc version: "+utils.ErrFormat, err)
+	if m.hwCapCmd == nil {
+		// if no data return empty string. This is caused by an
+		// unsupported architecture or older version of glibc
 		return ""
 	}
-	// This successfully handles a version of (none)
-	if strings.Compare(result, "2.33") < 0 {
-		return "N/A"
-	}
 
-	// Find the hwcap
 	rSupported := runCmd(m.hwCapCmd)
 
-	// remove the legacy hwcap section, as we don't want to report those
-	legacyBytes := []byte("Legacy HWCAP subdirectories")
+	// check if there is any hwcap output
 	bytesSupported, err := ioutil.ReadAll(rSupported)
 	if err != nil {
 		log.Infof("Couldn't get hwcap: "+utils.ErrFormat, err)
 		return ""
 	}
+
+	hwCapBytes := []byte("Subdirectories of glibc-hwcaps")
+	hwCapIndex := bytes.Index(bytesSupported, hwCapBytes)
+	if hwCapIndex < 0 {
+		// no glibc-hwcaps, return empty string
+		return ""
+	}
+
+	// remove the legacy hwcap section, as we don't want to report those
+	legacyBytes := []byte("Legacy HWCAP subdirectories")
+
 	legacyIndex := bytes.Index(bytesSupported, legacyBytes)
 	if legacyIndex >= 0 {
 		bytesSupported = bytesSupported[0:legacyIndex]
 	}
+
 	// convert back to io.Reader for the filter functions
 	newSupported := bytes.NewReader(bytesSupported)
 
 	// now find which version is supported
 	resultSupported, err := filterFirst(newSupported, `^(?:(.*) +.*supported, searched.*)`, false)
 	if err != nil {
-		log.Infof("Couldn't get hwcap: "+utils.ErrFormat, err)
-		return ""
+		log.Infof("No supported hwcap: "+utils.ErrFormat, err)
+		return "-"
 	}
 
 	return resultSupported

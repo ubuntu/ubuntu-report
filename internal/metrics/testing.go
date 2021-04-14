@@ -18,7 +18,6 @@ func NewTestMetrics(root string,
 		screenInfoCmd: cmdScreen,
 		spaceInfoCmd:  cmdPartition,
 		archCmd:       cmdArch,
-		libc6Cmd:      cmdLibc6,
 		hwCapCmd:      cmdHwCap,
 		getenv:        getenv,
 	}

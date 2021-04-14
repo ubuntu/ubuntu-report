@@ -249,21 +249,137 @@ tmpfs                   5120         4       5116   1% /run/lock`
 		}
 
 	case "dpkg":
-		if args[0] != "--print-architecture" {
+		if args[0] != "--print-architecture" && args[0] != "--status" {
 			fmt.Fprintf(os.Stderr, "Unexpected dpkg arguments: %v\n", args)
+			os.Exit(1)
+		}
+		switch args[0] {
+		case "--print-architecture":
+			switch args[1] {
+			case "regular":
+				fmt.Println("amd64")
+			case "empty":
+			case "fail":
+				fmt.Println("amd64") // still print content
+				os.Exit(1)
+			}
+		case "--status":
+			if args[1] != "libc6" {
+				fmt.Fprintf(os.Stderr, "Unexpected dpkg --status arguments: %v\n", args)
+				os.Exit(1)
+			}
+			regularOutput := `Package: libc6
+Status: install ok installed
+Priority: optional
+Section: libs
+Installed-Size: 13111
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+Architecture: amd64
+Multi-Arch: same
+Source: glibc
+Version: 2.33-0ubuntu5
+Replaces: libc6-amd64
+Depends: libgcc-s1, libcrypt1 (>= 1:4.4.10-10ubuntu4)
+Recommends: libidn2-0 (>= 2.0.5~), libnss-nis, libnss-nisplus
+Suggests: glibc-doc, debconf | debconf-2.0, locales
+Breaks: busybox (<< 1.30.1-6), fakeroot (<< 1.25.3-1.1ubuntu2~), hurd (<< 1:0.9.git20170910-1), ioquake3 (<< 1.36+u20200211.f2c61c1~dfsg-2~), iraf-fitsutil (<< 2018.07.06-4), libgegl-0.4-0 (<< 0.4.18), libtirpc1 (<< 0.2.3), locales (<< 2.33), locales-all (<< 2.33), macs (<< 2.2.7.1-3~), nocache (<< 1.1-1~), nscd (<< 2.33), openarena (<< 0.8.8+dfsg-4~), openssh-server (<< 1:8.2p1-4), r-cran-later (<< 0.7.5+dfsg-2), wcc (<< 0.0.2+dfsg-3)
+Conffiles:
+ /etc/ld.so.conf.d/x86_64-linux-gnu.conf d4e7a7b88a71b5ffd9e2644e71a0cfab
+Description: GNU C Library: Shared libraries
+ Contains the standard libraries that are used by nearly all programs on
+ the system. This package includes shared versions of the standard C library
+ and the standard math library, as well as many others.
+Homepage: https://www.gnu.org/software/libc/libc.html
+Original-Maintainer: GNU Libc Maintainers <debian-glibc@lists.debian.org>
+Original-Vcs-Browser: https://salsa.debian.org/glibc-team/glibc
+Original-Vcs-Git: https://salsa.debian.org/glibc-team/glibc.git`
+
+			switch args[2] {
+			case "regular", "no hwcap":
+				fmt.Println(regularOutput)
+
+			case "old version":
+				fmt.Println(`Package: libc6
+Status: install ok installed
+Priority: optional
+Section: libs
+Installed-Size: 13111
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+Architecture: amd64
+Multi-Arch: same
+Source: glibc
+Version: 2.32
+Replaces: libc6-amd64
+Depends: libgcc-s1, libcrypt1 (>= 1:4.4.10-10ubuntu4)
+Recommends: libidn2-0 (>= 2.0.5~), libnss-nis, libnss-nisplus
+Suggests: glibc-doc, debconf | debconf-2.0, locales
+Breaks: busybox (<< 1.30.1-6), fakeroot (<< 1.25.3-1.1ubuntu2~), hurd (<< 1:0.9.git20170910-1), ioquake3 (<< 1.36+u20200211.f2c61c1~dfsg-2~), iraf-fitsutil (<< 2018.07.06-4), libgegl-0.4-0 (<< 0.4.18), libtirpc1 (<< 0.2.3), locales (<< 2.33), locales-all (<< 2.33), macs (<< 2.2.7.1-3~), nocache (<< 1.1-1~), nscd (<< 2.33), openarena (<< 0.8.8+dfsg-4~), openssh-server (<< 1:8.2p1-4), r-cran-later (<< 0.7.5+dfsg-2), wcc (<< 0.0.2+dfsg-3)
+Conffiles:
+ /etc/ld.so.conf.d/x86_64-linux-gnu.conf d4e7a7b88a71b5ffd9e2644e71a0cfab
+Description: GNU C Library: Shared libraries
+ Contains the standard libraries that are used by nearly all programs on
+ the system. This package includes shared versions of the standard C library
+ and the standard math library, as well as many others.
+Homepage: https://www.gnu.org/software/libc/libc.html
+Original-Maintainer: GNU Libc Maintainers <debian-glibc@lists.debian.org>
+Original-Vcs-Browser: https://salsa.debian.org/glibc-team/glibc
+Original-Vcs-Git: https://salsa.debian.org/glibc-team/glibc.git`)
+
+			case "not installed":
+				fmt.Println(`dpkg-query: package 'libc6' is not installed and no information is available
+Use dpkg --info (= dpkg-deb --info) to examine archive files.`)
+			case "empty:":
+			case "fail":
+				// still print content
+				fmt.Println(regularOutput)
+				os.Exit(1)
+			}
+
+		}
+
+	case "/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2":
+		if args[0] != "--help" {
+			fmt.Fprintf(os.Stderr, "Unexpected ld arguments: %v\n", args)
 			os.Exit(1)
 		}
 		switch args[1] {
 		case "regular":
-			fmt.Println("amd64")
-		case "empty":
-		case "fail":
-			fmt.Println("amd64") // still print content
-			os.Exit(1)
-		}
+			fmt.Println(`Usage: /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 [OPTION]... EXECUTABLE-FILE [ARGS-FOR-PROGRAM...]
+You have invoked 'ld.so', the program interpreter for dynamically-linked
+ELF programs.  Usually, the program interpreter is invoked automatically
+when a dynamically-linked executable is started.
 
-	case "/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2":
-		regularOutput := `Shared library search path:
+You may invoke the program interpreter program directly from the command
+line to load and run an ELF executable file; this is like executing that
+file itself, but always uses the program interpreter you invoked,
+instead of the program interpreter specified in the executable file you
+run.  Invoking the program interpreter directly provides access to
+additional diagnostics, and changing the dynamic linker behavior without
+setting environment variables (which would be inherited by subprocesses).
+
+  --list                list all dependencies and how they are resolved
+  --verify              verify that given object really is a dynamically linked
+                        object we can handle
+  --inhibit-cache       Do not use /etc/ld.so.cache
+  --library-path PATH   use given PATH instead of content of the environment
+                        variable LD_LIBRARY_PATH
+  --glibc-hwcaps-prepend LIST
+                        search glibc-hwcaps subdirectories in LIST
+  --glibc-hwcaps-mask LIST
+                        only search built-in subdirectories if in LIST
+  --inhibit-rpath LIST  ignore RUNPATH and RPATH information in object names
+                        in LIST
+  --audit LIST          use objects named in LIST as auditors
+  --preload LIST        preload objects named in LIST
+  --argv0 STRING        set argv[0] to STRING before running
+  --list-tunables       list all tunables with minimum and maximum values
+  --list-diagnostics    list diagnostics information
+  --help                display this help and exit
+  --version             output version information and exit
+
+This program interpreter self-identifies as: /lib64/ld-linux-x86-64.so.2
+
+Shared library search path:
   (libraries located via /etc/ld.so.cache)
   /lib/x86_64-linux-gnu (system search path)
   /usr/lib/x86_64-linux-gnu (system search path)
@@ -279,58 +395,64 @@ Legacy HWCAP subdirectories under library search path directories:
   x86_64 (AT_PLATFORM; supported, searched)
   tls (supported, searched)
   avx512_1
-  x86_64 (supported, searched)`
-		if args[0] != "--help" {
-			fmt.Fprintf(os.Stderr, "Unexpected ld arguments: %v\n", args)
-			os.Exit(1)
-		}
-		switch args[1] {
-		case "regular":
-			fmt.Println(regularOutput)
+  x86_64 (supported, searched)`)
+
+		case "no hwcap":
+			fmt.Println(`Usage: /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 [OPTION]... EXECUTABLE-FILE [ARGS-FOR-PROGRAM...]
+You have invoked 'ld.so', the program interpreter for dynamically-linked
+ELF programs.  Usually, the program interpreter is invoked automatically
+when a dynamically-linked executable is started.
+
+You may invoke the program interpreter program directly from the command
+line to load and run an ELF executable file; this is like executing that
+file itself, but always uses the program interpreter you invoked,
+instead of the program interpreter specified in the executable file you
+run.  Invoking the program interpreter directly provides access to
+additional diagnostics, and changing the dynamic linker behavior without
+setting environment variables (which would be inherited by subprocesses).
+
+  --list                list all dependencies and how they are resolved
+  --verify              verify that given object really is a dynamically linked
+                        object we can handle
+  --inhibit-cache       Do not use /etc/ld.so.cache
+  --library-path PATH   use given PATH instead of content of the environment
+                        variable LD_LIBRARY_PATH
+  --glibc-hwcaps-prepend LIST
+                        search glibc-hwcaps subdirectories in LIST
+  --glibc-hwcaps-mask LIST
+                        only search built-in subdirectories if in LIST
+  --inhibit-rpath LIST  ignore RUNPATH and RPATH information in object names
+                        in LIST
+  --audit LIST          use objects named in LIST as auditors
+  --preload LIST        preload objects named in LIST
+  --argv0 STRING        set argv[0] to STRING before running
+  --list-tunables       list all tunables with minimum and maximum values
+  --list-diagnostics    list diagnostics information
+  --help                display this help and exit
+  --version             output version information and exit
+
+This program interpreter self-identifies as: /lib64/ld-linux-x86-64.so.2
+
+Shared library search path:
+  (libraries located via /etc/ld.so.cache)
+  /lib/x86_64-linux-gnu (system search path)
+  /usr/lib/x86_64-linux-gnu (system search path)
+  /lib (system search path)
+  /usr/lib (system search path)
+
+Subdirectories of glibc-hwcaps directories, in priority order:
+  x86-64-v4
+  x86-64-v3
+  x86-64-v2
+
+Legacy HWCAP subdirectories under library search path directories:
+  x86_64 (AT_PLATFORM; supported, searched)
+  tls (supported, searched)
+  avx512_1
+  x86_64 (supported, searched)`)
+
 		case "empty":
 		case "fail":
-			os.Exit(1)
-		}
-	case "apt-cache":
-		if args[0] != "policy" && args[1] != "libc6" {
-			fmt.Fprintf(os.Stderr, "Unexpected ld arguments: %v\n", args)
-			os.Exit(1)
-		}
-		switch args[2] {
-		case "regular":
-			fmt.Println(`libc6:
-  Installed: 2.33-0ubuntu4
-  Candidate: 2.33-0ubuntu4
-  Version table:
- *** 2.33-0ubuntu4 500
-        500 http://us.archive.ubuntu.com/ubuntu hirsute/main amd64 Packages
-        100 /var/lib/dpkg/status`)
-		case "old version":
-			fmt.Println(`libc6:
-  Installed: 2.32
-  Candidate: 2.33-0ubuntu4
-  Version table:
- *** 2.33-0ubuntu4 500
-        500 http://us.archive.ubuntu.com/ubuntu hirsute/main amd64 Packages
-        100 /var/lib/dpkg/status`)
-		case "not installed":
-			fmt.Println(`libc6:
-  Installed: (none)
-  Candidate: 2.33-0ubuntu4
-  Version table:
- *** 2.33-0ubuntu4 500
-        500 http://us.archive.ubuntu.com/ubuntu hirsute/main amd64 Packages
-        100 /var/lib/dpkg/status`)
-		case "empty:":
-		case "fail":
-			// still print content
-			fmt.Println(`libc6:
-  Installed: 2.33-0ubuntu4
-  Candidate: 2.33-0ubuntu4
-  Version table:
- *** 2.33-0ubuntu4 500
-        500 http://us.archive.ubuntu.com/ubuntu hirsute/main amd64 Packages
-        100 /var/lib/dpkg/status`)
 			os.Exit(1)
 		}
 	}

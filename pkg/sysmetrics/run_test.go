@@ -870,7 +870,7 @@ func newTestMetricsWithCommands(t *testing.T, root, caseGPU, caseCPU, caseScreen
 	cmdScreen, cancelScreen := newMockShortCmd(t, "xrandr", caseScreen)
 	cmdPartition, cancelPartition := newMockShortCmd(t, "df", casePartition)
 	cmdArchitecture, cancelArchitecture := newMockShortCmd(t, "dpkg", "--print-architecture", caseArch)
-	cmdLibc6, cancelLibc6 := newMockShortCmd(t, "apt-cache", "policy", "libc6", caseHwCap)
+	cmdLibc6, cancelLibc6 := newMockShortCmd(t, "dpkg", "--status", "libc6", caseHwCap)
 	cmdHwCap, cancelHwCap := newMockShortCmd(t, "/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2", "--help", caseHwCap)
 	return metrics.NewTestMetrics(root, cmdGPU, cmdCPU, cmdScreen, cmdPartition,
 			cmdArchitecture, cmdLibc6, cmdHwCap, helper.GetenvFromMap(env)),
