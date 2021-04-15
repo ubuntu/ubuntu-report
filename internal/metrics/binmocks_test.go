@@ -342,9 +342,7 @@ Use dpkg --info (= dpkg-deb --info) to examine archive files.`)
 			fmt.Fprintf(os.Stderr, "Unexpected ld arguments: %v\n", args)
 			os.Exit(1)
 		}
-		switch args[1] {
-		case "regular":
-			fmt.Println(`Usage: /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 [OPTION]... EXECUTABLE-FILE [ARGS-FOR-PROGRAM...]
+		regularOutput := `Usage: /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 [OPTION]... EXECUTABLE-FILE [ARGS-FOR-PROGRAM...]
 You have invoked 'ld.so', the program interpreter for dynamically-linked
 ELF programs.  Usually, the program interpreter is invoked automatically
 when a dynamically-linked executable is started.
@@ -395,8 +393,11 @@ Legacy HWCAP subdirectories under library search path directories:
   x86_64 (AT_PLATFORM; supported, searched)
   tls (supported, searched)
   avx512_1
-  x86_64 (supported, searched)`)
+  x86_64 (supported, searched)`
 
+		switch args[1] {
+		case "regular":
+			fmt.Println(regularOutput)
 		case "no hwcap":
 			fmt.Println(`Usage: /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 [OPTION]... EXECUTABLE-FILE [ARGS-FOR-PROGRAM...]
 You have invoked 'ld.so', the program interpreter for dynamically-linked
@@ -453,6 +454,7 @@ Legacy HWCAP subdirectories under library search path directories:
 
 		case "empty":
 		case "fail":
+			fmt.Println(regularOutput)
 			os.Exit(1)
 		}
 	}
