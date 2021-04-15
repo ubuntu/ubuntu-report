@@ -61,6 +61,24 @@ func WithArchitectureCommand(cmd *exec.Cmd) func(*Metrics) error {
 	}
 }
 
+// WithLibc6Command tweaks the version of libc6 that is reported
+func WithLibc6Command(cmd *exec.Cmd) func(*Metrics) error {
+	log.Debugf("Setting libc6 command to '%s'", cmd.Args)
+	return func(m *Metrics) error {
+		m.libc6Cmd = cmd
+		return nil
+	}
+}
+
+// WithHwCapCommand tweaks the path to ld-linux
+func WithHwCapCommand(cmd *exec.Cmd) func(*Metrics) error {
+	log.Debugf("Setting hwcap command to '%s'", cmd.Args)
+	return func(m *Metrics) error {
+		m.hwCapCmd = cmd
+		return nil
+	}
+}
+
 // WithMapForEnv replace system getenv with given environ hashmap
 func WithMapForEnv(env map[string]string) func(*Metrics) error {
 	log.Debugf("Setting new environment to '%v'", env)

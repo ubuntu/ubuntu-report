@@ -1,3 +1,15 @@
+ubuntu-report (1.6.4) UNRELEASED; urgency=medium
+
+  * Add new metric for glibc hwcaps (LP: #1922712)
+
+ -- William 'jawn-smith' Wilson <william.wilson@canonical.com>  Wed, 07 Apr 2021 16:52:26 -0500
+
+ubuntu-report (1.6.3) hirsute; urgency=medium
+
+  * Don't build with lto for now.
+
+ -- Matthias Klose <doko@ubuntu.com>  Sat, 03 Apr 2021 11:18:04 +0200
+
 ubuntu-report (1.6.2) hirsute; urgency=medium
 
   * Fix tests failing due to invalid casting
