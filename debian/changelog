@@ -1,4 +1,4 @@
-ubuntu-report (1.6.4) UNRELEASED; urgency=medium
+ubuntu-report (1.6.4) hirsute; urgency=medium
 
   * Add new metric for glibc hwcaps (LP: #1922712)
 
