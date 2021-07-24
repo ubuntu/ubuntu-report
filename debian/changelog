@@ -1,3 +1,10 @@
+ubuntu-report (1.6.5) UNRELEASED; urgency=medium
+
+  * Fix building on RISC-V (LP: #1943146)
+    - Bump github.com/sirupsen/logrus to v1.8.2-0.20210422133436-b50299cfaaa1
+
+ -- Heinrich Schuchardt <heinrich.schuchardt@canonical.com>  Sat, 24 Jul 2021 03:26:18 +0200
+
 ubuntu-report (1.6.4) hirsute; urgency=medium
 
   * Add new metric for glibc hwcaps (LP: #1922712)
