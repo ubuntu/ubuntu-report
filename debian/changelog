@@ -1,4 +1,4 @@
-ubuntu-report (1.6.5) UNRELEASED; urgency=medium
+ubuntu-report (1.6.5) impish; urgency=medium
 
   * Fix building on RISC-V (LP: #1943146)
     - Bump github.com/sirupsen/logrus to v1.8.2-0.20210422133436-b50299cfaaa1
