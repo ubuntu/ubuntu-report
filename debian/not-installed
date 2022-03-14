@@ -3,3 +3,5 @@
 usr/share/gocode/src/github.com/ubuntu/ubuntu-report/vendor
 # don't install command line code, we only ship the library and internals
 usr/share/gocode/src/github.com/ubuntu/ubuntu-report/cmd
+# don’t install bindings as there is no real consumer
+usr/share/gocode/src/github.com/ubuntu/ubuntu-report/pkg/

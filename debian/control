@@ -51,24 +51,3 @@ Description: Report hardware and other collected metrics - shared lib
  This package contains development files for applications using
  the sysmetrics collection and report functionality.
 
-Package: golang-github-ubuntu-ubuntu-report-dev
-Architecture: all
-Depends: ${misc:Depends},
-         golang-go (>= 2:1.10~),
-         golang-github-cpuguy83-go-md2man-dev,
-         golang-github-inconshreveable-mousetrap-dev,
-         golang-github-pkg-errors-dev,
-         golang-github-russross-blackfriday-dev,
-         golang-github-sirupsen-logrus-dev,
-         golang-github-spf13-cobra-dev,
-         golang-github-spf13-pflag-dev,
-         golang-golang-x-crypto-dev,
-         golang-golang-x-sys-dev,
-         golang-gopkg-yaml.v2-dev,
-Description: Report hardware and other collected metrics - source
- The tool will show you what is going to be reported and ask for your
- acknowledgement before uploading it. This information can't be used to
- identify a single machine and is presented before being sent to the server.
- .
- This package provides Golang sources and API to use sysmetrics collection
- and report functionality.
