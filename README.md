@@ -1,9 +1,10 @@
 # Ubuntu Report
+
 Report hardware and other collected metrics like installer or upgrade information.
 
 This information can't be used to identify a single machine and is presented before being sent to the server.
 
-[![Build & Tests Status](https://travis-ci.org/ubuntu/ubuntu-report.svg?branch=master)](https://travis-ci.org/ubuntu/ubuntu-report)
+[![Build & Tests Status](https://api.travis-ci.com/ubuntu/ubuntu-report.svg?branch=master)](https://travis-ci.com/ubuntu/ubuntu-report)
 [![codecov](https://codecov.io/gh/ubuntu/ubuntu-report/branch/master/graph/badge.svg)](https://codecov.io/gh/ubuntu/ubuntu-report)
 [![Go Report Card](https://goreportcard.com/badge/github.com/ubuntu/ubuntu-report)](https://goreportcard.com/report/github.com/ubuntu/ubuntu-report)
 
@@ -47,10 +48,10 @@ ubuntu-report [flags]
 #### Options
 
 ```
-  -f, --force           collect and send new report even if already reported
-  -h, --help            help for ubuntu-report
-  -u, --url string      server url to send report to. Leave empty for default. (default "https://metrics.ubuntu.com")
-  -v, --verbose count   issue INFO (-v) and DEBUG (-vv) output
+-f, --force           collect and send new report even if already reported
+-h, --help            help for ubuntu-report
+-u, --url string      server url to send report to. Leave empty for default. (default "https://metrics.ubuntu.com")
+-v, --verbose count   issue INFO (-v) and DEBUG (-vv) output
 ```
 
 ### ubuntu-report interactive
@@ -72,15 +73,15 @@ ubuntu-report send yes|no [flags]
 #### Options
 
 ```
-  -h, --help         help for send
-  -u, --url string   server url to send report to. Leave empty for default. (default "https://metrics.ubuntu.com")
+-h, --help         help for send
+-u, --url string   server url to send report to. Leave empty for default. (default "https://metrics.ubuntu.com")
 ```
 
 #### Options inherited from parent commands
 
 ```
-  -f, --force           collect and send new report even if already reported
-  -v, --verbose count   issue INFO (-v) and DEBUG (-vv) output
+-f, --force           collect and send new report even if already reported
+-v, --verbose count   issue INFO (-v) and DEBUG (-vv) output
 ```
 
 ### ubuntu-report service
@@ -98,15 +99,15 @@ ubuntu-report service [flags]
 #### Options
 
 ```
-  -h, --help         help for service
-  -u, --url string   server url to send report to. Leave empty for default. (default "https://metrics.ubuntu.com")
+-h, --help         help for service
+-u, --url string   server url to send report to. Leave empty for default. (default "https://metrics.ubuntu.com")
 ```
 
 #### Options inherited from parent commands
 
 ```
-  -f, --force           collect and send new report even if already reported
-  -v, --verbose count   issue INFO (-v) and DEBUG (-vv) output
+-f, --force           collect and send new report even if already reported
+-v, --verbose count   issue INFO (-v) and DEBUG (-vv) output
 ```
 
 ### ubuntu-report show
@@ -124,14 +125,14 @@ ubuntu-report show [flags]
 #### Options
 
 ```
-  -h, --help   help for show
+-h, --help   help for show
 ```
 
 #### Options inherited from parent commands
 
 ```
-  -f, --force           collect and send new report even if already reported
-  -v, --verbose count   issue INFO (-v) and DEBUG (-vv) output
+-f, --force           collect and send new report even if already reported
+-v, --verbose count   issue INFO (-v) and DEBUG (-vv) output
 ```
 
 ## Service
