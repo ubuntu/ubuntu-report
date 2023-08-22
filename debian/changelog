@@ -1,3 +1,11 @@
+ubuntu-report (1.7.2) mantic; urgency=medium
+
+  * Fix FTBFS with golang-1.21. (LP: #2032594)
+    Missing x_crosscall2_ptr symbols in libsysmetrics1.
+  * Add missing tzdata to Build Depends
+
+ -- Shengjing Zhu <shengjing.zhu@canonical.com>  Tue, 22 Aug 2023 15:15:56 +0800
+
 ubuntu-report (1.7.1) jammy; urgency=medium
 
   * Fix builder golang version which tried to ship internal/ alongside
