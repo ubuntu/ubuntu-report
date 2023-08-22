@@ -5,6 +5,7 @@ Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
 Build-Depends: debhelper (>= 11),
                dh-golang (>= 1.17~),
                golang-go (>= 2:1.10~),
+               tzdata,
 Standards-Version: 4.1.2
 XS-Go-Import-Path: github.com/ubuntu/ubuntu-report
 Homepage: https://github.com/ubuntu/ubuntu-report
