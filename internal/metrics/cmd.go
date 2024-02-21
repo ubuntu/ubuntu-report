@@ -95,7 +95,7 @@ func (m Metrics) getScreens() []screenInfo {
 
 	var lastSize string
 	for _, screeninfo := range results {
-		if strings.Index(screeninfo, "mm") > -1 {
+		if strings.Contains(screeninfo, "mm") {
 			lastSize = strings.Replace(screeninfo, " ", "", -1)
 			continue
 		}
