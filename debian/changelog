@@ -1,3 +1,10 @@
+ubuntu-report (1.7.3) noble; urgency=medium
+
+  * Use regex to capature all crosscall symbols in libsysmetrics1. (LP: #2055528)
+    These are internal symbols from cgo. Fix FTBFS with golang-1.22.
+
+ -- Shengjing Zhu <shengjing.zhu@canonical.com>  Fri, 01 Mar 2024 15:47:58 +0800
+
 ubuntu-report (1.7.2) mantic; urgency=medium
 
   * Fix FTBFS with golang-1.21. (LP: #2032594)
