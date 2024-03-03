@@ -106,7 +106,7 @@ func setCommand(cmds ...string) *exec.Cmd {
 // Collect system, installer and update info, returning a json formatted byte
 func (m Metrics) Collect() ([]byte, error) {
 	log.Debugf("Collecting metrics on system with root set to %s", m.root)
-	r := metrics{}
+	r := MetricsData{}
 
 	r.Version = m.getVersion()
 

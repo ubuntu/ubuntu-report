@@ -2,7 +2,7 @@ package metrics
 
 import "encoding/json"
 
-type metrics struct {
+type MetricsData struct {
 	Version string `json:",omitempty"`
 
 	OEM *struct {
