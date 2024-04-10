@@ -721,7 +721,14 @@ func TestInteractiveMetricsCollectAndSend(t *testing.T) {
 			if err != nil {
 				t.Fatal("couldn't read generated report file", err)
 			}
-			want := helper.LoadOrUpdateGolden(t, filepath.Join("testdata/good", "gold", fmt.Sprintf("cachereport-twice.ReportType%d-%s", int(ReportInteractive), strings.Replace(tc.name, " ", "-", -1))), got, *Update)
+            
+            // To avoid case-insensitive file name collisions, append command case to golden file name.
+            cmdCase := "lc"
+            if 'A' <= tc.name[0] && tc.name[0] <= 'Z' {
+                cmdCase = "uc"
+            }
+
+			want := helper.LoadOrUpdateGolden(t, filepath.Join("testdata/good", "gold", fmt.Sprintf("cachereport-twice.ReportType%d-%s-%s", int(ReportInteractive), strings.Replace(tc.name, " ", "-", -1), cmdCase)), got, *Update)
 			a.Equal(got, want)
 		})
 	}
