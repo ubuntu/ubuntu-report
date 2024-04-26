@@ -4,6 +4,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get upgrade -y && rm -r
 
 WORKDIR /app
 COPY build/ubuntu-reportd /app/ubuntu-reportd
+RUN mkdir -p /mnt/data
 
 EXPOSE 8080
-ENTRYPOINT ["/app/ubuntu-reportd"]
+ENTRYPOINT ["/app/ubuntu-reportd", "-c", "/app/config.yaml"]
