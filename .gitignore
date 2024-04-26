@@ -21,3 +21,7 @@ stage/
 prime/
 snap/.snapcraft/state
 *.snap
+
+# Ide artefacts
+.vscode
+.idea
