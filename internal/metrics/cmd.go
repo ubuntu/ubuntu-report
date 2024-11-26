@@ -35,50 +35,63 @@ func (m Metrics) getGPU() []gpuInfo {
 	return gpus
 }
 
+// populateCpuInfo is a helper recursive function for getCPU to populate the cpuInfo struct.
+func populateCpuInfo(entries []LscpuEntry, c *cpuInfo) cpuInfo {
+	for _, entry := range entries {
+		switch entry.Field {
+		case "CPU op-mode(s):":
+			c.OpMode = entry.Data
+		case "CPU(s):":
+			c.CPUs = entry.Data
+		case "Thread(s) per core:":
+			c.Threads = entry.Data
+		case "Core(s) per socket:":
+			c.Cores = entry.Data
+		case "Socket(s):":
+			c.Sockets = entry.Data
+		case "Vendor ID:":
+			c.Vendor = entry.Data
+		case "CPU family:":
+			c.Family = entry.Data
+		case "Model:":
+			c.Model = entry.Data
+		case "Stepping:":
+			c.Stepping = entry.Data
+		case "Model name:":
+			c.Name = entry.Data
+		case "Virtualization:":
+			c.Virtualization = entry.Data
+		case "Hypervisor vendor:":
+			c.Hypervisor = entry.Data
+		case "Virtualization type:":
+			c.VirtualizationType = entry.Data
+		}
+		if len(entry.Children) > 0 {
+			populateCpuInfo(entry.Children, c)
+		}
+	}
+
+	return *c
+}
+
 func (m Metrics) getCPU() cpuInfo {
 	c := cpuInfo{}
 
 	r := runCmd(m.cpuInfoCmd)
 
-	for result := range filter(r, `{"field": *"(.*)", *"data": *"(.*)"},`, true) {
-		if result.err != nil {
-			log.Infof("Couldn't get CPU info: "+utils.ErrFormat, result.err)
-			return cpuInfo{}
-		}
+	result, err := parseJSON(r, &Lscpu{})
 
-		key, v := result.r[0], result.r[1]
-
-		switch strings.TrimSpace(key) {
-		case "CPU op-mode(s):":
-			c.OpMode = v
-		case "CPU(s):":
-			c.CPUs = v
-		case "Thread(s) per core:":
-			c.Threads = v
-		case "Core(s) per socket:":
-			c.Cores = v
-		case "Socket(s):":
-			c.Sockets = v
-		case "Vendor ID:":
-			c.Vendor = v
-		case "CPU family:":
-			c.Family = v
-		case "Model:":
-			c.Model = v
-		case "Stepping:":
-			c.Stepping = v
-		case "Model name:":
-			c.Name = v
-		case "Virtualization:":
-			c.Virtualization = v
-		case "Hypervisor vendor:":
-			c.Hypervisor = v
-		case "Virtualization type:":
-			c.VirtualizationType = v
-		}
+	if err != nil {
+		log.Infof("Couldn't get CPU info: "+utils.ErrFormat, err)
+		return cpuInfo{}
 	}
 
-	return c
+	lscpu, ok := result.(*Lscpu)
+	if !ok {
+		log.Infof("Couldn't get CPU info, could not convert to a valid Lscpu struct: %v", result)
+	}
+
+	return populateCpuInfo(lscpu.Lscpu, &c)
 }
 
 func (m Metrics) getScreens() []screenInfo {
