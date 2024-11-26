@@ -47,7 +47,10 @@ func (m Metrics) getCPU() cpuInfo {
 		return cpuInfo{}
 	}
 
-	lscpu := result.(*Lscpu)
+	lscpu, ok := result.(*Lscpu)
+	if !ok {
+		log.Infof("Couldn't get CPU info, could not convert to a valid Lscpu struct: %v", result)
+	}
 
 	// helper recursive function to populate the cpuInfo struct
 	var populateCpuInfo func(entries []LscpuEntry, c *cpuInfo) cpuInfo
