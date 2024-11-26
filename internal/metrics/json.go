@@ -17,16 +17,16 @@ type Lscpu struct {
 	Lscpu []LscpuEntry `json:"lscpu"`
 }
 
-func parseJSON(r io.Reader, structPtr interface{}) (interface{}, error) {
+func parseJSON(r io.Reader, v interface{}) (interface{}, error) {
 	// Read the entire content of the io.Reader first to check for errors even if valid json is first
 	buf, err := io.ReadAll(r)
 	if err != nil {
 		return nil, errors.Errorf("error reading from io.Reader: %v", err)
 	}
 
-	err = json.Unmarshal(buf, structPtr)
+	err = json.Unmarshal(buf, v)
 	if err != nil {
 		return nil, errors.Errorf("couldn't parse JSON: %v", err)
 	}
-	return structPtr, nil
+	return v, nil
 }
