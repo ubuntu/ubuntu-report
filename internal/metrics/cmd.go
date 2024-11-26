@@ -35,6 +35,45 @@ func (m Metrics) getGPU() []gpuInfo {
 	return gpus
 }
 
+// helper recursive function for getCPU to populate the cpuInfo struct
+func populateCpuInfo(entries []LscpuEntry, c *cpuInfo) cpuInfo {
+	for _, entry := range entries {
+		switch entry.Field {
+		case "CPU op-mode(s):":
+			c.OpMode = entry.Data
+		case "CPU(s):":
+			c.CPUs = entry.Data
+		case "Thread(s) per core:":
+			c.Threads = entry.Data
+		case "Core(s) per socket:":
+			c.Cores = entry.Data
+		case "Socket(s):":
+			c.Sockets = entry.Data
+		case "Vendor ID:":
+			c.Vendor = entry.Data
+		case "CPU family:":
+			c.Family = entry.Data
+		case "Model:":
+			c.Model = entry.Data
+		case "Stepping:":
+			c.Stepping = entry.Data
+		case "Model name:":
+			c.Name = entry.Data
+		case "Virtualization:":
+			c.Virtualization = entry.Data
+		case "Hypervisor vendor:":
+			c.Hypervisor = entry.Data
+		case "Virtualization type:":
+			c.VirtualizationType = entry.Data
+		}
+		if len(entry.Children) > 0 {
+			populateCpuInfo(entry.Children, c)
+		}
+	}
+
+	return *c
+}
+
 func (m Metrics) getCPU() cpuInfo {
 	c := cpuInfo{}
 
@@ -50,46 +89,6 @@ func (m Metrics) getCPU() cpuInfo {
 	lscpu, ok := result.(*Lscpu)
 	if !ok {
 		log.Infof("Couldn't get CPU info, could not convert to a valid Lscpu struct: %v", result)
-	}
-
-	// helper recursive function to populate the cpuInfo struct
-	var populateCpuInfo func(entries []LscpuEntry, c *cpuInfo) cpuInfo
-	populateCpuInfo = func(entries []LscpuEntry, c *cpuInfo) cpuInfo {
-		for _, entry := range entries {
-			switch entry.Field {
-			case "CPU op-mode(s):":
-				c.OpMode = entry.Data
-			case "CPU(s):":
-				c.CPUs = entry.Data
-			case "Thread(s) per core:":
-				c.Threads = entry.Data
-			case "Core(s) per socket:":
-				c.Cores = entry.Data
-			case "Socket(s):":
-				c.Sockets = entry.Data
-			case "Vendor ID:":
-				c.Vendor = entry.Data
-			case "CPU family:":
-				c.Family = entry.Data
-			case "Model:":
-				c.Model = entry.Data
-			case "Stepping:":
-				c.Stepping = entry.Data
-			case "Model name:":
-				c.Name = entry.Data
-			case "Virtualization:":
-				c.Virtualization = entry.Data
-			case "Hypervisor vendor:":
-				c.Hypervisor = entry.Data
-			case "Virtualization type:":
-				c.VirtualizationType = entry.Data
-			}
-			if len(entry.Children) > 0 {
-				populateCpuInfo(entry.Children, c)
-			}
-		}
-
-		return *c
 	}
 
 	return populateCpuInfo(lscpu.Lscpu, &c)
