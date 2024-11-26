@@ -17,7 +17,7 @@ type Lscpu struct {
 	Lscpu []LscpuEntry `json:"lscpu"`
 }
 
-func parseJSON(r io.Reader, v interface{}) (interface{}, error) {
+func parseJSON(r io.Reader, v any) (any, error) {
 	// Read the entire content of the io.Reader first to check for errors even if valid json is first
 	buf, err := io.ReadAll(r)
 	if err != nil {
