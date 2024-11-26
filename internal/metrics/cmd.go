@@ -35,7 +35,7 @@ func (m Metrics) getGPU() []gpuInfo {
 	return gpus
 }
 
-// helper recursive function for getCPU to populate the cpuInfo struct
+// populateCpuInfo is a helper recursive function for getCPU to populate the cpuInfo struct.
 func populateCpuInfo(entries []LscpuEntry, c *cpuInfo) cpuInfo {
 	for _, entry := range entries {
 		switch entry.Field {
