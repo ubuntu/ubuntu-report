@@ -146,9 +146,9 @@ func TestGetTimeZone(t *testing.T) {
 		want string
 	}{
 		{"regular", "testdata/good", "Europe/Paris"},
-		{"empty file", "testdata/empty", ""},
 		{"doesn't exist", "testdata/none", ""},
-		{"garbage content", "testdata/garbage", ""},
+		{"bad symlink", "testdata/empty", ""},
+		{"not a symlink", "testdata/garbage", ""},
 	}
 	for _, tc := range testCases {
 		tc := tc // capture range variable for parallel execution

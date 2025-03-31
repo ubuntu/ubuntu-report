@@ -38,16 +38,17 @@ func (m Metrics) getRAM() *float64 {
 }
 
 func (m Metrics) getTimeZone() string {
-	v, err := getFromFileTrimmed(filepath.Join(m.root, "etc/timezone"))
+	path, err := os.Readlink(filepath.Join(m.root, "etc/localtime"))
 	if err != nil {
 		log.Infof("couldn't get timezone information: "+utils.ErrFormat, err)
 		return ""
 	}
-	if strings.Contains(v, "\n") {
-		log.Infof(utils.ErrFormat, errors.Errorf("malformed timezone information, file contains: %s", v))
+	tzParts := strings.Split(path, string(os.PathSeparator))
+	if len(tzParts) < 2 {
+		log.Infof(utils.ErrFormat, errors.Errorf("malformed timezone information, localtime points to: %s", path))
 		return ""
 	}
-	return v
+	return strings.Join(tzParts[len(tzParts)-2:], "/")
 }
 
 func (m Metrics) getAutologin() bool {
