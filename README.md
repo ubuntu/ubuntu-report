@@ -1,6 +1,8 @@
 # Ubuntu Report
 Report hardware and other collected metrics like installer or upgrade information.
 
+Check [Ubuntu Insights](https://github.com/ubuntu/ubuntu-insights) as the new telemetry tool for ubuntu.
+
 This information can't be used to identify a single machine and is presented before being sent to the server.
 
 [![Build & Tests Status](https://travis-ci.org/ubuntu/ubuntu-report.svg?branch=master)](https://travis-ci.org/ubuntu/ubuntu-report)
