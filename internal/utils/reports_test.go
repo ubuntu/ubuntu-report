@@ -35,7 +35,7 @@ func TestReportPath(t *testing.T) {
 		{"no distro name", "/some/dir", "", "", "versionnumber", "", "/some/dir/.cache/ubuntu-report/.versionnumber", false},
 		{"no version name", "/some/dir", "", "distroname", "", "", "/some/dir/.cache/ubuntu-report/distroname.", false},
 		{"explicit cache dir", "", "", "distroname", "versionnumber", "/explicit/cachedir", "/explicit/cachedir/ubuntu-report/distroname.versionnumber", false},
-		{"explicit cache dir takes predecedence", "/some/dir", "/xdg_cache_path", "distroname", "versionnumber", "/explicit/cachedir", "/explicit/cachedir/ubuntu-report/distroname.versionnumber", false},
+		{"explicit cache dir takes precedence", "/some/dir", "/xdg_cache_path", "distroname", "versionnumber", "/explicit/cachedir", "/explicit/cachedir/ubuntu-report/distroname.versionnumber", false},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -73,7 +73,7 @@ func TestPendingReportPath(t *testing.T) {
 		{"absolute xdg path", "/some/dir", "/xdg_cache_path", "", "/xdg_cache_path/ubuntu-report/pending", false},
 		{"no home dir", "", "", "", u.HomeDir + "/.cache/ubuntu-report/pending", false},
 		{"explicit cache dir", "", "", "/explicit/cachedir", "/explicit/cachedir/ubuntu-report/pending", false},
-		{"explicit cache dir takes predecedence", "/some/dir", "/xdg_cache_path", "/explicit/cachedir", "/explicit/cachedir/ubuntu-report/pending", false},
+		{"explicit cache dir takes precedence", "/some/dir", "/xdg_cache_path", "/explicit/cachedir", "/explicit/cachedir/ubuntu-report/pending", false},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {

@@ -161,7 +161,7 @@ func (m Metrics) getDisks() []float64 {
 			continue
 		}
 
-		// convert in Gib in .1 precision
+		// convert in GB in .1 precision
 		size := float64(s) * float64(bs) / (1000 * 1000 * 1000)
 		size = math.Round(size*10) / 10
 

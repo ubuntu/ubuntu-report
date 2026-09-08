@@ -114,7 +114,7 @@ func (m Metrics) getScreens() []screenInfo {
 		}
 		i := strings.Fields(screeninfo)
 		if len(i) < 2 {
-			log.Infof("screen info should be either a screen physical size (connected) or a a resolution + freq, got: %s", screeninfo)
+			log.Infof("screen info should be either a screen physical size (connected) or a resolution + freq, got: %s", screeninfo)
 			continue
 		}
 		if lastSize == "" {
