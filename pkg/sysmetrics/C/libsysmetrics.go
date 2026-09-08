@@ -3,7 +3,7 @@ package main
 /*
 // sysmetrics_report_type define the desired kind of interaction in sysmetrics_collect_and_send()
 typedef enum {
-    // sysmetrics_report_interactive will show report content on stdout and read anwser on stdin
+    // sysmetrics_report_interactive will show report content on stdout and read answer on stdin
     sysmetrics_report_interactive = 0,
     // sysmetrics_report_auto will send a report without printing report
     sysmetrics_report_auto = 1,
@@ -60,7 +60,7 @@ func sysmetrics_send_decline(alwaysReport bool, baseURL *C.char) *C.char {
 
 // sysmetrics_collect_and_send gather system info and send them
 // The report will not be sent if a report has already been sent for this version unless "alwaysReport" is true.
-// It can be send to an alternative url via baseURL to send the report to, if not empty
+// It can be sent to an alternative url via baseURL to send the report to, if not empty
 // The return "err" will be != NULL in case any error occurred during POST.
 //export sysmetrics_collect_and_send
 func sysmetrics_collect_and_send(r C.sysmetrics_report_type, alwaysReport bool, baseURL *C.char) *C.char {

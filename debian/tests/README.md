@@ -1,6 +1,6 @@
 ## Autopkgtest
 
-In order to run the autopkgtest suite localy you need first to generate an image:
+In order to run the autopkgtest suite locally you need first to generate an image:
 
     $ autopkgtest-buildvm-ubuntu-cloud -a amd64 -r bionic -v
 

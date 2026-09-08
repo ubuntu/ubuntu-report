@@ -82,7 +82,7 @@ func TestSendInfiniteRequestServer(t *testing.T) {
 	t.Parallel()
 	a := helper.Asserter{T: t}
 
-	// not exactly an inifite request, but a long one
+	// not exactly an infinite request, but a long one
 	closehandler := make(chan struct{})
 	handlerclosed := make(chan struct{})
 	timeout := false

@@ -90,7 +90,7 @@
 //
 // sysmetrics_report_type is the following enum:
 //    typedef enum {
-//      // sysmetrics_report_interactive will show report content on stdout and read anwser on stdin
+//      // sysmetrics_report_interactive will show report content on stdout and read answer on stdin
 //      sysmetrics_report_interactive = 0,
 //      // sysmetrics_report_auto will send a report without printing report
 //      sysmetrics_report_auto = 1,

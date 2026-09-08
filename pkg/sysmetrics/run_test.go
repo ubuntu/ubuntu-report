@@ -79,7 +79,7 @@ func TestMetricsCollect(t *testing.T) {
 			a.CheckWantedErr(err1, tc.wantErr)
 			a.Equal(b1, want)
 
-			// second run should return the same thing (idemnpotence)
+			// second run should return the same thing (idempotence)
 			m, cancelGPU, cancelCPU, cancelScreen, cancelPartition,
 				cancelArchitecture, cancelLibc6, cancelHwCap = newTestMetricsWithCommands(t,
 				tc.root, tc.caseGPU, tc.caseCPU, tc.caseScreen, tc.casePartition,

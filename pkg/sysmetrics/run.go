@@ -66,7 +66,7 @@ func metricsSend(m metrics.Metrics, data []byte, acknowledgement, alwaysReport b
 			return errors.Wrapf(err, "couldn't get where pending reported metrics should be stored on disk: %v", returnErr)
 		}
 		if err := saveMetrics(p, data); err != nil {
-			return errors.Wrapf(err, "couldn't save pending reported are on disk: %v", returnErr)
+			return errors.Wrapf(err, "couldn't save pending reported data on disk: %v", returnErr)
 		}
 		return returnErr
 	}
@@ -93,7 +93,7 @@ func metricsCollectAndSend(m metrics.Metrics, r ReportType, alwaysReport bool, b
 
 	sendMetrics := true
 	if r == ReportInteractive {
-		fmt.Fprintln(out, "This is the result of hardware and optional installer/upgrader that we collected:")
+		fmt.Fprintln(out, "This is the result of hardware and optional installer/upgrader data that we collected:")
 		fmt.Fprintln(out, string(data))
 
 		validAnswer := false
@@ -101,7 +101,7 @@ func metricsCollectAndSend(m metrics.Metrics, r ReportType, alwaysReport bool, b
 		for validAnswer != true {
 			fmt.Fprintf(out, "Do you agree to report this? [y (send metrics)/n (send opt out message)/Q (quit)] ")
 			if !scanner.Scan() {
-				log.Info("programm interrupted")
+				log.Info("program interrupted")
 				return nil
 			}
 			text := strings.ToLower(strings.TrimSpace(scanner.Text()))
@@ -224,7 +224,7 @@ func metricsSendPendingReport(m metrics.Metrics, baseURL, reportBasePath string,
 
 	pending, err := utils.PendingReportPath(reportBasePath)
 	if err != nil {
-		return errors.Wrapf(err, "couldn't get where to previous reported metrics are on disk")
+		return errors.Wrapf(err, "couldn't get where previous reported metrics are on disk")
 	}
 	data, err := ioutil.ReadFile(pending)
 	if err != nil {

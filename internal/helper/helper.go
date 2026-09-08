@@ -24,7 +24,7 @@ type Asserter struct {
 	*testing.T
 }
 
-// Equal checks that the 2 values are equals
+// Equal checks that the 2 values are equal
 // slices and arrays can be of different orders
 func (m Asserter) Equal(got, want interface{}) {
 	m.Helper()
@@ -36,8 +36,8 @@ func (m Asserter) Equal(got, want interface{}) {
 		a, gotIsBytes := got.([]byte)
 		b, wantIsBytes := want.([]byte)
 		if gotIsBytes && wantIsBytes {
-			// convert them to string for easier comparaison once
-			// they don'tmatch
+			// convert them to string for easier comparison once
+			// they don't match
 			if same = reflect.DeepEqual(a, b); !same {
 				m.Errorf("got: %s (converted from []byte), wants %s (converted from []byte)", string(a), string(b))
 			}
@@ -227,7 +227,7 @@ func CaptureStdout(t *testing.T) (io.Reader, func()) {
 	}
 }
 
-// CaptureStdin returns an i.Writer to write, as stdin, and teardown
+// CaptureStdin returns an io.Writer to write, as stdin, and teardown
 func CaptureStdin(t *testing.T) (io.WriteCloser, func()) {
 	t.Helper()
 	stdin, stdinW, err := os.Pipe()
@@ -258,7 +258,7 @@ func CaptureLogs(t *testing.T) (io.Reader, func()) {
 	}
 }
 
-// RunFunctionWithTimeout run in a go routing the fn functionL
+// RunFunctionWithTimeout runs in a goroutine the fn function
 // There is a timeout as a maximum limit for the function, to run
 // The returned channel of errors is closed once the command ends
 // or if timeout is reached

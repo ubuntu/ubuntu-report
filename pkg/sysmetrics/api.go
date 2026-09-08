@@ -14,7 +14,7 @@ import (
 type ReportType int
 
 const (
-	// ReportInteractive will show report content on stdout and read anwser on stdin
+	// ReportInteractive will show report content on stdout and read answer on stdin
 	ReportInteractive ReportType = iota
 	// ReportAuto will send a report without printing report
 	ReportAuto
