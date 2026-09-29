@@ -5,4 +5,5 @@ libsysmetrics.so.1 libsysmetrics1 #MINVER#
  sysmetrics_send_report@Base 1.0.5
  fatalf@Base 1.0.0
  (regex|optional).*crosscall.* 1.0.0
+ (regex|optional)"threadentry" 1.0.0
  (regex|optional)"_cgo.*" 1.0.0

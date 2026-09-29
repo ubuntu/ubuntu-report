@@ -1,3 +1,13 @@
+ubuntu-report (1.7.5) UNRELEASED; urgency=medium
+
+  * Fix FTBFS with golang-1.27: c-shared builds now export threadentry
+    (and x_cgo_threadentry_platform) instead of go1.26's
+    _cgo_set_stacklo (golang/go#80632), so dpkg-gensymbols reported 'new
+    symbols appeared'. Add threadentry as an optional symbol in
+    libsysmetrics1. (LP: #2164597)
+
+ -- Anshul Singh <anshul.singh@canonical.com>  Tue, 29 Sep 2026 14:02:00 +0530
+
 ubuntu-report (1.7.3) noble; urgency=medium
 
   * Use regex to capature all crosscall symbols in libsysmetrics1. (LP: #2055528)
